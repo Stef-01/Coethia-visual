@@ -162,6 +162,14 @@ h1{
 .portrait-row{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:48px}
 .portrait-row svg{transition:transform .18s cubic-bezier(.16,1,.3,1)}
 .portrait-row svg:hover{transform:translateY(-4px) scale(1.05)}
+/* the five personas breathe at their own tempo -- alive, not restless */
+.portrait-row .pwrap{display:inline-block}
+@media (prefers-reduced-motion: no-preference){
+  .portrait-row .pwrap{animation:pbob 5.4s ease-in-out infinite}
+  .portrait-row .pwrap:nth-child(2n){animation-duration:6.2s;animation-delay:-1.7s}
+  .portrait-row .pwrap:nth-child(3n){animation-duration:5.8s;animation-delay:-3.1s}
+}
+@keyframes pbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 .hero p{max-width:640px;margin:0 auto 22px}
 .qgrid{display:flex;justify-content:center;gap:56px;flex-wrap:wrap;margin:56px 0 26px}
 .qgrid .q{max-width:190px}
@@ -1059,7 +1067,8 @@ const SCENES = [
 
 const hp = d3.select('#heroPortraits');
 PERSONAS.forEach(p => {
-  const s = hp.append('svg').attr('width',84).attr('height',84).attr('viewBox','-50 -50 100 100')
+  const s = hp.append('span').attr('class','pwrap')
+    .append('svg').attr('width',84).attr('height',84).attr('viewBox','-50 -50 100 100')
     .attr('role','img').attr('aria-label',p.name);
   drawArt(s, p.id, 0.86);          // clears the svg, so the title goes on after
   s.append('title').text(p.name);
