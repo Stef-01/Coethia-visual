@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>From Health Noise to Health Belief — a Design Argument</title>
+<meta name="description" content="Health advice is everywhere and agreement is nowhere. A scrollytelling design argument for sorting people by belief instead of by label — ending with the system that would close the loop.">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#F8F6F1">
+<meta property="og:title" content="From Health Noise to Health Belief">
+<meta property="og:description" content="A design argument for belief-based health communication — and the imagined system that closes the loop.">
+<meta property="og:type" content="article">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='44' fill='%23F37940'/%3E%3Ccircle cx='50' cy='50' r='20' fill='%23F8F6F1'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@300;400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- D3 from the folder first so the piece runs with no network at all; the CDN
+     is the fallback for when this file travels on its own. -->
+<script src="d3.v7.min.js"></script>
+<script>
+window.d3 || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"><\/script>');
+</script>
+<style>
+:root{
+  --bg:#F8F6F1;
+  --ink:#212E36;
+  --ink-body:#333333;
+  --ink-mute:#6F6F6F;
+  --accent:#F37940;
+  --teal:#7FCCC8;
+
+  --serif: Optima, "Gill Sans", "Gill Sans MT", Candara, "Libre Franklin", sans-serif;
+  --sans: "Libre Franklin", Helvetica, Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--bg); color:var(--ink-body);
+  font-family:var(--sans); font-weight:300; font-size:17px; line-height:1.85;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  font-kerning:normal;
+}
+strong{font-weight:700;color:var(--ink)}
+::selection{background:#F9C9B4;color:var(--ink)}
+
+/* ---------- MASTHEAD + READING PROGRESS ---------- */
+.masthead{
+  background:#FFFFFF;border-bottom:1px solid #E9E5DC;
+  padding:20px 24px;display:flex;align-items:center;justify-content:space-between;
+}
+.masthead .wordmark{display:flex;align-items:center;gap:12px;text-decoration:none}
+.masthead .wordmark svg{display:block;transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.masthead .wordmark:hover svg{transform:rotate(-8deg) scale(1.06)}
+.masthead .wordmark span{transition:color .2s ease;font-family:var(--serif);font-size:21px;color:var(--ink);letter-spacing:.01em}
+.masthead .wordmark:hover span{color:#B8492E}
+.masthead .wordmark:focus-visible{outline:3px solid var(--ink);outline-offset:4px}
+.masthead .tag{
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:#6F6F6F;
+}
+.progress{display:none}
+@supports (animation-timeline: scroll()) {
+  .progress{
+    display:block;position:fixed;top:0;left:0;width:100%;height:3px;z-index:60;
+    background:var(--accent);transform-origin:0 50%;transform:scaleX(0);
+    animation:readprogress linear both;animation-timeline:scroll(root);
+    pointer-events:none;
+  }
+  @keyframes readprogress{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  .masthead{
+    animation:mastLift linear both;
+    animation-timeline:scroll(root);animation-range:0 140px;
+  }
+  @keyframes mastLift{
+    from{box-shadow:0 1px 0 rgba(33,46,54,0)}
+    to{box-shadow:0 2px 16px rgba(33,46,54,.09)}
+  }
+}
+
+/* ---------- PAPER GRAIN ---------- */
+.grain{
+  position:fixed;inset:0;z-index:55;pointer-events:none;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  background-size:240px 240px;
+}
+
+.measure{max-width:808px;margin:0 auto;padding-left:24px;padding-right:24px}
+
+/* ---------- HERO ---------- */
+.hero{padding-top:90px;padding-bottom:40px;text-align:center}
+@media (prefers-reduced-motion: no-preference){
+  .hero .kicker,.hero h1,.hero .deck,.hero .portrait-row,.hero p,.hero .scrollcue{
+    animation:riseIn .7s cubic-bezier(.16,1,.3,1) both;
+  }
+  .hero h1{animation-delay:.08s}
+  .hero .deck{animation-delay:.16s}
+  .hero .portrait-row{animation-delay:.26s}
+  .hero p{animation-delay:.34s}
+  .hero .scrollcue{animation-delay:.44s}
+}
+@keyframes riseIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.kicker{
+  font-family:var(--mono); font-size:13px; font-weight:400; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--ink); display:inline-block;
+  border-bottom:1px solid var(--accent); padding-bottom:7px;
+}
+h1{
+  font-family:var(--serif); font-weight:400; font-size:clamp(38px,6vw,74px);
+  line-height:1.07; color:var(--ink); margin:38px 0 22px; letter-spacing:-.01em;
+  text-wrap:balance;
+}
+.deck{
+  font-family:var(--serif); font-weight:500; font-size:clamp(20px,2.4vw,30px);
+  line-height:1.16; color:var(--ink); margin:0 auto 44px; max-width:700px; text-wrap:balance;
+}
+.portrait-row{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:48px}
+.portrait-row svg{transition:transform .18s cubic-bezier(.16,1,.3,1)}
+.portrait-row svg:hover{transform:translateY(-4px) scale(1.05)}
+.hero p{max-width:640px;margin:0 auto 22px}
+.scrollcue{
+  font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+  color:#6F6F6F;margin:70px 0 30px
+}
+.cue-arrow{display:inline-block}
+@media (prefers-reduced-motion: no-preference){
+  .cue-arrow{animation:cueBob 2.8s ease-in-out 1.4s infinite}
+}
+@keyframes cueBob{
+  0%,72%,100%{transform:translateY(0)}
+  84%{transform:translateY(5px)}
+}
+
+/* ---------- SCROLLER ---------- */
+.scroller{display:flex;align-items:flex-start;max-width:1352px;margin:0 auto;padding:0 24px}
+.graphic{
+  flex:1 1 auto; position:sticky; top:0; height:100vh;
+  display:flex; align-items:center; justify-content:center; min-width:0;
+}
+.graphic svg{width:100%;height:100%;display:block}
+.scroll-scenes{flex:0 0 450px;width:450px;border-left:1px solid var(--ink)}
+.step{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:8vh 0}
+.step-inner{padding:0 22px}
+
+@media (prefers-reduced-motion: no-preference){
+  .reveal-ready .step-inner > *{
+    opacity:0; transform:translateY(16px);
+    transition:opacity .62s cubic-bezier(.16,1,.3,1), transform .62s cubic-bezier(.16,1,.3,1);
+  }
+  .reveal-ready .step-inner.in > *{opacity:1;transform:none}
+  .reveal-ready .step-inner.in > *:nth-child(2){transition-delay:.05s}
+  .reveal-ready .step-inner.in > *:nth-child(3){transition-delay:.11s}
+  .reveal-ready .step-inner.in > *:nth-child(4){transition-delay:.18s}
+  .reveal-ready .step-inner.in > *:nth-child(5){transition-delay:.24s}
+}
+.step h2{
+  font-family:var(--serif); font-weight:500; font-size:26px; line-height:1.26;
+  color:var(--ink); margin:0 0 13px; text-wrap:balance;
+}
+.step hr{border:0;border-top:1px solid var(--ink);margin:0 0 20px}
+@media (prefers-reduced-motion: no-preference){
+  .reveal-ready .step-inner > hr{
+    transform:none;transform-origin:0 50%;
+    clip-path:inset(0 100% 0 0);
+    transition:clip-path .72s cubic-bezier(.16,1,.3,1), opacity .3s ease;
+  }
+  .reveal-ready .step-inner.in > hr{clip-path:inset(0 0 0 0)}
+}
+.step p{margin:0 0 18px;font-size:19px;line-height:1.76}
+.hint{font-size:15px;color:#B8492E;display:flex;gap:9px;align-items:flex-start;margin-top:26px;line-height:1.5}
+.hint svg{flex:0 0 auto;margin-top:3px}
+.note{font-size:12px;line-height:1.55;opacity:.8;margin-top:22px}
+
+.chip{
+  background:var(--c); color:var(--t,#212E36); padding:1px 7px 2px;
+  font-weight:600; font-size:.93em; border-radius:2px; white-space:nowrap;
+}
+.creedlist{list-style:none;margin:0 0 18px;padding:0}
+.creedlist li{margin:0 0 12px;font-size:18px;line-height:1.5}
+.creedlist .quote{display:block;font-size:16px;color:var(--ink-body)}
+
+/* ---------- OUTRO / CTA / METHODS ---------- */
+.outro{padding-top:90px;padding-bottom:10px}
+.outro p{max-width:680px}
+.outro h2{font-family:var(--serif);font-weight:500;font-size:clamp(26px,3.2vw,38px);line-height:1.2;color:var(--ink);margin:0 0 10px}
+.outro hr{border:0;border-top:1px solid var(--ink);margin:0 0 26px}
+.cta{background:#FFFFFF;margin-top:70px;padding:78px 0}
+.cta-inner{
+  max-width:1000px;margin:0 auto;padding:0 24px;
+  display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;
+}
+.cta .t{font-family:var(--serif);font-size:clamp(28px,3.4vw,44px);font-weight:400;color:var(--ink);line-height:1.14;text-wrap:balance}
+.cta .lead{font-size:17px;line-height:1.75;margin:0 0 26px}
+.btn{
+  display:inline-block;font-family:var(--sans);font-size:15px;font-weight:600;
+  color:#FFFFFF;background:#B8492E;padding:14px 28px;text-decoration:none;
+  border-radius:999px;transition:background .18s ease,transform .18s ease;
+}
+.btn:hover{background:var(--ink)}
+.btn:active{transform:scale(.98)}
+.btn .arrow{display:inline-block;transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.btn:hover .arrow{transform:translateX(5px)}
+.btn:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.btn[aria-disabled="true"]{opacity:.55;cursor:not-allowed}
+.btn[aria-disabled="true"]:hover{background:#B8492E}
+.cta-note{font-size:13px;color:#6F6F6F;margin-top:14px}
+@media (max-width:760px){
+  .cta-inner{grid-template-columns:1fr;gap:26px}
+}
+.methods{padding-top:64px;padding-bottom:110px;font-size:13px;line-height:1.8}
+.methods-grid{display:grid;grid-template-columns:5fr 7fr;gap:48px;max-width:1000px;margin:0 auto;padding:0 24px}
+.methods .col p{opacity:.78}
+.methods h3{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);margin:0 0 12px;font-weight:500}
+@media (max-width:760px){
+  .methods-grid{grid-template-columns:1fr;gap:8px}
+}
+
+/* ---------- TOOLTIP ---------- */
+#tip{
+  position:fixed;pointer-events:none;opacity:0;
+  background:var(--ink);color:var(--bg);font-size:12px;line-height:1.5;
+  padding:9px 12px;max-width:250px;z-index:99;font-family:var(--sans);
+  transform:translateY(7px) scale(.97);transform-origin:top left;
+  transition:opacity .15s ease, transform .3s cubic-bezier(.16,1,.3,1);
+  box-shadow:0 8px 26px rgba(33,46,54,.20);
+}
+#tip.on{opacity:1;transform:none}
+#tip b{font-weight:600}
+@media (prefers-reduced-motion: reduce){
+  #tip{transition:opacity .1s linear;transform:none}
+}
+
+@media (max-width:960px){
+  .scroller{display:block;padding:0 18px}
+  .graphic{position:sticky;top:0;height:56vh;height:56svh;z-index:2;
+    background:var(--bg);border-bottom:1px solid var(--ink)}
+  .scroll-scenes{width:100%;border-left:0;border-top:0}
+  .step{min-height:64vh;padding:38px 0 12vh;display:block;justify-content:flex-start}
+  .step-inner{padding:0}
+}
+@media (max-width:600px){
+  .graphic{height:46vh;height:46svh}
+}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  .portrait-row svg,.masthead .wordmark svg{transition:none}
+  .portrait-row svg:hover{transform:none}
+  .masthead .wordmark:hover svg{transform:none}
+  .cue-arrow{animation:none}
+  .btn .arrow{transition:none}
+  .btn:hover .arrow{transform:none}
+}
+
+/* ---------- PRINT ---------- */
+@media print{
+  .progress,.grain,.scrollcue,.hint,.masthead .tag,.cta-note{display:none !important}
+  body{background:#fff;color:#000;font-size:10.5pt;line-height:1.5}
+  .masthead{border-bottom:1px solid #000;padding:0 0 10px;margin-bottom:20px;box-shadow:none}
+  .measure{max-width:none;padding:0}
+  .hero{padding-top:0;text-align:left}
+  h1{font-size:26pt}
+  .deck{font-size:14pt;margin-left:0}
+  .hero p{max-width:none}
+  .scroller{display:block;padding:0}
+  .graphic{position:static !important;height:auto !important;border:0 !important;
+    break-inside:avoid;margin-bottom:16px}
+  .graphic svg{height:300px}
+  .scroll-scenes{width:100% !important;border:0 !important}
+  .step{min-height:0 !important;padding:0 0 14px !important;break-inside:avoid}
+  .step-inner,.step-inner > *{opacity:1 !important;transform:none !important;
+    clip-path:none !important;animation:none !important;transition:none !important}
+  .step h2{font-size:13pt}
+  .step p{font-size:10.5pt;line-height:1.45}
+  .cta{background:none;padding:18px 0;margin-top:24px}
+  .btn{background:none;color:#000;border:1px solid #000}
+  a{color:#000}
+}
+</style>
+</head>
+<body>
+
+<div class="progress" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="masthead">
+  <a class="wordmark" href="#" onclick="scrollTo({top:0,behavior:'smooth'});return false" aria-label="Political Health — back to top">
+    <svg width="30" height="30" viewBox="-50 -50 100 100" aria-hidden="true">
+      <circle cx="-16" cy="-12" r="15" fill="#C3DCEB"/>
+      <circle cx="18" cy="-18" r="11" fill="#FFD733"/>
+      <circle cx="24" cy="14" r="14" fill="#F37940"/>
+      <circle cx="-10" cy="24" r="10" fill="#E74D4E"/>
+      <circle cx="4" cy="-2" r="7" fill="#7FCCC8"/>
+    </svg>
+    <span>Political Health</span>
+  </a>
+  <div class="tag">Design Prototype</div>
+</header>
+
+<div class="hero measure">
+  <div class="kicker">Health Communication &nbsp;/&nbsp; USA &nbsp;/&nbsp; Explainer</div>
+  <h1>From Health Noise to Health Belief</h1>
+  <div class="deck">Everyone Gets Health Advice. No One Hears the Same Thing. The Fix Starts With Listening for Belief, Not Broadcasting at Labels</div>
+  <div class="portrait-row" id="heroPortraits"></div>
+  <p>The average American now meets more health claims before breakfast than a 1990s patient met in a year — and the claims disagree. This piece follows one question through the wreckage: <em>if the old way of aiming health messages is broken, what would the right way actually look like?</em></p>
+  <p><strong>The answer arrives at the end, where it belongs.</strong></p>
+  <div class="scrollcue"><span class="cue-arrow" aria-hidden="true">↓</span> &nbsp;scroll</div>
+</div>
+
+<section class="scroller">
+  <!-- role="group", not role="img": this chart contains focusable controls.
+       Decorative layers are aria-hidden individually. -->
+  <div class="graphic"><svg id="viz" preserveAspectRatio="xMidYMid meet" role="group"
+    aria-label="Animated chart. Health messages first collide as noise around one person, then are aimed at demographic buckets, then the same population is re-sorted onto a two-axis belief map with four belief states. One treatment takes four different meanings, and the final scenes assemble a six-station loop — listen, map, translate, activate, measure, learn — that closes the gap between public belief and evidence."></svg></div>
+  <div class="scroll-scenes" id="scenes"></div>
+</section>
+
+<div class="outro measure">
+  <h2>The Reprise, in Prose</h2>
+  <hr>
+  <p>Nothing in this argument required a brand. Fragmented noise, hollow labels, live belief, four states, one evidence base with four meanings — all of that stands on its own, and the reader who stops before the last two scenes loses none of it.</p>
+  <p>What the last two scenes add is the engineering claim: that the argument, run continuously instead of read once, <em>is</em> a system. Listening becomes an intake. The map becomes a model. Translation becomes a production line with evidence at the center. Measurement feeds the next round of listening.</p>
+  <p><strong>Coethia is the working name for that system — the imagined optimal ending of the argument, not its premise.</strong> Which is why it appears here, at the end, and nowhere before.</p>
+</div>
+
+<div class="cta">
+  <div class="cta-inner">
+    <div class="t">Build the Loop</div>
+    <div>
+      <p class="lead">The argument you just read is the design brief. Coethia is the system it imagines: belief-based health communication with one evidence base at the center and trusted voices at every edge.</p>
+      <a class="btn" href="#" role="button" aria-disabled="true" onclick="return false">Follow the build&nbsp;&nbsp;<span class="arrow" aria-hidden="true">&rarr;</span></a>
+      <div class="cta-note">Concept prototype — the system described here is imagined, not shipped.</div>
+    </div>
+  </div>
+</div>
+
+<div class="methods">
+  <div class="methods-grid">
+    <div class="col">
+      <h3>Credits</h3>
+      <p>A companion piece to <em>How Does Politics Shape American Health?</em> in this same series, sharing its palette, illustration idiom and motion grammar. Structure, layout grammar and motion vocabulary ultimately adapted from Surgo Ventures’ <em>COVID-19 Vaccine Persona Explainer</em> (design: Daisy Chung; development: Julia Janicki). All artwork, code and data here are original.</p>
+    </div>
+    <div class="col">
+      <h3>Data and Methods</h3>
+      <p><strong>This is a design prototype, and nothing here is a finding.</strong> The message fragments are invented composites. The population dots, the bucket mixes, the belief-state shares and every number on screen are synthetic placeholders generated by a seeded pseudo-random function in this file, constructed to be structurally plausible. They are not survey results and should not be cited.</p>
+      <p>The four belief states — <strong>Sovereign Optimizer</strong>, <strong>Guided Optimizer</strong>, <strong>Natural Autonomist</strong> and <strong>Therapeutic Minimalist</strong> — are illustrative names for quadrants of a two-axis space (institutional trust × intervention appetite). They stand in for the output of the kind of psychobehavioral segmentation described in the companion piece; no clustering is run here.</p>
+      <p>Coethia, as presented in the final scenes, is a concept: the system this argument implies. Its loop — listen, map, translate, activate, measure, learn — is a design proposal, not a description of software that exists.</p>
+    </div>
+  </div>
+</div>
+
+<div id="tip" aria-hidden="true"></div>
+
+<script>
+// graceful failure if D3 is unreachable (e.g. the file is opened offline, alone)
+window.addEventListener('DOMContentLoaded', function(){
+  if (typeof d3 !== 'undefined') return;
+  var s = document.querySelector('.scroller');
+  if (s) s.insertAdjacentHTML('beforebegin',
+    '<div class="measure" style="border:1px solid #212E36;padding:18px 22px;margin:30px auto;font-size:15px">' +
+    'The interactive graphics could not load (the D3 library needs a network connection). The narration below is still readable.</div>');
+});
+</script>
+<script>
+/* =====================================================================
+   1. DATA — all synthetic; see the Methods block and the on-chart stamp
+   ===================================================================== */
+
+let _s = 20260811;
+function rnd(){ _s = (_s * 1103515245 + 12345) & 0x7fffffff; return _s / 0x7fffffff; }
+
+const STATES = [
+  { id:'sov', name:'Sovereign Optimizer', lines:['Sovereign','Optimizer'],
+    creed:'“Give me the data. I’ll decide.”',
+    meaning:'Control and performance. Show the numbers, hand over the levers.',
+    color:'#E74D4E', trust:'low', appetite:'high' },
+  { id:'gui', name:'Guided Optimizer', lines:['Guided','Optimizer'],
+    creed:'“My doctor and the evidence support it.”',
+    meaning:'A confirmed recommendation. Authority plus proof, in that order.',
+    color:'#C3DCEB', trust:'high', appetite:'high' },
+  { id:'nat', name:'Natural Autonomist', lines:['Natural','Autonomist'],
+    creed:'“I’d rather fix it naturally.”',
+    meaning:'A last resort, after everything gentler has had its chance.',
+    color:'#87C26B', trust:'low', appetite:'low' },
+  { id:'the', name:'Therapeutic Minimalist', lines:['Therapeutic','Minimalist'],
+    creed:'“Only if the benefit outweighs the cost.”',
+    meaning:'A cost-benefit question. Lowest effective dose, clearly justified.',
+    color:'#EFC08A', trust:'high', appetite:'low' }
+];
+
+// the six things people actually say — each is a doorway into one state
+const STATEMENTS = [
+  { t:'“I want control and results.”', s:0 },
+  { t:'“I trust data, not experts.”', s:0 },
+  { t:'“My doctor and the evidence.”', s:1 },
+  { t:'“I’ll do what’s proven to work.”', s:1 },
+  { t:'“I want what’s natural.”', s:2 },
+  { t:'“Only if it’s really worth it.”', s:3 }
+];
+
+// five hollow audiences from the old model
+const BUCKETS = ['One party','One age band','One gender','One community','One income band'];
+// per-bucket belief mixes — different, but every bucket contains all four
+const MIX = [
+  [.34,.24,.22,.20],
+  [.20,.40,.15,.25],
+  [.26,.20,.34,.20],
+  [.16,.36,.20,.28],
+  [.30,.24,.26,.20]
+];
+
+// the six message fragments of one morning
+const FRAGMENTS = [
+  { k:'social',  l1:'Is seed oil',        l2:'making you sick?',      tag:'SOCIAL' },
+  { k:'podcast', l1:'Ep. 245 · Big Pharma', l2:'versus you',          tag:'PODCAST' },
+  { k:'ai',      l1:'“best way to',       l2:'lose weight?”',         tag:'AI CHAT' },
+  { k:'news',    l1:'New study questions', l2:'popular drug',         tag:'NEWS' },
+  { k:'creator', l1:'Detox first.',       l2:'Everything after.',     tag:'CREATOR' },
+  { k:'guide',   l1:'Standards of Care',  l2:'2026 · for clinicians', tag:'GUIDELINE' }
+];
+// which fragments flatly disagree with which
+const CONTRA = [[0,5],[1,3],[2,4]];
+
+// the six stations of the loop the finale assembles
+const LOOP = [
+  { id:'listen',    label:'Listen' },
+  { id:'map',       label:'Map' },
+  { id:'translate', label:'Translate' },
+  { id:'activate',  label:'Activate' },
+  { id:'measure',   label:'Measure' },
+  { id:'learn',     label:'Learn' }
+];
+
+/* 110 population dots. Each has a bucket and a belief state; the same dots are
+   re-laid-out scene by scene, which is the argument: same people, better sort. */
+const N_DOTS = 110;
+const DOTS = [];
+(function(){
+  let id = 0;
+  const perBucket = [22,22,22,22,22];
+  perBucket.forEach((n,b) => {
+    // deal belief states to match the bucket's mix as closely as counts allow
+    const counts = MIX[b].map(m => Math.round(m*n));
+    while (d3.sum(counts) > n) counts[counts.indexOf(Math.max(...counts))]--;
+    while (d3.sum(counts) < n) counts[counts.indexOf(Math.min(...counts))]++;
+    counts.forEach((c,s) => { for(let k=0;k<c;k++) DOTS.push({ id:id++, b, s }); });
+  });
+})();
+const STATE_COUNT = [0,0,0,0];
+DOTS.forEach(d => STATE_COUNT[d.s]++);
+const statePct = s => Math.round(100 * STATE_COUNT[s] / DOTS.length);
+
+/* =====================================================================
+   2. SHARED ILLUSTRATION HELPERS — same idiom as the companion piece
+   ===================================================================== */
+
+function person(g, skin, cloth, hair){
+  g.append('path').attr('d','M -17 26 Q -17 4 0 4 Q 17 4 17 26 Z').attr('fill',cloth);
+  g.append('circle').attr('cx',0).attr('cy',-10).attr('r',11.6).attr('fill',hair);
+  g.append('circle').attr('cx',0).attr('cy',-7).attr('r',10.2).attr('fill',skin);
+  g.append('circle').attr('cx',-3.6).attr('cy',-6.5).attr('r',1.25).attr('fill','#22304D');
+  g.append('circle').attr('cx',3.6).attr('cy',-6.5).attr('r',1.25).attr('fill','#22304D');
+}
+function arm(g, x1,y1, cx,cy, x2,y2, skin, sleeve){
+  if (sleeve) g.append('path').attr('d',`M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`)
+    .attr('stroke',sleeve).attr('stroke-width',9).attr('fill','none').attr('stroke-linecap','round');
+  g.append('path').attr('d',`M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`)
+    .attr('stroke',skin).attr('stroke-width',6).attr('fill','none').attr('stroke-linecap','round');
+  g.append('circle').attr('cx',x2).attr('cy',y2).attr('r',4.4).attr('fill',skin);
+}
+function sparkle(g, x, y, s, color){
+  g.append('path')
+    .attr('d',`M ${x} ${y-s*2} L ${x+s*0.6} ${y-s*0.6} L ${x+s*2} ${y} L ${x+s*0.6} ${y+s*0.6} L ${x} ${y+s*2} L ${x-s*0.6} ${y+s*0.6} L ${x-s*2} ${y} L ${x-s*0.6} ${y-s*0.6} Z`)
+    .attr('fill',color);
+}
+
+const LOOKS = {
+  sov:{ skin:'#EAC086', cloth:'#4E6E58', hair:'#6E3B23' },
+  gui:{ skin:'#F0B79B', cloth:'#8FD0D2', hair:'#2E3F63' },
+  nat:{ skin:'#8D5524', cloth:'#7A5C8E', hair:'#241B16' },
+  the:{ skin:'#C68642', cloth:'#5FA8A0', hair:'#20160E' }
+};
+
+const ART = {
+  // Guided Optimizer: the badge-checker from the companion cast
+  gui(g){
+    const L=LOOKS.gui;
+    g.append('circle').attr('r',46).attr('fill','#DCEBF5');
+    const p=g.append('g').attr('transform','translate(-7,8)'); person(p,L.skin,L.cloth,L.hair);
+    arm(g, 6,16, 19,6, 21,-13, L.skin, L.cloth);
+    g.append('circle').attr('cx',24).attr('cy',-26).attr('r',11).attr('fill','#7FCCC8');
+    g.append('path').attr('d','M 19 -27 L 23 -23 L 30 -31').attr('stroke','#fff').attr('stroke-width',2.6)
+      .attr('fill','none').attr('stroke-linecap','round').attr('stroke-linejoin','round');
+    sparkle(g, 37, -13, 2.6, '#3E8E89');
+  },
+  // Sovereign Optimizer: holds the data itself
+  sov(g){
+    const L=LOOKS.sov;
+    g.append('circle').attr('r',46).attr('fill','#F7C4C2');
+    const p=g.append('g').attr('transform','translate(-11,8)'); person(p,L.skin,L.cloth,L.hair);
+    arm(g, -2,18, 8,20, 13,13, L.skin, L.cloth);
+    const t=g.append('g').attr('transform','translate(21,3) rotate(6)');
+    t.append('rect').attr('x',-11).attr('y',-15).attr('width',22).attr('height',30).attr('rx',2.5).attr('fill','#FFFFFF');
+    t.append('rect').attr('x',-11).attr('y',-15).attr('width',22).attr('height',30).attr('rx',2.5)
+      .attr('fill','none').attr('stroke','#B8492E').attr('stroke-width',1.6);
+    [[-5,4,7],[0,-1,12],[5,7,4]].forEach(([x,y,h])=>{
+      t.append('rect').attr('x',x-1.6).attr('y',y).attr('width',3.2).attr('height',h).attr('fill','#E74D4E');
+    });
+  },
+  // Natural Autonomist: the self-directing herbalist
+  nat(g){
+    const L=LOOKS.nat;
+    g.append('circle').attr('r',46).attr('fill','#DCEFD2');
+    const p=g.append('g').attr('transform','translate(-11,8)'); person(p,L.skin,L.cloth,L.hair);
+    arm(g, -2,18, 7,21, 12,15, L.skin, L.cloth);
+    g.append('g').attr('transform','translate(19,7)').call(s=>{
+      s.append('rect').attr('x',-9).attr('y',-13).attr('width',18).attr('height',25).attr('rx',3).attr('fill','#E8A34E');
+      s.append('rect').attr('x',-6).attr('y',-18).attr('width',12).attr('height',6).attr('rx',1.5).attr('fill','#C4802F');
+      s.append('rect').attr('x',-7).attr('y',-5).attr('width',14).attr('height',9).attr('rx',1).attr('fill','#DCEFD2');
+    });
+    g.append('path').attr('d','M 7 -24 C 16 -32 28 -30 30 -21 C 22 -15 11 -17 7 -24 Z').attr('fill','#7FA84E');
+    g.append('path').attr('d','M 9 -23 Q 19 -24 28 -21').attr('stroke','#DCEFD2').attr('stroke-width',1.2).attr('fill','none');
+  },
+  // Therapeutic Minimalist: the weigher of costs
+  the(g){
+    const L=LOOKS.the;
+    g.append('circle').attr('r',46).attr('fill','#FFF0B0');
+    const p=g.append('g').attr('transform','translate(-5,8)'); person(p,L.skin,L.cloth,L.hair);
+    arm(g, 4,18, 12,14, 2,6, L.skin, L.cloth);
+    // a small balance: benefit against cost
+    const b=g.append('g').attr('transform','translate(24,-16)');
+    b.append('path').attr('d','M 0 -10 L 0 8').attr('stroke','#B8862A').attr('stroke-width',2.2).attr('stroke-linecap','round');
+    b.append('path').attr('d','M -12 -6 L 12 -6').attr('stroke','#B8862A').attr('stroke-width',2.2).attr('stroke-linecap','round');
+    b.append('path').attr('d','M -12 -6 L -15 2 L -9 2 Z').attr('fill','#F6C445');
+    b.append('path').attr('d','M 12 -6 L 9 2 L 15 2 Z').attr('fill','#F6C445');
+  }
+};
+
+function drawArt(sel, key, scale){
+  sel.selectAll('*').remove();
+  const g = sel.append('g').attr('transform',`scale(${scale||1})`);
+  const clip = 'clip-' + key + '-' + Math.random().toString(36).slice(2,8);
+  const cp = g.append('clipPath').attr('id',clip);
+  cp.append('circle').attr('r',46);
+  const inner = g.append('g').attr('clip-path',`url(#${clip})`);
+  ART[key](inner);
+}
+
+/* =====================================================================
+   3. HERO
+   ===================================================================== */
+
+const hp = d3.select('#heroPortraits');
+STATES.forEach(st => {
+  const s = hp.append('svg').attr('width',84).attr('height',84).attr('viewBox','-50 -50 100 100')
+    .attr('role','img').attr('aria-label',st.name);
+  drawArt(s, st.id, 0.86);
+  s.append('title').text(st.name);
+});
+
+/* =====================================================================
+   4. SCENE COPY — brand-free until the reprise, by design
+   ===================================================================== */
+
+const chip = (t,c,light) => `<span class="chip" style="--c:${c}${light?'':';--t:#212E36'}">${t}</span>`;
+
+const SCENES = [
+  { key:'noise1', frame:'stage', h:'Tuesday, 7:41 a.m.',
+    body:`<p>Before breakfast, one person has already met a seed-oil scare, a podcast prosecuting the drug industry, an AI chat about weight loss, a headline casting doubt on a prescription her mother takes, and a clinical guideline written for her doctor.</p>
+          <p>None of these sources know the others exist. All of them are talking about her body.</p>`,
+    note:'Illustrative fragments — composites, not real posts or programs.' },
+
+  { key:'noise2', frame:'stage', h:'The Noise Has a Shape',
+    body:`<p>Look closer and the chaos is repetitive. The same few treatments, tests and habits circle past again and again — praised in one fragment, prosecuted in the next.</p>
+          <p><strong>The problem is not too little information. It is that no two fragments agree on what the information means.</strong></p>` },
+
+  { key:'oldmodel', frame:'row', h:'The Old Answer: Aim at Labels',
+    body:`<p>Health communication inherited its answer from consumer advertising: cut the population into demographic buckets — a party, an age band, a gender, a community, an income band — and aim one message at each.</p>
+          <p>The buckets are easy to buy media against. That is most of what they have going for them.</p>` },
+
+  { key:'oldfail', frame:'row', h:'The Labels Don’t Predict the Response',
+    body:`<p>Send the same message into any bucket and it splits three ways: some accept, some reject, most shrug.</p>
+          <p><strong>Whatever is driving the response, it is not the label the message was aimed at.</strong> The buckets are real groups of people — they are just not groups <em>about health</em>.</p>` },
+
+  { key:'beliefs', frame:'row', h:'Listen Instead',
+    body:`<p>Stop sorting people by what they are. Sort them by what they say when a health decision is actually in front of them.</p>
+          <p>Six sentences, heard over and over, do most of the work — and notice what happens to the picture: <strong>color only appears when you listen.</strong> The buckets never needed it, because the buckets never explained anything.</p>`,
+    hint:'Hover any dot to see where it came from' },
+
+  { key:'map', frame:'map', h:'Two Questions Beat Five Labels',
+    body:`<p>Nearly all of those sentences collapse onto two axes: <strong>how much you trust institutions</strong>, and <strong>how much medicine you want in your life</strong>.</p>
+          <p>Cross them and the same population lands in four belief states — each one a different conversation about the same science.</p>`,
+    hint:'Hover a quadrant to read its belief state' },
+
+  { key:'states', frame:'map', h:'Four Belief States',
+    body:`<ul class="creedlist">
+            <li>${chip('Sovereign Optimizer','#E74D4E')}<span class="quote">“Give me the data. I’ll decide.”</span></li>
+            <li>${chip('Guided Optimizer','#C3DCEB')}<span class="quote">“My doctor and the evidence support it.”</span></li>
+            <li>${chip('Natural Autonomist','#87C26B')}<span class="quote">“I’d rather fix it naturally.”</span></li>
+            <li>${chip('Therapeutic Minimalist','#EFC08A')}<span class="quote">“Only if the benefit outweighs the cost.”</span></li>
+          </ul>
+          <p><strong>No party, no age bracket, no zip code appears anywhere in the definitions.</strong></p>`,
+    hint:'Hover a quadrant to read its belief state' },
+
+  { key:'factions', frame:'map', h:'Every “Audience” Contains All Four',
+    body:`<p>Take any single bucket from the old model — one party, one community, one age band — and light its members up on the belief map.</p>
+          <p><strong>They are everywhere.</strong> Four factions, four different conversations, inside every audience the old model treated as one. One message per bucket was never going to work.</p>`,
+    hint:'Ringed dots all belong to the same old-model bucket',
+    note:'Synthetic population — the mixes differ by bucket, but every bucket contains every state.' },
+
+  { key:'meanings', frame:'map', h:'Same Treatment, Four Meanings',
+    body:`<p>Put one treatment in the middle of the map. To a ${chip('Sovereign Optimizer','#E74D4E')} it reads as control and performance. To a ${chip('Guided Optimizer','#C3DCEB')}, a doctor’s confirmed recommendation. To a ${chip('Therapeutic Minimalist','#EFC08A')}, a cost-benefit question. To a ${chip('Natural Autonomist','#87C26B')}, a last resort after gentler things.</p>
+          <p><strong>Four conversations. One evidence base. The evidence never changes — the meaning does.</strong></p>` },
+
+  { key:'require', frame:'wide', h:'What Would It Take?',
+    body:`<p>To communicate this way on purpose — at scale, all the time — you would need to <strong>hear</strong> belief as it moves, <strong>map</strong> it onto axes that predict behavior, <strong>translate</strong> one evidence base into every state’s language, <strong>deliver</strong> each translation through a voice that state already trusts, and <strong>measure</strong> whether belief actually moved.</p>
+          <p>Nobody’s org chart does all five. The loop stays open — which is why the noise from scene one still wins.</p>`,
+    note:'Dashed = missing. This scene is the gap, not the product.' },
+
+  { key:'reprise', frame:'wide', h:'Now Read It Again, as One System',
+    body:`<p>Run the argument back. The listening was scene five. The map was scene six. The translation was scene nine. The missing machinery of the last scene is just the loop that connects what you have already seen.</p>
+          <p><strong>Close the loop and the whole story becomes one continuous system: listen, map, translate, activate, measure, learn.</strong> That system is the imaginative optimal ending of this argument — the thing the piece has been describing without naming.</p>
+          <p>Call it <strong>Coethia</strong>.</p>`,
+    note:'Coethia is a concept-stage system. This piece is its design argument, not its launch.' },
+
+  { key:'newstate', frame:'wide', h:'The Loop, Closed',
+    body:`<p>Noise goes in one side. Matched, trusted, evidence-faithful messages come out the other — one for each belief state, all carrying the same science.</p>
+          <p><strong>Belief moves, and medicine hears it move.</strong> Public belief and scientific response finally talk to each other — which is where this story was always trying to end.</p>` }
+];
+
+const HAND = `<svg width="15" height="17" viewBox="0 0 15 17" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 8V2.6a1.3 1.3 0 0 1 2.6 0V8m0-1.6a1.3 1.3 0 0 1 2.6 0V8m0-1a1.3 1.3 0 0 1 2.6 0v4.4c0 2.6-1.7 5-4.6 5-2.6 0-4-1.4-5-3.2L1.3 10a1.3 1.3 0 0 1 2.2-1.3L4.5 10"/></svg>`;
+const TOUCH = typeof matchMedia === 'function' && matchMedia('(hover: none)').matches;
+const hintText = t => TOUCH ? t.replace(/^Hover/, 'Tap') : t;
+
+const scenesSel = d3.select('#scenes');
+SCENES.forEach(s => {
+  const st = scenesSel.append('div').attr('class','step').attr('data-key', s.key);
+  const inner = st.append('div').attr('class','step-inner');
+  inner.append('h2').text(s.h);
+  inner.append('hr');
+  inner.append('div').html(s.body);
+  if (s.hint) inner.append('div').attr('class','hint').html(HAND + '<span>' + hintText(s.hint) + '</span>');
+  if (s.note) inner.append('div').attr('class','note').text(s.note);
+});
+
+/* =====================================================================
+   5. GEOMETRY + TYPE SCALE
+   ===================================================================== */
+
+const svg = d3.select('#viz');
+const SANS = 'Libre Franklin, Helvetica, Arial, sans-serif';
+const MONO = 'IBM Plex Mono, monospace';
+
+const REDUCE  = typeof matchMedia === 'function'
+  && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const ELASTIC = REDUCE ? 1 : 1000;
+const FADE    = REDUCE ? 1 : 500;
+const CAMERA  = REDUCE ? 1 : 900;
+const MOVE    = REDUCE ? 1 : 950;    // dot regroup travel
+const VALUE_EASE = REDUCE ? d3.easeLinear : d3.easeCubicOut;
+
+function show(sel, v, dur){ sel.transition('vis').duration(dur || FADE).attr('opacity', v); }
+
+// stroke-dasharray reveal
+function drawOn(sel, dur, delayFn){
+  sel.each(function(d, i){
+    let L = 0;
+    try { L = this.getTotalLength(); } catch(e){ L = 0; }
+    if (!L || REDUCE){ d3.select(this).style('opacity',1).attr('stroke-dashoffset',0); return; }
+    d3.select(this)
+      .attr('stroke-dasharray', L + ' ' + L)
+      .attr('stroke-dashoffset', L)
+      .style('opacity', 1)
+      .transition('draw').duration(dur || ELASTIC)
+      .delay(delayFn ? delayFn(d, i) : 0)
+      .ease(d3.easeCubicInOut)
+      .attr('stroke-dashoffset', 0)
+      .on('end interrupt', function(){
+        d3.select(this).attr('stroke-dasharray', null).attr('stroke-dashoffset', null);
+      });
+  });
+}
+
+/* Responsive type scale — same machinery as the companion piece: every chrome
+   label carries its base size in data-fs and is multiplied by TK, derived from
+   the live render scale of the frame the scene is heading to. */
+let TK = 1;
+const MIN_LABEL_PX = 9.6;
+const BASE_LABEL = 12;
+function renderScale(frame){
+  const n = svg.node(); if (!n) return 1;
+  const r = n.getBoundingClientRect();
+  const vbAttr = frame || svg.attr('viewBox'); if (!vbAttr || !r.width) return 1;
+  const vb = vbAttr.split(/[\s,]+/).map(Number);
+  if (!vb[2] || !vb[3]) return 1;
+  return Math.min(r.width / vb[2], r.height / vb[3]);
+}
+function computeTK(frame){
+  const s = renderScale(frame);
+  TK = Math.max(1, Math.min(2.35, MIN_LABEL_PX / (BASE_LABEL * s)));
+}
+const MOBILE = () => TK > 1.3;
+function typed(sel, base){
+  return sel.attr('data-fs', base).attr('font-size', base * TK);
+}
+function applyTypeScale(){
+  svg.selectAll('text[data-fs],tspan[data-fs]')
+     .attr('font-size', function(){ return +this.getAttribute('data-fs') * TK; });
+  svg.selectAll('tspan[data-dy]')
+     .attr('dy', function(){ return +this.getAttribute('data-dy') * TK; });
+}
+
+const FRAMES = {
+  stage:'170 30 660 620',
+  row:  '40 30 920 590',
+  map:  '130 10 740 650',
+  wide: '30 0 940 700'
+};
+const FRAMES_MOBILE = {
+  stage:'190 30 620 660',
+  row:  '20 20 960 640',
+  map:  '120 0 760 730',
+  wide: '10 0 980 760'
+};
+function isNarrow(){ return innerWidth <= 960; }
+const frameFor = name => (isNarrow() ? FRAMES_MOBILE : FRAMES)[name];
+
+/* =====================================================================
+   6. LAYERS
+   ===================================================================== */
+
+const gNoise  = svg.append('g').attr('opacity',0);   // figure + fragments
+const gContra = svg.append('g').attr('opacity',0);   // contradiction links
+const gModel  = svg.append('g').attr('opacity',0);   // buckets + megaphone
+const gReact  = svg.append('g').attr('opacity',0);   // accept/reject/shrug
+const gSay    = svg.append('g').attr('opacity',0);   // belief speech bubbles
+const gField  = svg.append('g').attr('opacity',0);   // quadrant fields + axes
+const gDots   = svg.append('g').attr('opacity',0);   // the population
+const gRing   = svg.append('g').attr('opacity',0);   // faction rings (drawn with dots)
+const gState  = svg.append('g').attr('opacity',0);   // state figures + labels
+const gMean   = svg.append('g').attr('opacity',0);   // treatment + four meanings
+const gLoop   = svg.append('g').attr('opacity',0);   // the six stations
+const gMark   = svg.append('g').attr('opacity',0);   // the reveal
+const gFlow   = svg.append('g').attr('opacity',0);   // noise-in / messages-out
+const gTitle  = svg.append('g').attr('opacity',0);
+const gHit    = svg.append('g');
+const gStamp  = svg.append('g').attr('opacity',0).attr('pointer-events','none');
+
+/* Every drawing layer is hidden from assistive tech; the chart's meaning is
+   carried by the svg label, the four quadrant buttons, and the prose. */
+[gNoise,gContra,gModel,gReact,gSay,gField,gDots,gRing,gState,gMean,gLoop,gMark,gFlow,gTitle,gStamp]
+  .forEach(g => g.attr('aria-hidden','true'));
+
+const stampText = gStamp.append('text')
+  .attr('text-anchor','start').attr('font-family',SANS)
+  .attr('font-weight',500).attr('fill','#6F6F6F')
+  .text('Synthetic data · illustrative prototype, not survey results');
+function placeStamp(frame){
+  const vb = (frame || svg.attr('viewBox') || '0 0 1000 700').split(/[\s,]+/).map(Number);
+  stampText.attr('data-fs', 10.5).attr('font-size', 10.5 * TK)
+    .attr('x', vb[0] + 4).attr('y', vb[1] + vb[3] - 6);
+}
+
+const titleText = gTitle.append('text')
+  .attr('x',500).attr('y',52).attr('text-anchor','middle')
+  .attr('font-family',SANS).call(typed,18).attr('font-weight',700)
+  .attr('fill','#212E36');
+function setTitle(txt){
+  if (titleText.text() === txt) return;
+  if (REDUCE){ titleText.text(txt); return; }
+  titleText.transition('title').duration(200).attr('opacity',0)
+    .on('end', function(){
+      d3.select(this).text(txt)
+        .transition('title').duration(280).attr('opacity',1);
+    });
+}
+
+/* =====================================================================
+   7. SCENE GEOMETRY
+   ===================================================================== */
+
+// ---- noise stage ----
+const NX=500, NY=360, NR=225;
+const FRAG_W=170, FRAG_H=58;
+const fragPos = FRAGMENTS.map((f,i)=>{
+  const a = -Math.PI/2 + i*(Math.PI*2/FRAGMENTS.length);
+  return { x: NX + Math.cos(a)*NR, y: NY + Math.sin(a)*NR*0.82 };
+});
+
+// centre figure: the person all of this is aimed at
+(function(){
+  const fig = gNoise.append('g').attr('transform',`translate(${NX},${NY}) scale(1.6)`);
+  fig.append('circle').attr('r',46).attr('fill','#EFE9DC');
+  const p = fig.append('g').attr('transform','translate(-4,8)');
+  person(p,'#C68642','#5FA8A0','#20160E');
+  arm(fig, 6,18, 14,16, 16,7, '#C68642', '#5FA8A0');
+  const ph = fig.append('g').attr('transform','translate(21,0) rotate(10)');
+  ph.append('rect').attr('x',-6).attr('y',-11).attr('width',12).attr('height',22).attr('rx',2.5).attr('fill','#212E36');
+  ph.append('rect').attr('x',-4.5).attr('y',-8.5).attr('width',9).attr('height',15).attr('rx',1).attr('fill','#9FD8D4');
+})();
+
+const fragG = gNoise.selectAll('g.frag').data(FRAGMENTS).join('g').attr('class','frag')
+  .attr('transform',(f,i)=>`translate(${fragPos[i].x},${fragPos[i].y})`);
+fragG.append('rect').attr('x',-FRAG_W/2).attr('y',-FRAG_H/2)
+  .attr('width',FRAG_W).attr('height',FRAG_H)
+  .attr('fill','#FFFFFF').attr('stroke','#212E36').attr('stroke-width',1.2);
+fragG.append('text').attr('x',-FRAG_W/2+10).attr('y',-FRAG_H/2+16)
+  .attr('font-family',MONO).call(typed,8.5).attr('letter-spacing','.14em')
+  .attr('fill','#B8492E').text(f=>f.tag);
+fragG.append('text').attr('x',-FRAG_W/2+10).attr('y',-FRAG_H/2+33)
+  .attr('font-family',SANS).call(typed,11.5).attr('font-weight',600)
+  .attr('fill','#212E36').text(f=>f.l1);
+fragG.append('text').attr('x',-FRAG_W/2+10).attr('y',-FRAG_H/2+48)
+  .attr('font-family',SANS).call(typed,11.5).attr('font-weight',600)
+  .attr('fill','#212E36').text(f=>f.l2);
+
+// contradiction links: dashed red arcs pairing fragments that disagree.
+// They render beneath the cards — an argument between fragments, not a strike
+// through their words.
+gContra.lower();
+CONTRA.forEach(([a,b])=>{
+  const pa=fragPos[a], pb=fragPos[b];
+  const mx=(pa.x+pb.x)/2, my=(pa.y+pb.y)/2;
+  const dx=pb.x-pa.x, dy=pb.y-pa.y, L=Math.hypot(dx,dy);
+  const ox=-dy/L*40, oy=dx/L*40;
+  gContra.append('path')
+    .attr('d',`M ${pa.x} ${pa.y} Q ${mx+ox} ${my+oy} ${pb.x} ${pb.y}`)
+    .attr('fill','none').attr('stroke','#E74D4E').attr('stroke-width',1.8)
+    .attr('stroke-dasharray','7 5').attr('opacity',.85);
+  const vg = gContra.append('g').attr('transform',`translate(${mx+ox*0.55},${my+oy*0.55})`);
+  vg.append('circle').attr('r',11).attr('fill','#E74D4E');
+  vg.append('text').attr('text-anchor','middle').attr('y',3.5)
+    .attr('font-family',MONO).call(typed,8.5).attr('font-weight',500)
+    .attr('fill','#FFFFFF').text('vs');
+});
+
+// ---- old model: buckets + megaphone ----
+const BUX = BUCKETS.map((b,i)=> 140 + i*180);
+const BUY = 380, BUR = 66;
+const bucketG = gModel.selectAll('g.bucket').data(BUCKETS).join('g').attr('class','bucket')
+  .attr('transform',(b,i)=>`translate(${BUX[i]},${BUY})`);
+bucketG.append('circle').attr('r',BUR)
+  .attr('fill','#EFEAE0').attr('stroke','#212E36').attr('stroke-width',1.4);
+bucketG.append('text').attr('y',BUR+24).attr('text-anchor','middle')
+  .attr('font-family',SANS).call(typed,12.5).attr('font-weight',700)
+  .attr('fill','#212E36').text(b=>b);
+
+// the megaphone that fires the same thing at everyone
+(function(){
+  const m = gModel.append('g').attr('transform','translate(500,140)');
+  m.append('rect').attr('x',-30).attr('y',-14).attr('width',34).attr('height',28).attr('rx',4).attr('fill','#212E36');
+  m.append('path').attr('d','M 4 -22 L 42 -34 L 42 34 L 4 22 Z').attr('fill','#F37940');
+  m.append('rect').attr('x',-40).attr('y',-6).attr('width',12).attr('height',12).attr('rx',2).attr('fill','#212E36');
+  [[54,-16],[58,0],[54,16]].forEach(([x,y])=>{
+    m.append('path').attr('d',`M ${x} ${y} q 8 ${-y*0.2} 14 0`)
+      .attr('stroke','#B8492E').attr('stroke-width',2.4).attr('fill','none').attr('stroke-linecap','round');
+  });
+  m.append('text').attr('x',8).attr('y',52).attr('text-anchor','middle')
+    .attr('font-family',SANS).call(typed,12.5).attr('font-weight',700)
+    .attr('fill','#212E36').text('One message, five copies');
+})();
+// identical rays to every bucket
+BUX.forEach(x=>{
+  gModel.append('path')
+    .attr('class','ray')
+    .attr('d',`M 512 176 Q ${(512+x)/2} ${240} ${x} ${BUY-BUR-12}`)
+    .attr('fill','none').attr('stroke','#B8492E').attr('stroke-width',1.6)
+    .attr('stroke-dasharray','6 5').attr('opacity',.8);
+});
+
+// reactions: the same message splits three ways inside every bucket
+BUX.forEach(x=>{
+  const r = gReact.append('g').attr('transform',`translate(${x},${BUY-BUR-30})`);
+  const items=[[-28,'#7FCCC8','check'],[0,'#E74D4E','cross'],[28,'#6F6F6F','shrug']];
+  items.forEach(([dx,c,k])=>{
+    r.append('circle').attr('cx',dx).attr('r',11).attr('fill',c);
+    if(k==='check') r.append('path').attr('d',`M ${dx-5} 0 L ${dx-1} 4 L ${dx+5} -4`)
+      .attr('stroke','#FFFFFF').attr('stroke-width',2.2).attr('fill','none')
+      .attr('stroke-linecap','round').attr('stroke-linejoin','round');
+    if(k==='cross'){ r.append('path').attr('d',`M ${dx-4} -4 L ${dx+4} 4 M ${dx+4} -4 L ${dx-4} 4`)
+      .attr('stroke','#FFFFFF').attr('stroke-width',2.2).attr('stroke-linecap','round'); }
+    if(k==='shrug') r.append('text').attr('x',dx).attr('y',4).attr('text-anchor','middle')
+      .attr('font-family',SANS).call(typed,12).attr('font-weight',700)
+      .attr('fill','#FFFFFF').text('?');
+  });
+});
+
+// ---- belief statements ----
+const SAYX=[190,500,810], SAYY=[190,420];
+const sayPos = STATEMENTS.map((st,i)=>({ x:SAYX[i%3], y:SAYY[Math.floor(i/3)] }));
+const sayG = gSay.selectAll('g.say').data(STATEMENTS).join('g').attr('class','say')
+  .attr('transform',(st,i)=>`translate(${sayPos[i].x},${sayPos[i].y-64})`);
+sayG.append('rect').attr('x',-92).attr('y',-24).attr('width',184).attr('height',40).attr('rx',8)
+  .attr('fill',st=>STATES[st.s].color);
+sayG.append('path').attr('d','M -8 16 L 0 30 L 8 16 Z').attr('fill',st=>STATES[st.s].color);
+sayG.append('text').attr('text-anchor','middle').attr('y',1)
+  .attr('font-family',SANS).call(typed,12).attr('font-weight',600)
+  .attr('fill','#212E36').text(st=>st.t);
+
+// ---- the belief map ----
+const MX0=250, MX1=750, MY0=110, MY1=520;
+const QC = [ // TL sov, TR gui, BL nat, BR the — x: trust, y: appetite
+  { x:(MX0+500)/2, y:(MY0+315)/2+8 },
+  { x:(500+MX1)/2, y:(MY0+315)/2+8 },
+  { x:(MX0+500)/2, y:(315+MY1)/2+8 },
+  { x:(500+MX1)/2, y:(315+MY1)/2+8 }
+];
+const fields = gField.selectAll('rect.q').data(STATES).join('rect').attr('class','q')
+  .attr('x',(s,i)=> i%2===0 ? MX0 : 500).attr('y',(s,i)=> i<2 ? MY0 : 315)
+  .attr('width',250).attr('height',(s,i)=> i<2 ? 205 : 205)
+  .attr('fill',s=>s.color).attr('opacity',.16);
+const axes = gField.append('g');
+axes.append('path').attr('class','ax').attr('d',`M ${MX0-8} 315 L ${MX1+8} 315`)
+  .attr('stroke','#212E36').attr('stroke-width',1.5).attr('fill','none');
+axes.append('path').attr('class','ax').attr('d',`M 500 ${MY1+8} L 500 ${MY0-8}`)
+  .attr('stroke','#212E36').attr('stroke-width',1.5).attr('fill','none');
+// axis captions — outside the fields, so they never crowd the dots
+axes.append('text').attr('x',MX1).attr('y',MY1+30).attr('text-anchor','end')
+  .attr('font-family',SANS).call(typed,11.5).attr('font-weight',700).attr('fill','#212E36')
+  .text('Institutional trust →');
+axes.append('text').attr('x',MX0).attr('y',MY1+30).attr('text-anchor','start')
+  .attr('font-family',SANS).call(typed,11.5).attr('fill','#6F6F6F')
+  .text('low');
+axes.append('text')
+  .attr('transform',`translate(${MX0-16},${MY0}) rotate(-90)`)
+  .attr('text-anchor','end')
+  .attr('font-family',SANS).call(typed,11.5).attr('font-weight',700).attr('fill','#212E36')
+  .text('Intervention appetite →');
+axes.append('text')
+  .attr('transform',`translate(${MX0-16},${MY1}) rotate(-90)`)
+  .attr('text-anchor','start')
+  .attr('font-family',SANS).call(typed,11.5).attr('fill','#6F6F6F')
+  .text('low');
+
+// state labels inside fields
+const stLab = gState.selectAll('g.stl').data(STATES).join('g').attr('class','stl')
+  .attr('transform',(s,i)=>`translate(${QC[i].x},${QC[i].y - 26})`);
+stLab.each(function(s){
+  const g = d3.select(this);
+  s.lines.forEach((ln,k)=>{
+    g.append('text').attr('text-anchor','middle').attr('y',k*17)
+      .attr('data-dy', k?17:0)
+      .attr('font-family',SANS).call(typed,14).attr('font-weight',700)
+      .attr('fill','#212E36')
+      .attr('stroke','#F8F6F1').attr('stroke-width',3).attr('stroke-opacity',.9)
+      .attr('paint-order','stroke fill')
+      .text(ln);
+  });
+  g.append('text').attr('class','share').attr('text-anchor','middle').attr('y', s.lines.length*17+16)
+    .attr('font-family',MONO).call(typed,12).attr('font-weight',500)
+    .attr('fill','#212E36')
+    .attr('stroke','#F8F6F1').attr('stroke-width',3).attr('stroke-opacity',.9)
+    .attr('paint-order','stroke fill')
+    .text(statePct(STATES.indexOf(s)) + '%');
+});
+// state figures at the outer corners (desktop only — phones have no room)
+const FIGPOS = [ {x:MX0-58,y:MY0+36}, {x:MX1+58,y:MY0+36}, {x:MX0-58,y:MY1-36}, {x:MX1+58,y:MY1-36} ];
+const stFig = gState.selectAll('g.stf').data(STATES).join('g').attr('class','stf')
+  .attr('transform',(s,i)=>`translate(${FIGPOS[i].x},${FIGPOS[i].y}) scale(.78)`);
+stFig.each(function(s){ drawArt(d3.select(this), s.id, 1); });
+
+/* ---- dot layouts ----
+   The same 110 dots, four layouts. Positions are precomputed with the seeded
+   generator so every visit is identical. */
+DOTS.forEach(d=>{
+  // L1 bucket: jitter inside the bucket disc
+  const a1 = rnd()*Math.PI*2, r1 = Math.sqrt(rnd())*(BUR-14);
+  d.bx = BUX[d.b] + Math.cos(a1)*r1;
+  d.by = BUY + Math.sin(a1)*r1;
+  // L2 statement cluster: dots gather under the sentence that is their doorway
+  const opts = STATEMENTS.map((st,i)=>({st,i})).filter(o=>o.st.s===d.s);
+  const pick = opts[Math.floor(rnd()*opts.length)].i;
+  const a2 = rnd()*Math.PI*2, r2 = Math.sqrt(rnd())*52;
+  d.sx = sayPos[pick].x + Math.cos(a2)*r2;
+  d.sy = sayPos[pick].y + 26 + Math.sin(a2)*r2*0.75;
+  // L3 quadrant
+  d.qx = QC[d.s].x + (rnd()*2-1)*96;
+  d.qy = QC[d.s].y + 34 + (rnd()*2-1)*58;
+});
+
+const NEUTRAL = '#C8BFAE';
+const circles = gDots.selectAll('circle.dot').data(DOTS, d=>d.id).join('circle')
+  .attr('class','dot')
+  .attr('cx',d=>d.bx).attr('cy',d=>d.by).attr('r',6.5)
+  .attr('fill',NEUTRAL).attr('opacity',.92)
+  .style('cursor','pointer');
+
+// faction rings ride with the dots — same teal ring device as the companion
+const FACTION_BUCKET = 3;
+const ringDots = DOTS.filter(d=>d.b===FACTION_BUCKET);
+const rings = gRing.selectAll('circle.ring').data(ringDots, d=>d.id).join('circle')
+  .attr('class','ring')
+  .attr('r',10).attr('fill','none')
+  .attr('stroke','#7FCCC8').attr('stroke-width',3.5)
+  .attr('pointer-events','none');
+
+// ---- same treatment, four meanings ----
+(function(){
+  const t = gMean.append('g').attr('transform','translate(500,318)');
+  t.append('circle').attr('r',46).attr('fill','#F8F6F1').attr('stroke','#212E36').attr('stroke-width',1.6);
+  const cap = t.append('g').attr('transform','rotate(-28)');
+  cap.append('rect').attr('x',-9).attr('y',-22).attr('width',18).attr('height',44).attr('rx',9).attr('fill','#C25236');
+  cap.append('path').attr('d','M -9 0 L 9 0').attr('stroke','#F8F6F1').attr('stroke-width',2);
+  cap.append('rect').attr('x',-9).attr('y',-22).attr('width',18).attr('height',22).attr('rx',9).attr('fill','#E8836A');
+  t.append('text').attr('y',66).attr('text-anchor','middle')
+    .attr('font-family',SANS).call(typed,12).attr('font-weight',700)
+    .attr('fill','#212E36').text('One treatment');
+  // four leaders + meaning cards
+  STATES.forEach((s,i)=>{
+    const c = QC[i];
+    const dx = c.x-500, dy = (c.y+20)-318, L = Math.hypot(dx,dy);
+    const sx = 500 + dx/L*54, sy = 318 + dy/L*54;
+    const ex = c.x - dx/L*10, ey = (c.y+20) - dy/L*10;
+    gMean.append('path').attr('class','lead')
+      .attr('d',`M ${sx} ${sy} L ${ex} ${ey}`)
+      .attr('stroke','#212E36').attr('stroke-width',1.4).attr('fill','none');
+    const card = gMean.append('g').attr('transform',`translate(${c.x},${c.y+20})`);
+    card.append('rect').attr('x',-104).attr('y',-30).attr('width',208).attr('height',60)
+      .attr('fill','#FFFFFF').attr('stroke',s.color).attr('stroke-width',2);
+    card.append('rect').attr('x',-104).attr('y',-30).attr('width',7).attr('height',60).attr('fill',s.color);
+    card.append('text').attr('x',-88).attr('y',-9)
+      .attr('font-family',SANS).call(typed,11.5).attr('font-weight',700)
+      .attr('fill','#212E36').text(s.name);
+    const m1 = s.meaning.split('. ')[0]+'.';
+    card.append('text').attr('x',-88).attr('y',9)
+      .attr('font-family',SANS).call(typed,10.5).attr('fill','#333')
+      .text(m1);
+  });
+})();
+
+// ---- the loop ----
+const LC = { x:500, y:330 }, LR = 205;
+const stationPos = LOOP.map((s,i)=>{
+  const a = -Math.PI/2 + i*(Math.PI*2/LOOP.length);
+  return { x: LC.x + Math.cos(a)*LR, y: LC.y + Math.sin(a)*LR };
+});
+// connecting arcs (drawn on in the reprise)
+const arcs = [];
+LOOP.forEach((s,i)=>{
+  const a0 = -Math.PI/2 + i*(Math.PI*2/6) + 0.24;
+  const a1 = -Math.PI/2 + (i+1)*(Math.PI*2/6) - 0.24;
+  const p0 = { x: LC.x+Math.cos(a0)*LR, y: LC.y+Math.sin(a0)*LR };
+  const p1 = { x: LC.x+Math.cos(a1)*LR, y: LC.y+Math.sin(a1)*LR };
+  arcs.push(gLoop.append('path').attr('class','arc')
+    .attr('d',`M ${p0.x} ${p0.y} A ${LR} ${LR} 0 0 1 ${p1.x} ${p1.y}`)
+    .attr('fill','none').attr('stroke','#212E36').attr('stroke-width',2)
+    .style('opacity',0));
+});
+// arrowheads on each arc end
+const arrowMarks = LOOP.map((s,i)=>{
+  const a1 = -Math.PI/2 + (i+1)*(Math.PI*2/6) - 0.24;
+  const p1 = { x: LC.x+Math.cos(a1)*LR, y: LC.y+Math.sin(a1)*LR };
+  const tang = a1 + Math.PI/2;
+  return gLoop.append('path')
+    .attr('transform',`translate(${p1.x},${p1.y}) rotate(${tang*180/Math.PI})`)
+    .attr('d','M -7 -5 L 2 0 L -7 5')
+    .attr('fill','none').attr('stroke','#212E36').attr('stroke-width',2)
+    .attr('stroke-linecap','round').attr('stroke-linejoin','round')
+    .style('opacity',0);
+});
+
+// station glyphs — dashed and questioning until the reprise fills them
+function stationGlyph(g, id){
+  const s = g.append('g').attr('class','glyph');
+  if(id==='listen'){
+    s.append('path').attr('d','M -4 -8 A 9 9 0 0 1 6 2 Q 6 8 0 9').attr('stroke','#212E36')
+      .attr('stroke-width',2.4).attr('fill','none').attr('stroke-linecap','round');
+    s.append('circle').attr('cx',-1).attr('cy',-1).attr('r',2.2).attr('fill','#212E36');
+  } else if(id==='map'){
+    s.append('path').attr('d','M -9 0 L 9 0 M 0 -9 L 0 9').attr('stroke','#212E36')
+      .attr('stroke-width',2.2).attr('stroke-linecap','round');
+    s.append('rect').attr('x',-11).attr('y',-11).attr('width',22).attr('height',22)
+      .attr('fill','none').attr('stroke','#212E36').attr('stroke-width',2);
+  } else if(id==='translate'){
+    s.append('rect').attr('x',-12).attr('y',-10).attr('width',15).attr('height',11).attr('rx',3)
+      .attr('fill','none').attr('stroke','#212E36').attr('stroke-width',2.2);
+    s.append('rect').attr('x',-1).attr('y',-2).attr('width',15).attr('height',11).attr('rx',3)
+      .attr('fill','#212E36');
+  } else if(id==='activate'){
+    s.append('path').attr('d','M -10 -4 L 2 -8 L 2 8 L -10 4 Z').attr('fill','#212E36');
+    s.append('path').attr('d','M 6 -5 q 5 5 0 10').attr('stroke','#212E36')
+      .attr('stroke-width',2.2).attr('fill','none').attr('stroke-linecap','round');
+  } else if(id==='measure'){
+    [[-7,4,6],[-1,-2,12],[5,2,8]].forEach(([x,y,h])=>{
+      s.append('rect').attr('x',x-2).attr('y',y).attr('width',4).attr('height',h).attr('fill','#212E36');
+    });
+  } else {
+    s.append('path').attr('d','M 8 -5 A 9 9 0 1 1 -3 -8.5').attr('stroke','#212E36')
+      .attr('stroke-width',2.4).attr('fill','none').attr('stroke-linecap','round');
+    s.append('path').attr('d','M -7 -12 L -2 -8 L -8 -4').attr('fill','none')
+      .attr('stroke','#212E36').attr('stroke-width',2.2)
+      .attr('stroke-linecap','round').attr('stroke-linejoin','round');
+  }
+  return s;
+}
+const stationG = gLoop.selectAll('g.station').data(LOOP).join('g').attr('class','station')
+  .attr('transform',(s,i)=>`translate(${stationPos[i].x},${stationPos[i].y})`);
+const stationDisc = stationG.append('circle').attr('r',34)
+  .attr('fill','#F8F6F1').attr('stroke','#212E36').attr('stroke-width',1.8)
+  .attr('stroke-dasharray','6 5');
+stationG.each(function(s){ stationGlyph(d3.select(this), s.id).attr('opacity',.35); });
+const stationQ = stationG.append('text').attr('class','q').attr('y',6).attr('x',18)
+  .attr('text-anchor','middle')
+  .attr('font-family',SANS).call(typed,15).attr('font-weight',700)
+  .attr('fill','#B8492E').text('?');
+stationG.append('text').attr('y',56).attr('text-anchor','middle')
+  .attr('font-family',SANS).call(typed,13).attr('font-weight',700)
+  .attr('fill','#212E36').text(s=>s.label);
+
+// the evidence base at the loop's centre
+const evid = gLoop.append('g').attr('transform',`translate(${LC.x},${LC.y})`);
+evid.append('rect').attr('x',-34).attr('y',-42).attr('width',68).attr('height',84).attr('rx',4)
+  .attr('fill','#FFFFFF').attr('stroke','#7FCCC8').attr('stroke-width',2.4);
+[[-20,-24],[-20,-10],[-20,4],[-20,18]].forEach(([x,y],i)=>{
+  evid.append('rect').attr('x',x).attr('y',y).attr('width',i===3?24:40).attr('height',4)
+    .attr('rx',2).attr('fill', i===0 ? '#7FCCC8' : '#D8D2C4');
+});
+evid.append('text').attr('y',62).attr('text-anchor','middle')
+  .attr('font-family',SANS).call(typed,12).attr('font-weight',700)
+  .attr('fill','#212E36').text('One evidence base');
+
+// ---- the reveal ----
+const MARKC = ['#F37940','#7FCCC8','#FFD733','#E74D4E','#87C26B','#C3DCEB'];
+const markG = gMark.append('g').attr('transform',`translate(${LC.x},${LC.y})`);
+const markDots = d3.range(14).map(i=>{
+  const a = i*0.82, r = 8 + i*3.4;
+  return markG.append('circle')
+    .attr('cx',Math.cos(a)*r).attr('cy',Math.sin(a)*r)
+    .attr('r',2.4 + i*0.34)
+    .attr('fill',MARKC[i%MARKC.length])
+    .attr('opacity',0);
+});
+const markWord = gMark.append('text')
+  .attr('x',LC.x).attr('y',LC.y+92).attr('text-anchor','middle')
+  .attr('font-family',MONO).call(typed,19).attr('font-weight',500)
+  .attr('letter-spacing','.34em').attr('fill','#212E36')
+  .attr('opacity',0).text('COETHIA');
+const markSub = gMark.append('text')
+  .attr('x',LC.x).attr('y',LC.y+116).attr('text-anchor','middle')
+  .attr('font-family',SANS).call(typed,11.5)
+  .attr('fill','#6F6F6F')
+  .attr('opacity',0).text('the imagined system at the end of the argument');
+
+// ---- the closed loop: noise in, matched messages out ----
+(function(){
+  // three fragments funnel into Listen (top-left inflow)
+  const inPts = [[70,120],[60,220],[95,320]];
+  inPts.forEach(([x,y],i)=>{
+    const c = gFlow.append('g').attr('transform',`translate(${x},${y})`);
+    c.append('rect').attr('x',-38).attr('y',-13).attr('width',76).attr('height',26)
+      .attr('fill','#FFFFFF').attr('stroke','#212E36').attr('stroke-width',1);
+    c.append('text').attr('text-anchor','middle').attr('y',4)
+      .attr('font-family',MONO).call(typed,8.5).attr('fill','#B8492E')
+      .text(['SOCIAL','PODCAST','NEWS'][i]);
+    gFlow.append('path')
+      .attr('d',`M ${x+42} ${y} Q ${x+150} ${stationPos[0].y-70+i*6} ${stationPos[0].x-44} ${stationPos[0].y-8+i*5}`)
+      .attr('fill','none').attr('stroke','#6F6F6F').attr('stroke-width',1.3)
+      .attr('stroke-dasharray','4 4').attr('opacity',.8);
+  });
+  // four matched messages flow out of Activate to the four state figures
+  const outPts = [[905,120],[935,215],[935,320],[905,420]];
+  STATES.forEach((s,i)=>{
+    const [x,y]=outPts[i];
+    const fig = gFlow.append('g').attr('transform',`translate(${x},${y}) scale(.6)`);
+    drawArt(fig, s.id, 1);
+    const msg = gFlow.append('g').attr('transform',`translate(${x-68},${y})`);
+    msg.append('rect').attr('x',-30).attr('y',-12).attr('width',60).attr('height',24).attr('rx',12)
+      .attr('fill',s.color);
+    msg.append('path').attr('d','M 22 6 L 34 12 L 26 0 Z').attr('fill',s.color);
+    msg.append('text').attr('text-anchor','middle').attr('y',4)
+      .attr('font-family',SANS).call(typed,9.5).attr('font-weight',700)
+      .attr('fill','#212E36').text('matched');
+    gFlow.append('path')
+      .attr('d',`M ${stationPos[3].x+34} ${stationPos[3].y+8} Q ${x-140} ${y+60} ${x-102} ${y}`)
+      .attr('fill','none').attr('stroke',s.color).attr('stroke-width',2)
+      .attr('opacity',.9);
+  });
+})();
+
+/* =====================================================================
+   8. TOOLTIP + QUADRANT INTERACTION
+   ===================================================================== */
+
+const tip = d3.select('#tip');
+const tipNode = tip.node();
+function placeTip(ev){
+  const pad = 14, b = tipNode.getBoundingClientRect();
+  let x = ev.clientX + pad, y = ev.clientY + pad;
+  if (x + b.width  > innerWidth  - 8) x = ev.clientX - b.width  - pad;
+  if (y + b.height > innerHeight - 8) y = ev.clientY - b.height - pad;
+  tip.style('left', Math.max(8,x)+'px').style('top', Math.max(8,y)+'px');
+}
+function hideTip(){ tip.classed('on',false); }
+addEventListener('scroll', hideTip, { passive:true });
+
+let dotsLive = false, dotsColored = false;
+circles
+  .on('mousemove', function(ev,d){
+    if (!dotsLive) return;
+    const from = BUCKETS[d.b].toLowerCase();
+    const st = dotsColored ? STATES[d.s].name : 'not yet listened to';
+    tip.html(`<b>One person</b><br>from ${from}<br>${dotsColored ? 'belief state: <b>'+st+'</b>' : st}`)
+       .classed('on',true);
+    placeTip(ev);
+  })
+  .on('mouseleave', hideTip);
+
+function stateLabel(i){
+  const s = STATES[i];
+  return `${s.name}. ${statePct(i)}% of this illustrative population. Creed: ${s.creed} ` +
+         `${s.trust} institutional trust, ${s.appetite} intervention appetite. ${s.meaning}`;
+}
+const hits = gHit.selectAll('rect').data(STATES).join('rect')
+  .attr('x',(s,i)=> i%2===0 ? MX0 : 500).attr('y',(s,i)=> i<2 ? MY0 : 315)
+  .attr('width',250).attr('height',205)
+  .attr('fill','transparent').style('cursor','pointer').style('pointer-events','none')
+  .attr('tabindex',-1).attr('role','button')
+  .attr('aria-label',(s,i)=>stateLabel(i));
+const focusRing = gHit.append('rect')
+  .attr('fill','none').attr('stroke','#212E36').attr('stroke-width',2).attr('rx',10)
+  .attr('opacity',0).attr('pointer-events','none');
+
+function quadTip(ev, s){
+  const i = STATES.indexOf(s);
+  tip.html(`<b>${s.name}</b> · ${statePct(i)}%<br>${s.creed}<br><br>${s.meaning}`)
+     .classed('on',true);
+  if (ev && ev.clientX != null) placeTip(ev);
+}
+function quadTipAt(i){
+  const node = hits.nodes()[i];
+  quadTip(null, STATES[i]);
+  const r = node.getBoundingClientRect(), b = tipNode.getBoundingClientRect();
+  let x = r.left + r.width/2 - b.width/2;
+  let y = r.bottom + 10;
+  if (y + b.height > innerHeight - 8) y = Math.max(8, r.top - b.height - 10);
+  tip.style('left', Math.min(Math.max(8,x), innerWidth - b.width - 8)+'px')
+     .style('top', y+'px');
+}
+function focusQuad(i){
+  fields.transition('hover').duration(180)
+    .attr('opacity',(s,k)=> k===i ? .34 : .1);
+}
+function unfocusQuad(){
+  fields.transition('hover').duration(180).attr('opacity',.16);
+}
+hits
+  .on('mousemove', function(ev,s){ quadTip(ev,s); focusQuad(STATES.indexOf(s)); })
+  .on('mouseleave', function(){ hideTip(); unfocusQuad(); });
+
+function showFocusRing(i){
+  const n = hits.nodes()[i];
+  const pad = 5, grow = 14;
+  const t = { x:+n.getAttribute('x')-pad, y:+n.getAttribute('y')-pad,
+              w:+n.getAttribute('width')+2*pad, h:+n.getAttribute('height')+2*pad };
+  const travelling = +focusRing.attr('opacity') > 0;
+  if (REDUCE){
+    focusRing.interrupt('ring').attr('x',t.x).attr('y',t.y)
+      .attr('width',t.w).attr('height',t.h).attr('opacity',1);
+    return;
+  }
+  if (!travelling){
+    focusRing.interrupt('ring')
+      .attr('x',t.x-grow).attr('y',t.y-grow)
+      .attr('width',t.w+2*grow).attr('height',t.h+2*grow).attr('opacity',0);
+  }
+  focusRing.transition('ring').duration(travelling?320:260)
+    .ease(travelling?d3.easeCubicInOut:d3.easeCubicOut)
+    .attr('x',t.x).attr('y',t.y).attr('width',t.w).attr('height',t.h).attr('opacity',1);
+}
+hits
+  .on('focus', function(ev,s){ const i=STATES.indexOf(s); showFocusRing(i); focusQuad(i); quadTipAt(i); })
+  .on('blur', function(){
+    setTimeout(()=>{
+      if (hits.nodes().indexOf(document.activeElement) !== -1) return;
+      focusRing.interrupt('ring').attr('opacity',0); hideTip(); unfocusQuad();
+    },0);
+  })
+  .on('keydown', function(ev,s){
+    const i = STATES.indexOf(s);
+    const order = [0,1,2,3];
+    const at = order.indexOf(i);
+    const go = j => { const n=hits.nodes()[order[j]]; n.focus({preventScroll:true}); };
+    if (ev.key==='ArrowRight'||ev.key==='ArrowDown'){ ev.preventDefault(); go(Math.min(3,at+1)); }
+    else if (ev.key==='ArrowLeft'||ev.key==='ArrowUp'){ ev.preventDefault(); go(Math.max(0,at-1)); }
+    else if (ev.key==='Home'){ ev.preventDefault(); go(0); }
+    else if (ev.key==='End'){ ev.preventDefault(); go(3); }
+    else if (ev.key==='Escape'){ this.blur(); }
+  });
+function setQuadTabbing(on){
+  hits.attr('tabindex',(s,i)=> on ? (i===0?0:-1) : null);
+  if (!on){ focusRing.interrupt('ring').attr('opacity',0); }
+}
+
+/* =====================================================================
+   9. SCENE CONTROLLER
+   ===================================================================== */
+
+const TITLES = {
+  noise1:'One person’s Tuesday', noise2:'One person’s Tuesday',
+  oldmodel:'The old model: audiences', oldfail:'The old model: audiences',
+  beliefs:'Listening for belief', map:'The belief map', states:'The belief map',
+  factions:'The belief map', meanings:'The belief map',
+  require:'The open loop', reprise:'The loop, named', newstate:'The loop, closed'
+};
+
+let current = null, axesDrawn = false, repriseRun = false;
+
+function layoutDots(target, stagger){
+  circles.transition('scene').duration(MOVE).ease(d3.easeCubicInOut)
+    .delay((d,i)=> REDUCE ? 0 : (stagger ? (i%20)*18 : 0))
+    .attr('cx', d=>d[target+'x']).attr('cy', d=>d[target+'y']);
+  rings.transition('scene').duration(MOVE).ease(d3.easeCubicInOut)
+    .delay((d,i)=> REDUCE ? 0 : (stagger ? (i%20)*18 : 0))
+    .attr('cx', d=>d[target+'x']).attr('cy', d=>d[target+'y']);
+}
+function colorDots(on){
+  dotsColored = on;
+  circles.transition('color').duration(REDUCE?1:700)
+    .attr('fill', d => on ? STATES[d.s].color : NEUTRAL);
+}
+
+function render(key){
+  if (key === current) return;
+  const prev = current; current = key;
+  const scene = SCENES.find(s=>s.key===key);
+
+  const noiseScene = key==='noise1' || key==='noise2';
+  const rowScene   = key==='oldmodel' || key==='oldfail' || key==='beliefs';
+  const mapScene   = ['map','states','factions','meanings'].includes(key);
+  const loopScene  = ['require','reprise','newstate'].includes(key);
+
+  hideTip(); unfocusQuad();
+
+  const frame = frameFor(scene.frame);
+  const prevTK = TK;
+  computeTK(frame);
+  if (TK !== prevTK) applyTypeScale();
+  placeStamp(frame);
+  svg.transition('frame').duration(CAMERA).ease(d3.easeCubicInOut).attr('viewBox', frame);
+
+  setTitle(TITLES[key] || '');
+  show(gTitle, noiseScene ? 0 : 1);
+  show(gStamp, 1);
+
+  show(gNoise,  noiseScene ? 1 : 0);
+  show(gContra, key==='noise2' ? 1 : 0);
+  if (key==='noise2' && prev==='noise1') drawOn(gContra.selectAll('path'), 800, (d,i)=>i*140);
+
+  show(gModel,  key==='oldmodel' || key==='oldfail' ? 1 : 0);
+  show(gReact,  key==='oldfail' ? 1 : 0);
+  show(gSay,    key==='beliefs' ? 1 : 0);
+
+  show(gField,  mapScene ? 1 : 0);
+  if (mapScene && !axesDrawn){ axesDrawn = true; drawOn(gField.selectAll('path.ax'), 900); }
+  show(gState,  (key==='states'||key==='factions'||key==='meanings') ? 1 : 0);
+  stFig.attr('display', MOBILE() ? 'none' : null);
+  show(gRing,   key==='factions' ? 1 : 0);
+  show(gMean,   key==='meanings' ? 1 : 0);
+  if (key==='meanings' && prev!=='meanings') drawOn(gMean.selectAll('path.lead'), 700, (d,i)=>i*120);
+
+  show(gLoop,   loopScene ? 1 : 0);
+  show(gMark,   (key==='reprise'||key==='newstate') ? 1 : 0);
+  show(gFlow,   key==='newstate' ? 1 : 0);
+
+  // dots: absent in noise, neutral in the bucket act, colored from beliefs on
+  const dotsOn = rowScene || mapScene;
+  dotsLive = dotsOn;
+  show(gDots, dotsOn ? (key==='meanings' ? .3 : 1) : 0);
+  circles.style('pointer-events', dotsOn && key!=='meanings' ? 'all' : 'none');
+  if (key==='oldmodel' || key==='oldfail'){ layoutDots('b'); colorDots(false); }
+  if (key==='beliefs'){ layoutDots('s', prev==='oldfail'||prev==='oldmodel'); colorDots(true); }
+  if (mapScene){ layoutDots('q', prev==='beliefs'); colorDots(true); }
+  show(gDots, dotsOn ? (key==='meanings' ? .3 : (key==='factions' ? .95 : 1)) : 0);
+
+  // quadrant buttons live only when the map is the subject
+  const quadLive = mapScene;
+  hits.style('pointer-events', quadLive ? 'all' : 'none');
+  setQuadTabbing(quadLive);
+
+  // ---- the reprise: stations fill, arcs draw, the mark forms ----
+  if (key==='reprise' && prev!=='reprise'){
+    show(evid, 0, 1);
+    const seq = REDUCE ? 0 : 1;
+    stationDisc.transition('fill').duration(REDUCE?1:420)
+      .delay((s,i)=> i*160*seq)
+      .attr('stroke-dasharray','1 0')
+      .attr('stroke-width',2.4)
+      .attr('fill','#FFFFFF');
+    stationG.selectAll('g.glyph').transition('fill').duration(REDUCE?1:420)
+      .delay((s,i)=> i*160*seq).attr('opacity',1);
+    stationQ.transition('fill').duration(REDUCE?1:200)
+      .delay((s,i)=> i*160*seq).attr('opacity',0);
+    arcs.forEach((a,i)=> drawOn(a, REDUCE?1:560, ()=> 200 + i*160*seq));
+    arrowMarks.forEach((m,i)=> m.transition('fill').duration(REDUCE?1:220)
+      .delay(520 + i*160*seq).style('opacity',1));
+    markDots.forEach((m,i)=> m.transition('mark').duration(REDUCE?1:380)
+      .delay(REDUCE?0:900 + i*55).ease(VALUE_EASE).attr('opacity',1));
+    markWord.transition('mark').duration(REDUCE?1:600).delay(REDUCE?0:1750).attr('opacity',1);
+    markSub.transition('mark').duration(REDUCE?1:600).delay(REDUCE?0:1950).attr('opacity',.9);
+    repriseRun = true;
+  }
+  if (key==='require' && repriseRun){
+    // scrolling back up: reopen the loop
+    repriseRun = false;
+    stationDisc.interrupt('fill').attr('stroke-dasharray','6 5').attr('stroke-width',1.8).attr('fill','#F8F6F1');
+    stationG.selectAll('g.glyph').interrupt('fill').attr('opacity',.35);
+    stationQ.interrupt('fill').attr('opacity',1);
+    arcs.forEach(a=>a.interrupt('draw').style('opacity',0));
+    arrowMarks.forEach(m=>m.interrupt('fill').style('opacity',0));
+    markDots.forEach(m=>m.interrupt('mark').attr('opacity',0));
+    markWord.interrupt('mark').attr('opacity',0);
+    markSub.interrupt('mark').attr('opacity',0);
+    show(evid, 1, 1);
+  }
+  if (key==='newstate' && prev!=='newstate' && !repriseRun){
+    // deep link straight to the finale: arrive with the loop already closed
+    stationDisc.attr('stroke-dasharray','1 0').attr('stroke-width',2.4).attr('fill','#FFFFFF');
+    stationG.selectAll('g.glyph').attr('opacity',1);
+    stationQ.attr('opacity',0);
+    arcs.forEach(a=>a.style('opacity',1));
+    arrowMarks.forEach(m=>m.style('opacity',1));
+    markDots.forEach(m=>m.attr('opacity',1));
+    markWord.attr('opacity',1); markSub.attr('opacity',.9);
+    repriseRun = true;
+  }
+  if (key==='require'){ show(evid, 1, 1); }
+}
+
+/* =====================================================================
+   10. OBSERVERS + BOOT
+   ===================================================================== */
+
+const activeSteps = new Set();
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => e.isIntersecting ? activeSteps.add(e.target) : activeSteps.delete(e.target));
+  if (!activeSteps.size) return;
+  const mid = innerHeight / 2;
+  let best = null, bestD = Infinity;
+  activeSteps.forEach(el => {
+    const r = el.getBoundingClientRect();
+    const d = Math.abs((r.top + r.bottom) / 2 - mid);
+    if (d < bestD){ bestD = d; best = el; }
+  });
+  if (best) render(best.dataset.key);
+}, { rootMargin:'-45% 0px -45% 0px', threshold:0 });
+document.querySelectorAll('.step').forEach(el => io.observe(el));
+
+if (!REDUCE){
+  document.documentElement.classList.add('reveal-ready');
+  const revealIO = new IntersectionObserver((entries, obs) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('in');
+      obs.unobserve(e.target);
+    });
+  }, { rootMargin:'0px 0px -22% 0px', threshold:0.1 });
+  document.querySelectorAll('.step-inner').forEach(el => revealIO.observe(el));
+}
+
+let resizeTimer = null;
+addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    const key = current;
+    if (!key) return;
+    const scene = SCENES.find(s => s.key === key);
+    if (!scene) return;
+    const frame = frameFor(scene.frame);
+    computeTK(frame);
+    applyTypeScale();
+    placeStamp(frame);
+    stFig.attr('display', MOBILE() ? 'none' : null);
+    svg.attr('viewBox', frame);
+    current = null;
+    render(key);
+  }, 180);
+}, { passive:true });
+
+addEventListener('beforeprint', () => {
+  document.querySelectorAll('.step-inner').forEach(el => el.classList.add('in'));
+});
+
+computeTK(frameFor('stage'));
+applyTypeScale();
+placeStamp(frameFor('stage'));
+svg.attr('viewBox', frameFor('stage'));
+render('noise1');
+</script>
+</body>
+</html>

@@ -1,11 +1,19 @@
-# How Does Politics Shape American Health?
+# Coethia Visuals
 
-A scrollytelling explainer arguing that American health behavior should be segmented
-by belief and barrier rather than by party, and that doing so changes who counts as
-reachable.
+Two scrollytelling explainers in one shared design system. Open either file in a
+browser — no build step, no server required.
 
-**[political-health-personas.html](political-health-personas.html)** — open it in a
-browser. No build step, no server required.
+**[political-health-personas.html](political-health-personas.html)** —
+*How Does Politics Shape American Health?* Argues that American health behavior
+should be segmented by belief and barrier rather than by party, and that doing so
+changes who counts as reachable.
+
+**[belief-based-communication.html](belief-based-communication.html)** —
+*From Health Noise to Health Belief.* Follows fragmented health noise through the
+failure of label-targeting to a two-axis belief map, then — only at the end — closes
+the argument with the system it implies: Coethia's listen–map–translate–activate–
+measure–learn loop, presented as the imagined optimal solution rather than the
+premise. The brand deliberately appears nowhere before the reprise.
 
 ---
 
