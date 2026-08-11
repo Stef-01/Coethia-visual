@@ -42,22 +42,23 @@ h1{
   line-height:1.1;color:var(--ink);margin:30px 0 14px;text-wrap:balance;
 }
 .lede{max-width:620px;margin:0 0 56px}
-.piece{display:block;text-decoration:none;color:inherit;border-top:1px solid var(--ink);padding:30px 0 34px}
+.piece{display:block;border-top:1px solid var(--ink);padding:30px 0 34px}
 .piece:last-of-type{border-bottom:1px solid var(--ink)}
 .piece h2{
   font-family:var(--serif);font-weight:500;font-size:clamp(22px,3vw,30px);
-  line-height:1.2;color:var(--ink);margin:0 0 10px;
-  transition:color .18s ease;
+  line-height:1.2;margin:0 0 10px;
 }
-.piece:hover h2{color:#B8492E}
+.piece h2 .tlink{color:var(--ink);text-decoration:none;transition:color .18s ease}
+.piece h2 .tlink:hover{color:#B8492E}
 .piece p{margin:0;max-width:600px;font-size:16px}
 .piece .go{
-  display:inline-block;margin-top:14px;font-family:var(--mono);font-size:12px;
-  letter-spacing:.12em;text-transform:uppercase;color:#B8492E;
+  display:inline-block;margin-top:14px;margin-right:30px;font-family:var(--mono);font-size:12px;
+  letter-spacing:.12em;text-transform:uppercase;
 }
+.piece .go a{color:#B8492E;text-decoration:none}
 .piece .go .arrow{display:inline-block;transition:transform .3s cubic-bezier(.16,1,.3,1)}
-.piece:hover .go .arrow{transform:translateX(5px)}
-.piece:focus-visible{outline:3px solid var(--ink);outline-offset:4px}
+.piece .go a:hover .arrow{transform:translateX(5px)}
+.piece a:focus-visible{outline:3px solid var(--ink);outline-offset:4px}
 .foot{font-size:12.5px;color:#6F6F6F;margin-top:46px;max-width:620px}
 @media (prefers-reduced-motion: reduce){
   .piece .go .arrow{transition:none}
@@ -84,17 +85,18 @@ h1{
   <h1>Two Arguments About American Health, Told by Scrolling</h1>
   <p class="lede">A pair of interactive design prototypes in one shared visual system. Every figure in both pieces is synthetic — these are arguments about <em>how to look</em>, not findings.</p>
 
-  <a class="piece" href="political-health-personas.html">
-    <h2>How Does Politics Shape American Health?</h2>
-    <p>Party predicts health behavior but never explains it. Five political health personas, segmented by belief and barrier instead of ballot, show who can actually be reached.</p>
-    <span class="go">Read the explainer&nbsp;&nbsp;<span class="arrow">&rarr;</span></span>
-  </a>
+  <div class="piece">
+    <h2><a class="tlink" href="political-health-personas.html">How Does Politics Shape American Health?</a></h2>
+    <p>Party predicts health behavior but never explains it. Five political health personas, segmented by belief and barrier instead of ballot, show who can actually be reached. Two editions, one argument: pick your temperament.</p>
+    <span class="go"><a href="political-health-personas.html">Precise edition&nbsp;&nbsp;<span class="arrow">&rarr;</span></a></span>
+    <span class="go"><a href="political-health-personas-classic.html">Classic edition&nbsp;&nbsp;<span class="arrow">&rarr;</span></a></span>
+  </div>
 
-  <a class="piece" href="belief-based-communication.html">
-    <h2>From Health Noise to Health Belief</h2>
+  <div class="piece">
+    <h2><a class="tlink" href="belief-based-communication.html">From Health Noise to Health Belief</a></h2>
     <p>Fragmented advice, hollow demographic targeting, and the two questions that beat five labels. The system that would close the loop arrives only at the end, where it belongs.</p>
-    <span class="go">Read the explainer&nbsp;&nbsp;<span class="arrow">&rarr;</span></span>
-  </a>
+    <span class="go"><a href="belief-based-communication.html">Read the explainer&nbsp;&nbsp;<span class="arrow">&rarr;</span></a></span>
+  </div>
 
   <p class="foot">Structure, layout grammar and motion vocabulary adapted from Surgo Ventures&rsquo; COVID-19 Vaccine Persona Explainer (design: Daisy Chung; development: Julia Janicki). All artwork, code and data here are original.</p>
 </main>

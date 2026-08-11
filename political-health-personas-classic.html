@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>How Does Politics Shape American Health? — Political Health Persona Explainer</title>
+<title>How Does Politics Shape American Health? — Classic Edition</title>
 <meta name="description" content="Party affiliation predicts American health behavior but never explains it. Five political health personas — segmented by belief and barrier, not ballot — show who can be reached and how.">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F8F6F1">
@@ -409,7 +409,7 @@ h1{
     </svg>
     <span>Political Health</span>
   </a>
-  <a class="tag" href="political-health-personas-classic.html">Precise edition · switch to classic &rarr;</a>
+  <a class="tag" href="political-health-personas.html">Classic edition · switch to precise &rarr;</a>
 </header>
 
 <div class="hero measure">
@@ -469,6 +469,7 @@ h1{
     </div>
     <div class="col">
       <h3>Data and Methods</h3>
+      <p><strong>This is the classic edition.</strong> It restores the warmer palettes (the golden income family, the vivid Cost-Constrained orange), the densely packed persona grid, the lobes’ half-depth retreat behind the tables, and the elastic bloom on the depth bands. The <a href="political-health-personas.html">precise edition</a> holds the stricter encodings: no display factor on the grid, no overshoot on marks whose size is a number, and lobes that never disagree with their own labels.</p>
       <p><strong>This is a design prototype.</strong> All figures shown are synthetic placeholders constructed to be structurally plausible — they are not survey results and should not be cited. The data schema is designed to be swapped for real survey output without changing any layout code.</p>
       <p><strong>Nothing here is a finding.</strong> Where the piece says segmentation work “routinely reports” something about trust, treat that as the premise the design is built on, not as a result this prototype establishes. No literature is cited because none is relied on: the argument being tested is about how you would <em>segment</em> a population, and it stands or falls on its own logic.</p>
       <p>The intended method mirrors standard psychobehavioral segmentation practice: a k-medoids partitioning-around-medoids clustering algorithm with a Gower distance metric, run over seven variables — <strong>trust in federal health agencies</strong>, <strong>trust in personal physician</strong>, <strong>perceived politicization of medical guidance</strong>, <strong>cost and coverage barriers</strong>, <strong>media diet homogeneity</strong>, <strong>individual-versus-collective responsibility for health</strong>, and <strong>perceived fairness of the health system</strong>.</p>
@@ -507,7 +508,7 @@ const PERSONAS = [
     interventions:['Clinicians, not officials','Transparent uncertainty'] },
 
   { id:'cost', name:'The Cost-Constrained', short:'Cost-Constrained',
-    share:19, share2:15, share3:12, score:5.4, color:'#EFC08A',
+    share:19, share2:15, share3:12, score:5.4, color:'#F9A65C',
     blurb:'They want care but cannot afford the gap between coverage and reality.',
     barriers:['Financial cost','Coverage gaps','Unpaid time off'],
     interventions:['Zero cost at the door','Upfront price clarity'] },
@@ -536,13 +537,13 @@ const FAMILIES = [
       {n:'Urban', c:'#42833E'}, {n:'Suburban', c:'#87C26B'}, {n:'Rural', c:'#2E6B2B'} ] },
   { id:'race', label:'Race', icon:'race', cats:[
       {n:'White', c:'#003F5C'}, {n:'Black', c:'#0056A3'}, {n:'Hispanic', c:'#69ACBF'},
-      {n:'Asian', c:'#A8C8DC'}, {n:'Other', c:'#3A5D74'} ] },
+      {n:'Asian', c:'#C3DCEB'}, {n:'Other', c:'#3A5D74'} ] },
   { id:'party', label:'Party', icon:'party', cats:[
-      {n:'Democrat', c:'#6B1F18'}, {n:'Independent', c:'#DE8F81'},
-      {n:'Republican', c:'#DD4A34'}, {n:'Other / none', c:'#FBDDD7'} ] },
+      {n:'Democrat', c:'#973027'}, {n:'Independent', c:'#E76D6D'},
+      {n:'Republican', c:'#D53F3B'}, {n:'Other / none', c:'#F8B7B7'} ] },
   { id:'income', label:'Income', icon:'income', cats:[
-      {n:'Under $35k', c:'#E3D5F0'}, {n:'$35k–$75k', c:'#BFA3DC'},
-      {n:'$75k–$150k', c:'#9070BC'}, {n:'$150k+', c:'#5F3E91'} ] }
+      {n:'Under $35k', c:'#FFD733'}, {n:'$35k–$75k', c:'#F9A65C'},
+      {n:'$75k–$150k', c:'#F37940'}, {n:'$150k+', c:'#FFFAA3'} ] }
 ];
 
 // bubbles that carry the teal highlight ring in the second demographic scene
@@ -606,13 +607,12 @@ const SHORT = {
   'Other / none':'Other', 'Under $35k':'<$35k', '$35k–$75k':'$35–75k',
   '$75k–$150k':'$75–150k', '$150k+':'$150k+'
 };
-/* ONE radius scale, no fudge factor, in both scenes: area is population, so
-   the five persona bubbles a demographic bubble breaks into sum back to it.
-   The old grid radius multiplied its count by 2.1 before scaling, which
-   inflated the encoded population of the split by the same factor and made a
-   mark mean two different things depending on which scene you were in. */
+/* CLASSIC EDITION: the grid radius carries a 2.1 display factor so the persona
+   columns pack lush and full, the way the piece originally read. The factor is
+   uniform, so within-scene comparisons hold; the precise edition drops it for
+   strict cross-scene area continuity. */
 const r1 = d => d.count1 === 0 ? 0 : Math.max(6, rScale(d.count1));
-const r2 = d => Math.max(3.5, rScale(d.count2));
+const r2 = d => Math.max(4, rScale(d.count2 * 2.1));
 
 /* =====================================================================
    2. ILLUSTRATIONS — original flat-vector scenes, drawn in code
@@ -725,8 +725,7 @@ const SCENES_ART = {
                  s.append('path').attr('d','M -6 -4 L -1 2 L 7 -8').attr('stroke','#F8D5D5').attr('stroke-width',3).attr('fill','none').attr('stroke-linecap','round').attr('stroke-linejoin','round'); });
   },
   income(g){
-    // follows the income family's own hue so the icon and its bubbles agree
-    g.append('circle').attr('r',46).attr('fill','#F0E8F8');
+    g.append('circle').attr('r',46).attr('fill','#FFF3B8');
     // pot gives the stem somewhere to grow from
     g.append('path').attr('d','M -15 20 L 15 20 L 11 40 L -11 40 Z').attr('fill','#E08A45');
     g.append('rect').attr('x',-17).attr('y',15).attr('width',34).attr('height',6).attr('rx',1.5).attr('fill','#F2A05A');
@@ -734,13 +733,13 @@ const SCENES_ART = {
     g.append('path').attr('d','M 0 6 Q -13 3 -17 -8').attr('stroke','#7FA84E').attr('stroke-width',2.8).attr('fill','none').attr('stroke-linecap','round');
     g.append('path').attr('d','M 0 -1 Q 13 -5 17 -15').attr('stroke','#7FA84E').attr('stroke-width',2.8).attr('fill','none').attr('stroke-linecap','round');
     // three well-separated coins, uniform glyph sizing
-    [[0,-15,11.5,'#BFA3DC'],[-19,-12,8,'#5F3E91'],[19,-20,8,'#9070BC']].forEach(([x,y,r,c])=>{
+    [[0,-15,11.5,'#FFD733'],[-19,-12,8,'#F37940'],[19,-20,8,'#F9A65C']].forEach(([x,y,r,c])=>{
       g.append('circle').attr('cx',x).attr('cy',y).attr('r',r).attr('fill',c);
       g.append('circle').attr('cx',x).attr('cy',y).attr('r',r-2.4).attr('fill','none')
-        .attr('stroke','#F0E8F8').attr('stroke-width',1).attr('opacity',.6);
+        .attr('stroke','#FFF3B8').attr('stroke-width',1).attr('opacity',.6);
       g.append('text').attr('x',x).attr('y',y+r*0.34).attr('text-anchor','middle')
         .attr('font-family','Libre Franklin, sans-serif').attr('font-size',r*0.95)
-        .attr('font-weight',700).attr('fill','#F0E8F8').text('$');
+        .attr('font-weight',700).attr('fill','#FFF3B8').text('$');
     });
   },
 
@@ -977,7 +976,7 @@ const SCENES = [
     note:'Synthetic sample standing in for ~3,000 U.S. adults. * Includes those who prefer to self-describe.' },
 
   { key:'demo2', frame:'demo', h:'The Same Person Is in Every Bucket',
-    body:`<p>Segmentation decks routinely report lower trust in health institutions among ${chip('women','#A94F76')}, ${chip('rural','#2E6B2B')} residents, ${chip('Black','#0056A3')} Americans, ${chip('Republicans','#C23834')} and ${chip('lower-income','#5F3E91')} adults. Take every one of those as given. They are still nearly useless for targeting.</p>
+    body:`<p>Segmentation decks routinely report lower trust in health institutions among ${chip('women','#A94F76')}, ${chip('rural','#2E6B2B')} residents, ${chip('Black','#0056A3')} Americans, ${chip('Republicans','#D53F3B')} and ${chip('lower-income','#FFD733',1)} adults. Take every one of those as given. They are still nearly useless for targeting.</p>
           <p>One person can sit inside all five of those circles at once — and the next person with the identical profile behaves the opposite way. One skipped the appointment because it cost $340. The other skipped it because they did not think it was necessary.</p>
           <p><strong>The same intervention cannot reach both.</strong></p>`,
     hint:'Hover any circle to see the group size', note:'' },
@@ -2423,12 +2422,10 @@ function render(key){
 
   // ---- LOBES: the signature elastic morph ----
   const shareOf = (p) => [p.share, p.share2, p.share3][wave];
-  /* Depth IS the number. An earlier version scaled the lobes to 0.5 on the
-     table scenes "to make room", while the % label kept printing the full
-     value, so the mark and its own label disagreed by a factor of two. There
-     is no room problem to solve: the band ends at 346 user units and the table
-     starts at 730. */
-  const depth   = 1;
+  /* CLASSIC EDITION: the lobes retreat to half depth while the barrier and
+     solution tables have the floor, then bloom back — a beat the precise
+     edition trades away for strict label/mark agreement. */
+  const depth   = tableScene ? 0.5 : 1;
 
   if (lobeScene){
     // re-entering after being hidden: reset flat, then bloom, so it reads as growth
@@ -2441,12 +2438,12 @@ function render(key){
        retreat that makes room for the table just made the shrink wobble. */
     const reveal = key === 'named' || key === 'shift' || key === 'final';
     lobes.transition('scene').duration(reveal ? ELASTIC : 700)
-      .ease(reveal ? VALUE_EASE : d3.easeCubicInOut)
+      .ease(reveal ? SHAPE_EASE : d3.easeCubicInOut)
       .attr('d',(p,i)=>lobeD(i, shareOf(p)*depth))
       .attr('opacity', p => (key==='likelihood' && (p.id==='inst'||p.id==='sovr')) ? .45 : .85);
     // the share rides at each lobe's tip — depth IS the number, so they travel together
     gLabels.selectAll('.pshare').transition('scene').duration(reveal ? ELASTIC : 700)
-      .ease(reveal ? VALUE_EASE : d3.easeCubicInOut)
+      .ease(reveal ? SHAPE_EASE : d3.easeCubicInOut)
       .attr('y', (d,i) => LOBE_Y0 + areaY(shareOf(PERSONAS[i]) * depth) + 20*TK);
   } else {
     lobes.transition('scene').duration(FADE).attr('d',(p,i)=>lobeD(i,0));
@@ -2456,8 +2453,8 @@ function render(key){
   if (outScene){
     const v = OUTCOME.v[wave === 0 ? 0 : wave];
     if (prev !== 'shift' && prev !== 'final') outPath.attr('d', outD(0));
-    outPath.transition('scene').duration(ELASTIC).ease(VALUE_EASE).attr('d', outD(v));
-    outLabel.transition('scene').duration(ELASTIC).ease(VALUE_EASE).attr('y', outY(v) + 32);
+    outPath.transition('scene').duration(ELASTIC).ease(SHAPE_EASE).attr('d', outD(v));
+    outLabel.transition('scene').duration(ELASTIC).ease(SHAPE_EASE).attr('y', outY(v) + 32);
     countTo(outLabel, () => v, pct);
   }
 
