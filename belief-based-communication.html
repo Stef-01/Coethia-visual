@@ -605,7 +605,7 @@ const SCENES = [
   { key:'factions', frame:'map', h:'Every “Audience” Contains All Four',
     body:`<p>Take any single bucket from the old model — one party, one community, one age band — and light its members up on the belief map.</p>
           <p><strong>They are everywhere.</strong> Four factions, four different conversations, inside every audience the old model treated as one. One message per bucket was never going to work.</p>`,
-    hint:'Ringed dots all belong to the same old-model bucket',
+    hint:'The bright, outlined dots are one old-model audience',
     note:'Synthetic population — the mixes differ by bucket, but every bucket contains every state.' },
 
   { key:'meanings', frame:'map', h:'Same Treatment, Four Meanings',
@@ -711,13 +711,13 @@ function applyTypeScale(){
 }
 
 const FRAMES = {
-  stage:'170 30 660 620',
+  stage:'148 24 704 640',
   row:  '40 30 920 590',
   map:  '130 10 740 650',
   wide: '30 0 940 700'
 };
 const FRAMES_MOBILE = {
-  stage:'190 30 620 660',
+  stage:'160 24 680 700',
   row:  '20 20 960 640',
   map:  '120 0 760 730',
   wide: '10 0 980 760'
@@ -799,20 +799,119 @@ const fragPos = FRAGMENTS.map((f,i)=>{
   ph.append('rect').attr('x',-4.5).attr('y',-8.5).attr('width',9).attr('height',15).attr('rx',1).attr('fill','#9FD8D4');
 })();
 
+/* Each fragment is drawn as the thing it is — a newspaper clipping, a podcast
+   tile, a social card, a chat bubble, a creator video, a clinical document —
+   rather than six identical labeled boxes. All soft-cornered, all in-palette. */
+const SERIF = 'Optima, Gill Sans, Gill Sans MT, Candara, Libre Franklin, sans-serif';
+const FRAG_ART = {
+  news(g,f){
+    g.append('rect').attr('x',-88).attr('y',-34).attr('width',176).attr('height',68).attr('rx',10)
+      .attr('fill','#FFFDF6').attr('stroke','#DCD5C6').attr('stroke-width',1.2);
+    g.append('text').attr('x',-76).attr('y',-19)
+      .attr('font-family',MONO).call(typed,7.5).attr('letter-spacing','.18em')
+      .attr('fill','#6F6F6F').text('THE MORNING PAPER');
+    g.append('path').attr('d','M -76 -13 L 76 -13 M -76 -10.5 L 76 -10.5')
+      .attr('stroke','#212E36').attr('stroke-width',.8);
+    g.append('text').attr('x',-76).attr('y',4)
+      .attr('font-family',SERIF).call(typed,12.5).attr('font-weight',500)
+      .attr('fill','#212E36').text(f.l1);
+    g.append('text').attr('x',-76).attr('y',18)
+      .attr('font-family',SERIF).call(typed,12.5).attr('font-weight',500)
+      .attr('fill','#212E36').text(f.l2);
+    [[-76,24,150],[-76,28,132]].forEach(([x,y,w])=>{
+      g.append('rect').attr('x',x).attr('y',y).attr('width',w).attr('height',2).attr('rx',1)
+        .attr('fill','#DCD5C6');
+    });
+  },
+  podcast(g,f){
+    g.append('rect').attr('x',-88).attr('y',-32).attr('width',176).attr('height',64).attr('rx',14)
+      .attr('fill','#212E36');
+    g.append('circle').attr('cx',-62).attr('cy',0).attr('r',15).attr('fill','#F37940');
+    g.append('path').attr('d','M -67 -7 L -54 0 L -67 7 Z').attr('fill','#FFFFFF');
+    [5,10,7,13,6,11,8].forEach((h,k)=>{
+      g.append('rect').attr('x',-38+k*8).attr('y',10-h/2).attr('width',3.5).attr('height',h)
+        .attr('rx',1.75).attr('fill','#7FCCC8');
+    });
+    g.append('text').attr('x',-40).attr('y',-12)
+      .attr('font-family',SANS).call(typed,11).attr('font-weight',700)
+      .attr('fill','#F8F6F1').text('Big Pharma vs. You');
+    g.append('text').attr('x',-40).attr('y',2)
+      .attr('font-family',MONO).call(typed,7.5).attr('letter-spacing','.12em')
+      .attr('fill','#9FB3BE').text('EP. 245 · 48 MIN');
+  },
+  social(g,f){
+    g.append('rect').attr('x',-88).attr('y',-32).attr('width',176).attr('height',64).attr('rx',14)
+      .attr('fill','#FFFFFF').attr('stroke','#DCD5C6').attr('stroke-width',1.2);
+    g.append('circle').attr('cx',-70).attr('cy',-13).attr('r',9).attr('fill','#C3DCEB');
+    g.append('circle').attr('cx',-70).attr('cy',-16).attr('r',3.2).attr('fill','#5B7B9A');
+    g.append('path').attr('d','M -76 -8 Q -70 -13 -64 -8 L -64 -6 L -76 -6 Z').attr('fill','#5B7B9A');
+    g.append('text').attr('x',-56).attr('y',-15)
+      .attr('font-family',SANS).call(typed,10).attr('font-weight',700)
+      .attr('fill','#212E36').text('wellness.jules');
+    g.append('text').attr('x',-56).attr('y',-4)
+      .attr('font-family',MONO).call(typed,7.5).attr('fill','#6F6F6F').text('@sponsored');
+    g.append('text').attr('x',-76).attr('y',12)
+      .attr('font-family',SANS).call(typed,10.5).attr('font-weight',600)
+      .attr('fill','#212E36').text('Is seed oil making you sick?');
+    g.append('path')
+      .attr('d','M -73 22 c -2.2 -2.6 -6 -0.9 -6 1.9 c 0 2.2 3.4 4 6 5.6 c 2.6 -1.6 6 -3.4 6 -5.6 c 0 -2.8 -3.8 -4.5 -6 -1.9 Z')
+      .attr('transform','scale(.85)')
+      .attr('fill','#E74D4E');
+    g.append('text').attr('x',-52).attr('y',26)
+      .attr('font-family',MONO).call(typed,7.5).attr('fill','#6F6F6F').text('1.2k');
+  },
+  ai(g,f){
+    g.append('rect').attr('x',-88).attr('y',-28).attr('width',176).attr('height',56).attr('rx',18)
+      .attr('fill','#E7F2F1').attr('stroke','#BFDDDA').attr('stroke-width',1.2);
+    g.append('path').attr('d','M -58 26 L -48 38 L -42 26 Z').attr('fill','#E7F2F1');
+    sparkle(g,-70,-12,2.6,'#3E8E89');
+    sparkle(g,-62,-18,1.7,'#3E8E89');
+    g.append('text').attr('x',-50).attr('y',-4)
+      .attr('font-family',SANS).call(typed,11).attr('font-weight',600)
+      .attr('fill','#212E36').text('“What’s the best way');
+    g.append('text').attr('x',-50).attr('y',10)
+      .attr('font-family',SANS).call(typed,11).attr('font-weight',600)
+      .attr('fill','#212E36').text('to lose weight?”');
+    g.append('text').attr('x',76).attr('y',-14)
+      .attr('font-family',MONO).call(typed,7.5).attr('letter-spacing','.14em')
+      .attr('fill','#3E8E89').attr('text-anchor','end').text('AI CHAT');
+  },
+  creator(g,f){
+    g.append('rect').attr('x',-88).attr('y',-34).attr('width',176).attr('height',68).attr('rx',12)
+      .attr('fill','#FBD6BE');
+    g.append('circle').attr('cx',0).attr('cy',-4).attr('r',14).attr('fill','#F8F6F1').attr('opacity',.92);
+    g.append('path').attr('d','M -4 -11 L 8 -4 L -4 3 Z').attr('fill','#212E36');
+    g.append('rect').attr('x',-76).attr('y',20).attr('width',152).attr('height',4).attr('rx',2)
+      .attr('fill','#F8F6F1').attr('opacity',.7);
+    g.append('rect').attr('x',-76).attr('y',20).attr('width',94).attr('height',4).attr('rx',2)
+      .attr('fill','#B8492E');
+    g.append('text').attr('x',-76).attr('y',-22)
+      .attr('font-family',SANS).call(typed,10.5).attr('font-weight',700)
+      .attr('fill','#212E36').text('Detox first. Everything after.');
+  },
+  guide(g,f){
+    g.append('rect').attr('x',-80).attr('y',-30).attr('width',160).attr('height',62).attr('rx',8)
+      .attr('fill','#FFFFFF').attr('stroke','#DCD5C6').attr('stroke-width',1.2);
+    g.append('rect').attr('x',-22).attr('y',-36).attr('width',44).attr('height',12).attr('rx',6)
+      .attr('fill','#5FA8A0');
+    g.append('text').attr('x',-68).attr('y',-8)
+      .attr('font-family',SANS).call(typed,10.5).attr('font-weight',700)
+      .attr('fill','#212E36').text('Standards of Care 2026');
+    [[-68,4],[-68,16]].forEach(([x,y],k)=>{
+      g.append('path').attr('d','M '+x+' '+y+' l 3.5 3.5 l 6 -6.5')
+        .attr('stroke','#5FA8A0').attr('stroke-width',2).attr('fill','none')
+        .attr('stroke-linecap','round').attr('stroke-linejoin','round');
+      g.append('rect').attr('x',x+16).attr('y',y-1).attr('width',k?52:74).attr('height',2.5).attr('rx',1.25)
+        .attr('fill','#DCD5C6');
+    });
+    g.append('text').attr('x',72).attr('y',26)
+      .attr('font-family',MONO).call(typed,7).attr('letter-spacing','.14em')
+      .attr('fill','#6F6F6F').attr('text-anchor','end').text('FOR CLINICIANS');
+  }
+};
 const fragG = gNoise.selectAll('g.frag').data(FRAGMENTS).join('g').attr('class','frag')
   .attr('transform',(f,i)=>`translate(${fragPos[i].x},${fragPos[i].y})`);
-fragG.append('rect').attr('x',-FRAG_W/2).attr('y',-FRAG_H/2)
-  .attr('width',FRAG_W).attr('height',FRAG_H)
-  .attr('fill','#FFFFFF').attr('stroke','#212E36').attr('stroke-width',1.2);
-fragG.append('text').attr('x',-FRAG_W/2+10).attr('y',-FRAG_H/2+16)
-  .attr('font-family',MONO).call(typed,8.5).attr('letter-spacing','.14em')
-  .attr('fill','#B8492E').text(f=>f.tag);
-fragG.append('text').attr('x',-FRAG_W/2+10).attr('y',-FRAG_H/2+33)
-  .attr('font-family',SANS).call(typed,11.5).attr('font-weight',600)
-  .attr('fill','#212E36').text(f=>f.l1);
-fragG.append('text').attr('x',-FRAG_W/2+10).attr('y',-FRAG_H/2+48)
-  .attr('font-family',SANS).call(typed,11.5).attr('font-weight',600)
-  .attr('fill','#212E36').text(f=>f.l2);
+fragG.each(function(f){ FRAG_ART[f.k](d3.select(this), f); });
 
 // contradiction links: dashed red arcs pairing fragments that disagree.
 // They render beneath the cards — an argument between fragments, not a strike
@@ -828,9 +927,9 @@ CONTRA.forEach(([a,b])=>{
     .attr('fill','none').attr('stroke','#E74D4E').attr('stroke-width',1.8)
     .attr('stroke-dasharray','7 5').attr('opacity',.85);
   const vg = gContra.append('g').attr('transform',`translate(${mx+ox*0.55},${my+oy*0.55})`);
-  vg.append('circle').attr('r',11).attr('fill','#E74D4E');
-  vg.append('text').attr('text-anchor','middle').attr('y',3.5)
-    .attr('font-family',MONO).call(typed,8.5).attr('font-weight',500)
+  vg.append('circle').attr('r',9).attr('fill','#C25236');
+  vg.append('text').attr('text-anchor','middle').attr('y',3)
+    .attr('font-family',MONO).call(typed,7.5).attr('font-weight',500)
     .attr('fill','#FFFFFF').text('vs');
 });
 
@@ -855,9 +954,12 @@ bucketG.append('text').attr('y',BUR+24).attr('text-anchor','middle')
     m.append('path').attr('d',`M ${x} ${y} q 8 ${-y*0.2} 14 0`)
       .attr('stroke','#B8492E').attr('stroke-width',2.4).attr('fill','none').attr('stroke-linecap','round');
   });
-  m.append('text').attr('x',8).attr('y',52).attr('text-anchor','middle')
+  m.append('text').attr('x',8).attr('y',-46).attr('text-anchor','middle')
     .attr('font-family',SANS).call(typed,12.5).attr('font-weight',700)
-    .attr('fill','#212E36').text('One message, five copies');
+    .attr('fill','#212E36')
+    .attr('stroke','#F8F6F1').attr('stroke-width',3).attr('stroke-opacity',.9)
+    .attr('paint-order','stroke fill')
+    .text('One message, five copies');
 })();
 // identical rays to every bucket
 BUX.forEach(x=>{
@@ -890,7 +992,7 @@ const SAYX=[190,500,810], SAYY=[190,420];
 const sayPos = STATEMENTS.map((st,i)=>({ x:SAYX[i%3], y:SAYY[Math.floor(i/3)] }));
 const sayG = gSay.selectAll('g.say').data(STATEMENTS).join('g').attr('class','say')
   .attr('transform',(st,i)=>`translate(${sayPos[i].x},${sayPos[i].y-64})`);
-sayG.append('rect').attr('x',-92).attr('y',-24).attr('width',184).attr('height',40).attr('rx',8)
+sayG.append('rect').attr('x',-92).attr('y',-24).attr('width',184).attr('height',40).attr('rx',16)
   .attr('fill',st=>STATES[st.s].color);
 sayG.append('path').attr('d','M -8 16 L 0 30 L 8 16 Z').attr('fill',st=>STATES[st.s].color);
 sayG.append('text').attr('text-anchor','middle').attr('y',1)
@@ -985,14 +1087,42 @@ const circles = gDots.selectAll('circle.dot').data(DOTS, d=>d.id).join('circle')
   .attr('fill',NEUTRAL).attr('opacity',.92)
   .style('cursor','pointer');
 
-// faction rings ride with the dots — same teal ring device as the companion
+/* Factions device: instead of rings (which read as a third encoding), the
+   scene spotlights one old-model audience — its members hold full colour and
+   gain a fine ink outline while everyone else recedes — and each quadrant
+   gets a counted pill, so "all four factions are inside" is stated in
+   numbers, not implied by decoration. */
 const FACTION_BUCKET = 3;
-const ringDots = DOTS.filter(d=>d.b===FACTION_BUCKET);
-const rings = gRing.selectAll('circle.ring').data(ringDots, d=>d.id).join('circle')
-  .attr('class','ring')
-  .attr('r',10).attr('fill','none')
-  .attr('stroke','#7FCCC8').attr('stroke-width',3.5)
-  .attr('pointer-events','none');
+const FCOUNT = [0,0,0,0];
+DOTS.forEach(d => { if (d.b===FACTION_BUCKET) FCOUNT[d.s]++; });
+const FTOTAL = FCOUNT.reduce((a,b)=>a+b,0);
+function setFaction(on){
+  circles.transition('fact').duration(REDUCE?1:520)
+    .attr('opacity', d => on ? (d.b===FACTION_BUCKET ? 1 : .14) : .92)
+    .attr('r', d => on && d.b===FACTION_BUCKET ? 8 : 6.5)
+    .attr('stroke', d => on && d.b===FACTION_BUCKET ? '#212E36' : 'none')
+    .attr('stroke-width', d => on && d.b===FACTION_BUCKET ? 1.2 : 0);
+}
+const factPills = gRing.selectAll('g.fpill').data(STATES).join('g').attr('class','fpill');
+factPills.append('rect')
+  .attr('fill','#FFFFFF').attr('stroke',st=>st.color).attr('stroke-width',1.8);
+factPills.append('text').attr('text-anchor','middle')
+  .attr('font-family',SANS).call(typed,10.5).attr('font-weight',700)
+  .attr('fill','#212E36')
+  .text((st,i)=>FCOUNT[i] + ' of ' + FTOTAL + ' here');
+/* The pills grow with the type scale, and stay pinned to their quadrant's
+   inner corner at any size. */
+function placeFactPills(){
+  const w = 96*TK, h = 24*TK;
+  factPills.attr('transform',(st,i)=>{
+    const px = i%2===0 ? MX0+12 : MX1-12-w;
+    const py = i<2 ? MY0+10 : MY1-10-h;
+    return `translate(${px},${py})`;
+  });
+  factPills.select('rect').attr('width',w).attr('height',h).attr('rx',h/2);
+  factPills.select('text').attr('x',w/2).attr('y',h*0.67);
+}
+placeFactPills();
 
 // ---- same treatment, four meanings ----
 (function(){
@@ -1015,21 +1145,21 @@ const rings = gRing.selectAll('circle.ring').data(ringDots, d=>d.id).join('circl
       .attr('d',`M ${sx} ${sy} L ${ex} ${ey}`)
       .attr('stroke','#212E36').attr('stroke-width',1.4).attr('fill','none');
     const card = gMean.append('g').attr('transform',`translate(${c.x},${c.y+20})`);
-    card.append('rect').attr('x',-104).attr('y',-30).attr('width',208).attr('height',60)
+    card.append('rect').attr('x',-104).attr('y',-30).attr('width',208).attr('height',60).attr('rx',12)
       .attr('fill','#FFFFFF').attr('stroke',s.color).attr('stroke-width',2);
-    card.append('rect').attr('x',-104).attr('y',-30).attr('width',7).attr('height',60).attr('fill',s.color);
-    card.append('text').attr('x',-88).attr('y',-9)
-      .attr('font-family',SANS).call(typed,11.5).attr('font-weight',700)
+    card.append('circle').attr('cx',-90).attr('cy',-11).attr('r',5).attr('fill',s.color);
+    card.append('text').attr('x',-78).attr('y',-7)
+      .attr('font-family',SANS).call(typed,12).attr('font-weight',700)
       .attr('fill','#212E36').text(s.name);
     const m1 = s.meaning.split('. ')[0]+'.';
-    card.append('text').attr('x',-88).attr('y',9)
-      .attr('font-family',SANS).call(typed,10.5).attr('fill','#333')
+    card.append('text').attr('x',-90).attr('y',12)
+      .attr('font-family',SANS).call(typed,11).attr('fill','#333')
       .text(m1);
   });
 })();
 
 // ---- the loop ----
-const LC = { x:500, y:330 }, LR = 205;
+const LC = { x:500, y:330 }, LR = 220;
 const stationPos = LOOP.map((s,i)=>{
   const a = -Math.PI/2 + i*(Math.PI*2/LOOP.length);
   return { x: LC.x + Math.cos(a)*LR, y: LC.y + Math.sin(a)*LR };
@@ -1095,7 +1225,7 @@ function stationGlyph(g, id){
 }
 const stationG = gLoop.selectAll('g.station').data(LOOP).join('g').attr('class','station')
   .attr('transform',(s,i)=>`translate(${stationPos[i].x},${stationPos[i].y})`);
-const stationDisc = stationG.append('circle').attr('r',34)
+const stationDisc = stationG.append('circle').attr('r',31)
   .attr('fill','#F8F6F1').attr('stroke','#212E36').attr('stroke-width',1.8)
   .attr('stroke-dasharray','6 5');
 stationG.each(function(s){ stationGlyph(d3.select(this), s.id).attr('opacity',.35); });
@@ -1103,13 +1233,74 @@ const stationQ = stationG.append('text').attr('class','q').attr('y',6).attr('x',
   .attr('text-anchor','middle')
   .attr('font-family',SANS).call(typed,15).attr('font-weight',700)
   .attr('fill','#B8492E').text('?');
-stationG.append('text').attr('y',56).attr('text-anchor','middle')
+stationG.append('text')
+  .attr('x',(st,i)=>Math.cos(-Math.PI/2 + i*(Math.PI*2/6))*58)
+  .attr('y',(st,i)=>Math.sin(-Math.PI/2 + i*(Math.PI*2/6))*58 + 5)
+  .attr('text-anchor',(st,i)=>{
+    const c = Math.cos(-Math.PI/2 + i*(Math.PI*2/6));
+    return c > .35 ? 'start' : (c < -.35 ? 'end' : 'middle');
+  })
   .attr('font-family',SANS).call(typed,13).attr('font-weight',700)
-  .attr('fill','#212E36').text(s=>s.label);
+  .attr('fill','#212E36')
+  .attr('stroke','#F8F6F1').attr('stroke-width',3).attr('stroke-opacity',.9)
+  .attr('paint-order','stroke fill')
+  .text(s=>s.label);
+
+/* What each station actually is lives in its hover (and its accessible
+   name), so the wheel itself stays sparse and spaced. */
+const STATION_INFO = {
+  listen:'Live social listening and standing forum panels surface the belief states forming around a health issue — narratives, questions, misinformation, sentiment.',
+  map:'Heard beliefs land on the trust-by-appetite map. Belief, authority and friction become the segmentation layer, not demographics.',
+  translate:'One evidence base becomes many faithful tellings: clinician explainers, creator shorts, plain-language myth corrections, resource cards.',
+  activate:'Each telling ships through the messenger its belief state already trusts — creators, clinicians, associations, paid reach.',
+  measure:'The metric is belief movement, not clicks: did the state\u2019s share shift, did its sentiment change.',
+  learn:'Whatever moved feeds the next round of listening. The loop is the product.'
+};
+const loopHits = gHit.selectAll('circle.lhit').data(LOOP).join('circle')
+  .attr('class','lhit')
+  .attr('cx',(st,i)=>stationPos[i].x).attr('cy',(st,i)=>stationPos[i].y)
+  .attr('r',46).attr('fill','transparent')
+  .style('cursor','pointer').style('pointer-events','none')
+  .attr('tabindex',-1).attr('role','button')
+  .attr('aria-label',st=>st.label + '. ' + STATION_INFO[st.id]);
+function stationTip(ev, st){
+  tip.html('<b>' + st.label + '</b><br>' + STATION_INFO[st.id]).classed('on',true);
+  if (ev && ev.clientX != null) placeTip(ev);
+}
+function stationTipAt(i){
+  stationTip(null, LOOP[i]);
+  const r = loopHits.nodes()[i].getBoundingClientRect(), b = tipNode.getBoundingClientRect();
+  let x = r.left + r.width/2 - b.width/2;
+  let y = r.bottom + 8;
+  if (y + b.height > innerHeight - 8) y = Math.max(8, r.top - b.height - 8);
+  tip.style('left', Math.min(Math.max(8,x), innerWidth - b.width - 8)+'px')
+     .style('top', y+'px');
+}
+loopHits
+  .on('mousemove', function(ev,st){ stationTip(ev,st);
+    d3.select(stationG.nodes()[LOOP.indexOf(st)]).select('circle')
+      .transition('hov').duration(160).attr('stroke-width',3);
+  })
+  .on('mouseleave', function(ev,st){ hideTip();
+    d3.select(stationG.nodes()[LOOP.indexOf(st)]).select('circle')
+      .transition('hov').duration(200).attr('stroke-width', repriseRun ? 2.4 : 1.8);
+  })
+  .on('focus', function(ev,st){ stationTipAt(LOOP.indexOf(st)); })
+  .on('blur', function(){ hideTip(); })
+  .on('keydown', function(ev,st){
+    const i = LOOP.indexOf(st);
+    const go = j => loopHits.nodes()[(j+6)%6].focus({preventScroll:true});
+    if (ev.key==='ArrowRight'||ev.key==='ArrowDown'){ ev.preventDefault(); go(i+1); }
+    else if (ev.key==='ArrowLeft'||ev.key==='ArrowUp'){ ev.preventDefault(); go(i-1); }
+    else if (ev.key==='Escape'){ this.blur(); }
+  });
+function setLoopTabbing(on){
+  loopHits.attr('tabindex',(st,i)=> on ? (i===0?0:-1) : null);
+}
 
 // the evidence base at the loop's centre
 const evid = gLoop.append('g').attr('transform',`translate(${LC.x},${LC.y})`);
-evid.append('rect').attr('x',-34).attr('y',-42).attr('width',68).attr('height',84).attr('rx',4)
+evid.append('rect').attr('x',-34).attr('y',-42).attr('width',68).attr('height',84).attr('rx',10)
   .attr('fill','#FFFFFF').attr('stroke','#7FCCC8').attr('stroke-width',2.4);
 [[-20,-24],[-20,-10],[-20,4],[-20,18]].forEach(([x,y],i)=>{
   evid.append('rect').attr('x',x).attr('y',y).attr('width',i===3?24:40).attr('height',4)
@@ -1144,16 +1335,16 @@ const markSub = gMark.append('text')
 // ---- the closed loop: noise in, matched messages out ----
 (function(){
   // three fragments funnel into Listen (top-left inflow)
-  const inPts = [[70,120],[60,220],[95,320]];
+  const inPts = [[88,84],[72,160],[94,238]];
   inPts.forEach(([x,y],i)=>{
     const c = gFlow.append('g').attr('transform',`translate(${x},${y})`);
-    c.append('rect').attr('x',-38).attr('y',-13).attr('width',76).attr('height',26)
-      .attr('fill','#FFFFFF').attr('stroke','#212E36').attr('stroke-width',1);
+    c.append('rect').attr('x',-38).attr('y',-13).attr('width',76).attr('height',26).attr('rx',10)
+      .attr('fill','#FFFFFF').attr('stroke','#DCD5C6').attr('stroke-width',1.2);
     c.append('text').attr('text-anchor','middle').attr('y',4)
       .attr('font-family',MONO).call(typed,8.5).attr('fill','#B8492E')
       .text(['SOCIAL','PODCAST','NEWS'][i]);
     gFlow.append('path')
-      .attr('d',`M ${x+42} ${y} Q ${x+150} ${stationPos[0].y-70+i*6} ${stationPos[0].x-44} ${stationPos[0].y-8+i*5}`)
+      .attr('d',`M ${x+42} ${y} Q ${x+170} ${38+i*10} ${stationPos[0].x-46} ${stationPos[0].y-14+i*6}`)
       .attr('fill','none').attr('stroke','#6F6F6F').attr('stroke-width',1.3)
       .attr('stroke-dasharray','4 4').attr('opacity',.8);
   });
@@ -1170,8 +1361,10 @@ const markSub = gMark.append('text')
     msg.append('text').attr('text-anchor','middle').attr('y',4)
       .attr('font-family',SANS).call(typed,9.5).attr('font-weight',700)
       .attr('fill','#212E36').text('matched');
+    /* out and around: the delivery lines leave Activate along the outside of
+       the wheel, never through it */
     gFlow.append('path')
-      .attr('d',`M ${stationPos[3].x+34} ${stationPos[3].y+8} Q ${x-140} ${y+60} ${x-102} ${y}`)
+      .attr('d',`M ${stationPos[3].x+30} ${stationPos[3].y+14} Q 865 552 ${x-102} ${y}`)
       .attr('fill','none').attr('stroke',s.color).attr('stroke-width',2)
       .attr('opacity',.9);
   });
@@ -1309,9 +1502,6 @@ function layoutDots(target, stagger){
   circles.transition('scene').duration(MOVE).ease(d3.easeCubicInOut)
     .delay((d,i)=> REDUCE ? 0 : (stagger ? (i%20)*18 : 0))
     .attr('cx', d=>d[target+'x']).attr('cy', d=>d[target+'y']);
-  rings.transition('scene').duration(MOVE).ease(d3.easeCubicInOut)
-    .delay((d,i)=> REDUCE ? 0 : (stagger ? (i%20)*18 : 0))
-    .attr('cx', d=>d[target+'x']).attr('cy', d=>d[target+'y']);
 }
 function colorDots(on){
   dotsColored = on;
@@ -1334,12 +1524,12 @@ function render(key){
   const frame = frameFor(scene.frame);
   const prevTK = TK;
   computeTK(frame);
-  if (TK !== prevTK) applyTypeScale();
+  if (TK !== prevTK){ applyTypeScale(); placeFactPills(); }
   placeStamp(frame);
   svg.transition('frame').duration(CAMERA).ease(d3.easeCubicInOut).attr('viewBox', frame);
 
   setTitle(TITLES[key] || '');
-  show(gTitle, noiseScene ? 0 : 1);
+  show(gTitle, (noiseScene || loopScene) ? 0 : 1);
   show(gStamp, 1);
 
   show(gNoise,  noiseScene ? 1 : 0);
@@ -1370,12 +1560,16 @@ function render(key){
   if (key==='oldmodel' || key==='oldfail'){ layoutDots('b'); colorDots(false); }
   if (key==='beliefs'){ layoutDots('s', prev==='oldfail'||prev==='oldmodel'); colorDots(true); }
   if (mapScene){ layoutDots('q', prev==='beliefs'); colorDots(true); }
-  show(gDots, dotsOn ? (key==='meanings' ? .3 : (key==='factions' ? .95 : 1)) : 0);
+  setFaction(key==='factions');
+  show(gDots, dotsOn ? (key==='meanings' ? .3 : 1) : 0);
 
   // quadrant buttons live only when the map is the subject
   const quadLive = mapScene;
   hits.style('pointer-events', quadLive ? 'all' : 'none');
   setQuadTabbing(quadLive);
+  // the wheel's stations explain themselves on hover in the loop scenes
+  loopHits.style('pointer-events', loopScene ? 'all' : 'none');
+  setLoopTabbing(loopScene);
 
   // ---- the reprise: stations fill, arcs draw, the mark forms ----
   if (key==='reprise' && prev!=='reprise'){
@@ -1468,6 +1662,7 @@ addEventListener('resize', () => {
     const frame = frameFor(scene.frame);
     computeTK(frame);
     applyTypeScale();
+    placeFactPills();
     placeStamp(frame);
     stFig.attr('display', MOBILE() ? 'none' : null);
     svg.attr('viewBox', frame);

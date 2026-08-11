@@ -409,7 +409,7 @@ h1{
     </svg>
     <span>Political Health</span>
   </a>
-  <a class="tag" href="political-health-personas-classic.html">Precise edition · switch to classic &rarr;</a>
+  <div class="tag">Design Prototype</div>
 </header>
 
 <div class="hero measure">
@@ -446,8 +446,8 @@ h1{
   <h2>The Reachable Are the Whole Ballgame</h2>
   <hr>
   <p>In this model, sixty-two percent of adults <em>start</em> in the middle three personas, and by the third wave forty-eight percent are still there. That gap is the whole argument. These are not people ideologically committed against the health system: they are tired, broke, confused by contradictory guidance, or burned by a past experience. Those are solvable problems, and the model only moves when you solve them.</p>
-  <p>Targeting by party sorts these people into the wrong buckets. A Republican Cost-Constrained voter and a Democratic Cost-Constrained voter need the same intervention: <strong>remove the cost.</strong> A Pragmatic Skeptic of either party needs the same thing: <strong>a messenger who isn’t a politician.</strong></p>
-  <p><strong>Segment by barrier, and the political map stops mattering.</strong></p>
+  <p>Targeting by party sorts these people into the wrong buckets. A Republican Cost-Constrained voter and a Democratic Cost-Constrained voter need the same pitch: <strong>lead with the price.</strong> A Pragmatic Skeptic of either party needs the same thing: <strong>a messenger who isn’t a politician.</strong></p>
+  <p><strong>Market to the barrier, and the political map stops mattering.</strong></p>
 </div>
 
 <div class="cta">
@@ -496,33 +496,33 @@ window.addEventListener('DOMContentLoaded', function(){
 const PERSONAS = [
   { id:'inst', name:'The Institutionalists', short:'Institutionalists',
     share:24, share2:30, share3:38, score:8.1, color:'#C3DCEB',
-    blurb:'Trust the system and use it routinely. Their barriers are logistical, not ideological.',
-    barriers:['Appointment availability','Time off work'],
-    interventions:['Default scheduling','Extended clinic hours'] },
+    blurb:'Trust the system and use it routinely. They need reminding, not persuading.',
+    barriers:['Low salience','Message fatigue'],
+    interventions:['Plain official reminders','Simple default-action CTAs'] },
 
   { id:'prag', name:'The Pragmatic Skeptics', short:'Pragmatic Skeptics',
     share:22, share2:20, share3:17, score:6.2, color:'#FFD733',
     blurb:'Not anti-science — anti-whiplash. Contradictory guidance eroded their confidence.',
     barriers:['Conflicting guidance','Partisan messengers'],
-    interventions:['Clinicians, not officials','Transparent uncertainty'] },
+    interventions:['Clinician-fronted creative','Uncertainty shown honestly'] },
 
   { id:'cost', name:'The Cost-Constrained', short:'Cost-Constrained',
     share:19, share2:15, share3:12, score:5.4, color:'#EFC08A',
-    blurb:'They want care but cannot afford the gap between coverage and reality.',
-    barriers:['Financial cost','Coverage gaps','Unpaid time off'],
-    interventions:['Zero cost at the door','Upfront price clarity'] },
+    blurb:'They want care but assume every message hides a bill.',
+    barriers:['Price opacity','Expects hidden costs','Ad distrust'],
+    interventions:['Lead with the price','Cost-transparent offers'] },
 
   { id:'disi', name:'The Disillusioned', short:'Disillusioned',
     share:21, share2:20, share3:19, score:3.8, color:'#F37940',
     blurb:'Mistreated before, and the system has not earned its way back.',
-    barriers:['Institutional trust','Past mistreatment','Access inequity'],
-    interventions:['Trusted local messengers','Community-sited care'] },
+    barriers:['Institutional distrust','Past mistreatment','Feels talked at'],
+    interventions:['Community messengers','Receipts, not promises'] },
 
   { id:'sovr', name:'The Sovereigntists', short:'Sovereigntists',
     share:14, share2:15, share3:14, score:2.1, color:'#E74D4E',
     blurb:'Health decisions read as identity claims. Mandates harden; they do not move.',
     barriers:['Bodily autonomy','Identity protection'],
-    interventions:['Frame as choice','Peer, in-group voices'] }
+    interventions:['Choice-first framing','In-group voices only'] }
 ];
 
 // engagement outcome: the share of adults up to date on recommended care
@@ -993,24 +993,24 @@ const SCENES = [
           <p>Roughly a quarter — <strong>The Institutionalists</strong> — engage with the health system readily and hit only logistical friction. At the other end, <strong>The Sovereigntists</strong> treat health decisions as expressions of identity; for them a mandate is not a nudge but a threat.</p>`,
     hint:'Hover a column to read its profile', note:'' },
 
-  { key:'likelihood', frame:'lobes', h:'These Personas Differ in Health Engagement',
-    body:`<p>Each persona sits at a different point on a 0–10 composite of preventive care uptake, screening adherence, and willingness to follow clinical guidance.</p>
+  { key:'likelihood', frame:'lobes', h:'These Personas Differ in Receptivity',
+    body:`<p>Each persona sits at a different point on a 0–10 composite of message receptivity: openness to health outreach, trust in the default messenger, and willingness to act on what they hear.</p>
           <p>Three of these segments — <strong>“The Reachable”</strong> — can plausibly be moved, because their barriers are structural or informational rather than identity-bound.</p>`,
     hint:'Hover a column to read its profile', note:'' },
 
   { key:'barriers', frame:'table', h:'Only the Right Barrier Closes the Gap',
-    body:`<p><strong>Key perceptual and structural barriers</strong> differ sharply between personas, and applying the wrong one is worse than doing nothing: a cost intervention aimed at a trust problem reads as condescension.</p>
+    body:`<p><strong>Key perceptual and structural barriers</strong> differ sharply between personas, and applying the wrong one is worse than doing nothing: a price-led pitch aimed at a trust problem reads as condescension.</p>
           <p><strong>Prioritize barriers, not demographics.</strong></p>`,
     hint:'Hover a column to explore its barriers', note:'' },
 
-  { key:'interventions', frame:'table', h:'Customized Solutions for Each Persona',
-    body:`<p>Here is a roadmap of intervention types matched to the real or perceived barrier of each persona.</p>
+  { key:'interventions', frame:'table', h:'A Different Pitch for Every Persona',
+    body:`<p>Here is the marketing playbook: a framing, a messenger and a channel matched to the barrier each persona actually has. None of it changes the medicine — all of it changes whether the message lands.</p>
           <p><strong>And it has to be local.</strong> A trusted intermediary in rural Kentucky is not a trusted intermediary in South Los Angeles. The persona tells you the strategy; local context tells you the messenger.</p>`,
-    hint:'Hover a column to explore its solutions', note:'' },
+    hint:'Hover a column to explore its playbook', note:'' },
 
   { key:'shift', frame:'outcome', h:'How the Personas Shift Over Time',
     body:`<p>Beliefs move. People migrate between personas as costs change, as guidance stabilizes or fractures, and as trust is earned or spent.</p>
-          <p>Remove the cost barrier and the <strong>Cost-Constrained</strong> shrink. Depoliticize the messenger and the <strong>Pragmatic Skeptics</strong> convert. The teal band below is the outcome that follows: adults up to date on recommended care.</p>`,
+          <p>Make price transparent and the <strong>Cost-Constrained</strong> shrink. Depoliticize the messenger and the <strong>Pragmatic Skeptics</strong> convert. The teal band below is the outcome that follows: adults up to date on recommended care.</p>`,
     hint:'', note:'Illustrative shift across three hypothetical survey waves.' },
 
   { key:'final', frame:'outcome', h:'The Time to Act Is Now',
@@ -1061,12 +1061,12 @@ QS.forEach(q => {
   if (t.empty()) return;
   t.append('caption').text(
     'Five political health personas. Shares are the modeled percentage of U.S. adults ' +
-    'in each wave; engagement is a 0–10 composite of preventive care uptake, screening ' +
-    'adherence and willingness to follow clinical guidance. Synthetic data — design ' +
+    'in each wave; receptivity is a 0–10 composite of openness to health outreach, trust ' +
+    'in the default messenger and willingness to act on what they hear. Synthetic data — design ' +
     'prototype, not survey results.');
 
   const head = t.append('thead').append('tr');
-  ['Persona','Wave 1','Wave 2','Wave 3','Engagement','Key barriers','Solutions']
+  ['Persona','Wave 1','Wave 2','Wave 3','Receptivity','Key barriers','Marketing playbook']
     .forEach((h,i) => head.append('th').attr('scope','col')
       .attr('class', i>=1 && i<=4 ? 'num' : null).text(h));
 
@@ -1735,7 +1735,7 @@ const barNum = barG.append('text').attr('x',BAR_W/2).attr('y',-9).attr('text-anc
 
 const barCap = gBars.append('text').attr('x',GUT_X).attr('y',BAR_Y+2).attr('text-anchor','end')
   .attr('font-family',SANS).call(typed,12).attr('font-weight',700).attr('fill','#212E36');
-barCap.append('tspan').attr('x',GUT_X).text('Engagement');
+barCap.append('tspan').attr('x',GUT_X).text('Receptivity');
 barCap.append('tspan').attr('x',GUT_X).attr('data-dy',15).attr('dy',15).text('0–10 scale');
 
 /* =====================================================================
@@ -1783,7 +1783,7 @@ function setColText(mode){
   // rebuild when the mode changes OR when the type scale moved under it
   if (mode === colTextMode && colTextTKT === TKT) return;
   colTextMode = mode; colTextTKT = TKT;
-  ctLabel.select('.l2').text(mode === 'barriers' ? 'Barriers' : 'Solutions');
+  ctLabel.select('.l2').text(mode === 'barriers' ? 'Barriers' : 'Playbook');
   // entries are spaced by the type they contain, so wrapped rows never collide
   const step = CT_DY * TKT;
   colTextG.each(function(p){
@@ -1939,7 +1939,7 @@ const hits = gHit.selectAll('rect').data(PERSONAS).join('rect')
 function personaLabel(p, wave){
   const share = [p.share, p.share2, p.share3][wave];
   return `${p.name}. ${share}% of adults. ${p.blurb} `
-       + `Barriers: ${p.barriers.join(', ')}. Solutions: ${p.interventions.join(', ')}.`;
+       + `Barriers: ${p.barriers.join(', ')}. Playbook: ${p.interventions.join(', ')}.`;
 }
 
 // a ring the keyboard can see; the mouse path never turns it on
@@ -1951,7 +1951,7 @@ const focusRing = gHit.append('rect')
 const waveOf = k => k === 'final' ? 2 : k === 'shift' ? 1 : 0;
 function personaTipMove(ev, p){
   const share = [p.share, p.share2, p.share3][waveOf(current)];
-  tip.html(`<b>${p.name}</b> · ${share}%<br>${p.blurb}<br><br><b>Barriers:</b> ${p.barriers.join(' · ')}<br><b>Solutions:</b> ${p.interventions.join(' · ')}`)
+  tip.html(`<b>${p.name}</b> · ${share}%<br>${p.blurb}<br><br><b>Barriers:</b> ${p.barriers.join(' · ')}<br><b>Playbook:</b> ${p.interventions.join(' · ')}`)
      .classed('on',true);
   placeTip(ev); focusColumn(p.id);
 }
@@ -1962,7 +1962,7 @@ hits.on('mousemove',personaTipMove).on('mouseleave',personaTipLeave);
    does not have, so it is pinned under the focused column instead. */
 function tipAtColumn(i, p){
   const share = [p.share, p.share2, p.share3][waveOf(current)];
-  tip.html(`<b>${p.name}</b> · ${share}%<br>${p.blurb}<br><br><b>Barriers:</b> ${p.barriers.join(' · ')}<br><b>Solutions:</b> ${p.interventions.join(' · ')}`)
+  tip.html(`<b>${p.name}</b> · ${share}%<br>${p.blurb}<br><br><b>Barriers:</b> ${p.barriers.join(' · ')}<br><b>Playbook:</b> ${p.interventions.join(' · ')}`)
      .classed('on',true);
   const node = hits.nodes()[i];
   const r = node.getBoundingClientRect(), b = tipNode.getBoundingClientRect();
