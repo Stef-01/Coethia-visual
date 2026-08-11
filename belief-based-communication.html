@@ -625,7 +625,23 @@ const SCENES = [
 
   { key:'newstate', frame:'wide', h:'The Loop, Closed',
     body:`<p>Noise goes in one side. Matched, trusted, evidence-faithful messages come out the other — one for each belief state, all carrying the same science.</p>
-          <p><strong>Belief moves, and medicine hears it move.</strong> Public belief and scientific response finally talk to each other — which is where this story was always trying to end.</p>` }
+          <p><strong>Belief moves, and medicine hears it move.</strong> Public belief and scientific response finally talk to each other — which is where this story was always trying to end.</p>` },
+
+  { key:'case', frame:'wide', h:'A Well-Made Campaign, Missing One Layer',
+    body:`<p>Ground it in a familiar pattern. A state health department runs a genuinely good testing campaign — strong creative, the right languages, the right cities. It buys the <strong>who</strong> factors: demographic and geographic targeting.</p>
+          <p>The factors that decide whether anyone <em>believes</em> the message — behavioral, contextual, and above all <strong>psychographic</strong> targeting — never make the media plan. Meanwhile the audience is somewhere else entirely, watching creators the campaign never briefed.</p>
+          <p><strong>The belief map is the missing line item.</strong></p>`,
+    note:'Illustrative composite of a common campaign pattern — not a critique of any specific campaign or creative team.' },
+
+  { key:'approach', frame:'wide', h:'The Same Brief, Run Through the Loop',
+    body:`<p>Give the imagined system a concrete brief: raise testing and prevention uptake in a state’s major metros, among the communities carrying the highest risk.</p>
+          <p>It answers with three moves, and each is just a loop station with a budget line: <strong>understand the audience</strong> (listen + map), <strong>craft credible messaging</strong> (translate, per belief state, with the evidence attached), and <strong>reach through voices the audience already trusts</strong> (activate).</p>`,
+    hint:'Hover a pillar to see which stations it runs on' },
+
+  { key:'model', frame:'wide', h:'Three Ways In',
+    body:`<p>And it meets an organization wherever it stands. <strong>Information</strong>: syndicated belief reports — narrative and sentiment across priority audiences, self-serve. <strong>Training</strong>: workshops that teach a team to identify, vet and activate credible messengers, done-for-you first, train-the-trainer after. <strong>Service</strong>: full activation — creator sourcing, vetting, deployment, reporting.</p>
+          <p><strong>It starts as information. It ends as a flywheel your team owns.</strong></p>`,
+    note:'Concept-stage model. Tiers describe the imagined offering, not a shipped product.' }
 ];
 
 const HAND = `<svg width="15" height="17" viewBox="0 0 15 17" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 8V2.6a1.3 1.3 0 0 1 2.6 0V8m0-1.6a1.3 1.3 0 0 1 2.6 0V8m0-1a1.3 1.3 0 0 1 2.6 0v4.4c0 2.6-1.7 5-4.6 5-2.6 0-4-1.4-5-3.2L1.3 10a1.3 1.3 0 0 1 2.2-1.3L4.5 10"/></svg>`;
@@ -742,13 +758,16 @@ const gMean   = svg.append('g').attr('opacity',0);   // treatment + four meaning
 const gLoop   = svg.append('g').attr('opacity',0);   // the six stations
 const gMark   = svg.append('g').attr('opacity',0);   // the reveal
 const gFlow   = svg.append('g').attr('opacity',0);   // noise-in / messages-out
+const gCase   = svg.append('g').attr('opacity',0);   // campaign vs. audience + targeting ledger
+const gAppr   = svg.append('g').attr('opacity',0);   // the three pillars
+const gTier   = svg.append('g').attr('opacity',0);   // the three tiers
 const gTitle  = svg.append('g').attr('opacity',0);
 const gHit    = svg.append('g');
 const gStamp  = svg.append('g').attr('opacity',0).attr('pointer-events','none');
 
 /* Every drawing layer is hidden from assistive tech; the chart's meaning is
    carried by the svg label, the four quadrant buttons, and the prose. */
-[gNoise,gContra,gModel,gReact,gSay,gField,gDots,gRing,gState,gMean,gLoop,gMark,gFlow,gTitle,gStamp]
+[gNoise,gContra,gModel,gReact,gSay,gField,gDots,gRing,gState,gMean,gLoop,gMark,gFlow,gCase,gAppr,gTier,gTitle,gStamp]
   .forEach(g => g.attr('aria-hidden','true'));
 
 const stampText = gStamp.append('text')
@@ -1371,6 +1390,203 @@ const markSub = gMark.append('text')
 })();
 
 /* =====================================================================
+   7b. THE EXTENDED ENDING — case, approach, tiers
+   ===================================================================== */
+
+// ---- the case: good campaign on the left, real audience on the right ----
+(function(){
+  gCase.append('text').attr('x',225).attr('y',86).attr('text-anchor','middle')
+    .attr('font-family',SANS).call(typed,13).attr('font-weight',700)
+    .attr('fill','#212E36').text('The campaign');
+  gCase.append('text').attr('x',790).attr('y',86).attr('text-anchor','middle')
+    .attr('font-family',SANS).call(typed,13).attr('font-weight',700)
+    .attr('fill','#212E36').text('What the audience actually watches');
+
+  function poster(x, y, bg, quote1, quote2, look){
+    const g = gCase.append('g').attr('transform','translate('+x+','+y+')');
+    g.append('rect').attr('x',-75).attr('y',-100).attr('width',150).attr('height',200).attr('rx',12)
+      .attr('fill',bg);
+    g.append('text').attr('x',-60).attr('y',-72)
+      .attr('font-family',SANS).call(typed,11.5).attr('font-weight',700)
+      .attr('fill','#FFFFFF').text(quote1);
+    g.append('text').attr('x',-60).attr('y',-56)
+      .attr('font-family',SANS).call(typed,11.5).attr('font-weight',700)
+      .attr('fill','#FFFFFF').text(quote2);
+    const pg = g.append('g').attr('transform','translate(-18,42) scale(1.05)');
+    person(pg, look.skin, look.cloth, look.hair);
+    g.append('rect').attr('x',-60).attr('y',72).attr('width',120).attr('height',18).attr('rx',9)
+      .attr('fill','#FFFFFF').attr('opacity',.92);
+    g.append('text').attr('x',0).attr('y',85).attr('text-anchor','middle')
+      .attr('font-family',MONO).call(typed,7.5).attr('letter-spacing','.12em')
+      .attr('fill','#212E36').text('GET TESTED');
+  }
+  poster(160, 240, '#C25236', '“I protect myself', 'for my family.”', LOOKS.gui);
+  poster(300, 268, '#5FA8A0', '“Early detection', 'is strength.”', LOOKS.sov);
+
+  function creatorCard(x, y, tint, handle, cap){
+    const g = gCase.append('g').attr('transform','translate('+x+','+y+')');
+    g.append('rect').attr('x',-70).attr('y',-52).attr('width',140).attr('height',104).attr('rx',12)
+      .attr('fill',tint);
+    g.append('circle').attr('cy',-10).attr('r',13).attr('fill','#F8F6F1').attr('opacity',.92);
+    g.append('path').attr('d','M -4 -16 L 7 -10 L -4 -4 Z').attr('fill','#212E36');
+    g.append('rect').attr('x',-58).attr('y',22).attr('width',116).attr('height',4).attr('rx',2)
+      .attr('fill','#F8F6F1').attr('opacity',.7);
+    g.append('rect').attr('x',-58).attr('y',22).attr('width',72).attr('height',4).attr('rx',2)
+      .attr('fill','#B8492E');
+    g.append('text').attr('x',-58).attr('y',-32)
+      .attr('font-family',MONO).call(typed,7.5).attr('fill','#212E36').text(handle);
+    g.append('text').attr('x',-58).attr('y',42)
+      .attr('font-family',SANS).call(typed,9.5).attr('font-weight',600)
+      .attr('fill','#212E36').text(cap);
+  }
+  creatorCard(722, 232, '#FBD6BE', '@kitchen.checkin', '2.1M views');
+  creatorCard(862, 276, '#C3DCEB', '@reallife.rn', '840k views');
+
+  // the targeting ledger between them
+  const FACTORS = [
+    { t:'Demographic', ok:true }, { t:'Geographic', ok:true },
+    { t:'Behavioral', ok:false }, { t:'Psychographic', ok:false, star:true },
+    { t:'Contextual', ok:false }, { t:'Programmatic', ok:false },
+    { t:'Retargeting', ok:false }
+  ];
+  const lx = 505, ly0 = 140, dy = 56;
+  gCase.append('text').attr('x',lx).attr('y',ly0-34).attr('text-anchor','middle')
+    .attr('font-family',SANS).call(typed,12.5).attr('font-weight',700)
+    .attr('fill','#212E36').text('The targeting it bought');
+  FACTORS.forEach((f,i)=>{
+    const y = ly0 + i*dy;
+    if (f.ok){
+      gCase.append('circle').attr('cx',lx-64).attr('cy',y).attr('r',11).attr('fill','#7FCCC8');
+      gCase.append('path').attr('d','M '+(lx-69)+' '+y+' l 3.5 3.5 l 6.5 -7')
+        .attr('stroke','#FFFFFF').attr('stroke-width',2.2).attr('fill','none')
+        .attr('stroke-linecap','round').attr('stroke-linejoin','round');
+    } else {
+      gCase.append('circle').attr('cx',lx-64).attr('cy',y).attr('r',11)
+        .attr('fill','none').attr('stroke','#B8492E').attr('stroke-width',2)
+        .attr('stroke-dasharray','3.5 3');
+    }
+    gCase.append('text').attr('x',lx-42).attr('y',y+4.5)
+      .attr('font-family',SANS).call(typed, f.star ? 14 : 12.5)
+      .attr('font-weight',700)
+      .attr('fill', f.ok ? '#212E36' : (f.star ? '#B8492E' : '#6F6F6F'))
+      .text(f.t);
+    if (f.star){
+      const bx = lx + 68;
+      gCase.append('rect').attr('x',bx-8).attr('y',y-13).attr('width',108).attr('height',26).attr('rx',13)
+        .attr('fill','#E7F2F1').attr('stroke','#7FCCC8').attr('stroke-width',1.6);
+      gCase.append('text').attr('x',bx+46).attr('y',y+4).attr('text-anchor','middle')
+        .attr('font-family',SANS).call(typed,10).attr('font-weight',700)
+        .attr('fill','#1E3A38').text('the belief map');
+    }
+  });
+  // group labels sit beside the first row of each group, reading as brackets
+  gCase.append('text').attr('x',lx-92).attr('y',ly0+4).attr('text-anchor','end')
+    .attr('font-family',MONO).call(typed,8).attr('letter-spacing','.14em')
+    .attr('fill','#3E8E89').text('BOUGHT');
+  gCase.append('text').attr('x',lx-92).attr('y',ly0+2*dy+4).attr('text-anchor','end')
+    .attr('font-family',MONO).call(typed,8).attr('letter-spacing','.14em')
+    .attr('fill','#B8492E').text('MISSED');
+})();
+
+// ---- the approach: one brief, three pillars, each mapped to its stations ----
+const PILLARS = [
+  { x:235, tint:'#DCEBF5', title:'Understand the audience',
+    sub:['Live listening + native search:','who, what, when, where, why.'],
+    stations:['listen','map'] },
+  { x:500, tint:'#E7F2F1', title:'Craft credible messaging',
+    sub:['Community guidelines + evidence','analysis, told per belief state.'],
+    stations:['translate'] },
+  { x:765, tint:'#FBE3D2', title:'Reach through trusted voices',
+    sub:['Creators and clinicians who already','hold the audience’s trust.'],
+    stations:['activate','measure'] }
+];
+(function(){
+  const b = gAppr.append('g').attr('transform','translate(500,96)');
+  b.append('rect').attr('x',-280).attr('y',-22).attr('width',560).attr('height',44).attr('rx',22)
+    .attr('fill','#FFFFFF').attr('stroke','#DCD5C6').attr('stroke-width',1.2);
+  b.append('text').attr('x',-258).attr('y',5)
+    .attr('font-family',MONO).call(typed,8.5).attr('letter-spacing','.16em')
+    .attr('fill','#B8492E').text('BRIEF');
+  b.append('text').attr('x',-198).attr('y',6)
+    .attr('font-family',SANS).call(typed,12).attr('font-weight',600)
+    .attr('fill','#212E36').text('Raise testing and prevention uptake in the metros at highest risk');
+
+  PILLARS.forEach(pl=>{
+    const g = gAppr.append('g').attr('transform','translate('+pl.x+',352)');
+    g.append('rect').attr('x',-110).attr('y',-120).attr('width',220).attr('height',240).attr('rx',18)
+      .attr('fill',pl.tint);
+    pl.stations.forEach((st,k)=>{
+      const off = (k - (pl.stations.length-1)/2) * 46;
+      const sg = g.append('g').attr('transform','translate('+off+',-82) scale(.8)');
+      sg.append('circle').attr('r',20).attr('fill','#F8F6F1').attr('stroke','#212E36').attr('stroke-width',1.6);
+      stationGlyph(sg, st).attr('transform','scale(.72)');
+    });
+    g.append('text').attr('x',0).attr('y',-30).attr('text-anchor','middle')
+      .attr('font-family',SANS).call(typed,13.5).attr('font-weight',700)
+      .attr('fill','#212E36').text(pl.title);
+    pl.sub.forEach((ln,k)=>{
+      g.append('text').attr('x',0).attr('y',-6+k*18).attr('text-anchor','middle')
+        .attr('font-family',SANS).call(typed,11).attr('fill','#333').text(ln);
+    });
+    g.append('path').attr('d','M -34 96 L 34 96')
+      .attr('stroke','#212E36').attr('stroke-width',1).attr('opacity',.25);
+  });
+  gAppr.append('path').attr('d','M 500 118 L 500 190')
+    .attr('stroke','#212E36').attr('stroke-width',1.4).attr('stroke-dasharray','5 5');
+  gAppr.append('path').attr('d','M 494 182 L 500 192 L 506 182')
+    .attr('fill','none').attr('stroke','#212E36').attr('stroke-width',1.4)
+    .attr('stroke-linecap','round').attr('stroke-linejoin','round');
+})();
+
+// pillar hovers name their stations — same spaced-out logic as the wheel
+const pillarHits = gHit.selectAll('rect.phit').data(PILLARS).join('rect')
+  .attr('class','phit')
+  .attr('x',pl=>pl.x-110).attr('y',232).attr('width',220).attr('height',240)
+  .attr('fill','transparent').style('cursor','pointer').style('pointer-events','none');
+pillarHits
+  .on('mousemove', function(ev,pl){
+    const names = pl.stations.map(id => LOOP.find(l=>l.id===id).label).join(' + ');
+    tip.html('<b>' + pl.title + '</b><br>Runs on: ' + names + '<br><br>' + pl.sub.join(' ')).classed('on',true);
+    placeTip(ev);
+  })
+  .on('mouseleave', hideTip);
+
+// ---- the tiers: three ways in, ascending ----
+(function(){
+  const TIERS = [
+    { x:190, h:150, tint:'#EFEAE0', name:'Tier 1 · Information',
+      sub:['Syndicated belief reports.','Narrative + sentiment across','priority audiences. Self-serve.'] },
+    { x:500, h:210, tint:'#DCEBF5', name:'Tier 2 · Training',
+      sub:['Workshops: identify, vet and','activate credible messengers.','Done-for-you, then','train-the-trainer.'] },
+    { x:810, h:270, tint:'#9FD8D4', name:'Tier 3 · Service',
+      sub:['Full activation: creator sourcing,','vetting, deployment, reporting.','White-glove, strategy','through execution.'] }
+  ];
+  const BASE = 560;
+  TIERS.forEach(t=>{
+    const g = gTier.append('g').attr('transform','translate('+t.x+','+(BASE-t.h)+')');
+    g.append('rect').attr('x',-125).attr('y',0).attr('width',250).attr('height',t.h).attr('rx',16)
+      .attr('fill',t.tint);
+    g.append('text').attr('x',0).attr('y',30).attr('text-anchor','middle')
+      .attr('font-family',SANS).call(typed,13.5).attr('font-weight',700)
+      .attr('fill','#212E36').text(t.name);
+    t.sub.forEach((ln,k)=>{
+      g.append('text').attr('x',0).attr('y',52+k*17).attr('text-anchor','middle')
+        .attr('font-family',SANS).call(typed,10.5).attr('fill','#333').text(ln);
+    });
+  });
+  gTier.append('path')
+    .attr('d','M 88 '+(BASE-170)+' Q 350 '+(BASE-260)+' 500 '+(BASE-232)+' Q 660 '+(BASE-306)+' 788 '+(BASE-292))
+    .attr('fill','none').attr('stroke','#B8492E').attr('stroke-width',1.6)
+    .attr('stroke-dasharray','6 5').attr('opacity',.8);
+  gTier.append('path').attr('d','M 780 '+(BASE-284)+' L 790 '+(BASE-292)+' L 778 '+(BASE-296))
+    .attr('fill','none').attr('stroke','#B8492E').attr('stroke-width',1.6)
+    .attr('stroke-linecap','round').attr('stroke-linejoin','round');
+  gTier.append('text').attr('x',500).attr('y',612).attr('text-anchor','middle')
+    .attr('font-family',SANS).call(typed,12.5).attr('font-weight',700)
+    .attr('fill','#212E36').text('Starts as information. Ends as a flywheel your team owns.');
+})();
+
+/* =====================================================================
    8. TOOLTIP + QUADRANT INTERACTION
    ===================================================================== */
 
@@ -1403,7 +1619,10 @@ function stateLabel(i){
   return `${s.name}. ${statePct(i)}% of this illustrative population. Creed: ${s.creed} ` +
          `${s.trust} institutional trust, ${s.appetite} intervention appetite. ${s.meaning}`;
 }
-const hits = gHit.selectAll('rect').data(STATES).join('rect')
+/* scoped to .qhit — gHit also carries the pillar hit rects, and an unscoped
+   rect selector would hijack them into this join */
+const hits = gHit.selectAll('rect.qhit').data(STATES).join('rect')
+  .attr('class','qhit')
   .attr('x',(s,i)=> i%2===0 ? MX0 : 500).attr('y',(s,i)=> i<2 ? MY0 : 315)
   .attr('width',250).attr('height',205)
   .attr('fill','transparent').style('cursor','pointer').style('pointer-events','none')
@@ -1493,7 +1712,8 @@ const TITLES = {
   oldmodel:'The old model: audiences', oldfail:'The old model: audiences',
   beliefs:'Listening for belief', map:'The belief map', states:'The belief map',
   factions:'The belief map', meanings:'The belief map',
-  require:'The open loop', reprise:'The loop, named', newstate:'The loop, closed'
+  require:'The open loop', reprise:'The loop, named', newstate:'The loop, closed',
+  'case':'The concept, grounded', approach:'The concept, grounded', model:'The concept, grounded'
 };
 
 let current = null, axesDrawn = false, repriseRun = false;
@@ -1518,6 +1738,7 @@ function render(key){
   const rowScene   = key==='oldmodel' || key==='oldfail' || key==='beliefs';
   const mapScene   = ['map','states','factions','meanings'].includes(key);
   const loopScene  = ['require','reprise','newstate'].includes(key);
+  const conceptScene = ['case','approach','model'].includes(key);
 
   hideTip(); unfocusQuad();
 
@@ -1551,6 +1772,10 @@ function render(key){
   show(gLoop,   loopScene ? 1 : 0);
   show(gMark,   (key==='reprise'||key==='newstate') ? 1 : 0);
   show(gFlow,   key==='newstate' ? 1 : 0);
+  show(gCase,   key==='case' ? 1 : 0);
+  show(gAppr,   key==='approach' ? 1 : 0);
+  show(gTier,   key==='model' ? 1 : 0);
+  pillarHits.style('pointer-events', key==='approach' ? 'all' : 'none');
 
   // dots: absent in noise, neutral in the bucket act, colored from beliefs on
   const dotsOn = rowScene || mapScene;
