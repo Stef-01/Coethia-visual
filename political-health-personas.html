@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>How Does Politics Shape American Health? — Political Health Persona Explainer</title>
+<title>How Does Politics Shape American Health? — The Reachable</title>
 <meta name="description" content="Party affiliation predicts American health behavior but never explains it. Five political health personas — segmented by belief and barrier, not ballot — show who can be reached and how.">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F8F6F1">
@@ -64,10 +64,40 @@ strong{font-weight:700;color:var(--ink)}
 }
 .masthead .tag{
   font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
-  color:#6F6F6F;text-decoration:none;transition:color .18s ease;
+  color:#6F6F6F;
 }
-a.tag:hover{color:#B8492E}
-a.tag:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.mastnav{display:flex;align-items:center;gap:22px}
+.mastnav a{
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:#6F6F6F;text-decoration:none;transition:color .18s ease;
+  display:inline-flex;align-items:center;gap:7px;
+}
+.mastnav a:hover{color:#B8492E}
+.mastnav a:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.mastnav .aro{display:inline-block;transition:transform .3s cubic-bezier(.16,1,.3,1);font-size:14px;line-height:1}
+.mastnav a:hover .aro.r{transform:translateX(4px)}
+.mastnav a:hover .aro.l{transform:translateX(-4px)}
+@media (max-width:640px){
+  .mastnav{gap:14px}
+  .mastnav .nl{display:none}
+}
+@media (prefers-reduced-motion: reduce){
+  .mastnav .aro{transition:none}
+  .mastnav a:hover .aro{transform:none}
+}
+.wordmark svg circle{
+  transition:transform .5s cubic-bezier(.16,1,.3,1);
+  transform-box:fill-box;transform-origin:center;
+}
+.wordmark:hover svg circle:nth-child(1){transform:translate(-3px,-2px)}
+.wordmark:hover svg circle:nth-child(2){transform:translate(2px,-3px)}
+.wordmark:hover svg circle:nth-child(3){transform:translate(3px,2px)}
+.wordmark:hover svg circle:nth-child(4){transform:translate(-2px,3px)}
+.wordmark:hover svg circle:nth-child(5){transform:scale(1.25)}
+@media (prefers-reduced-motion: reduce){
+  .wordmark svg circle{transition:none}
+  .wordmark:hover svg circle{transform:none}
+}
 /* scroll-driven reading progress — no JS, hidden where unsupported */
 .progress{display:none}
 @supports (animation-timeline: scroll()) {
@@ -399,7 +429,7 @@ h1{
 <div class="grain" aria-hidden="true"></div>
 
 <header class="masthead">
-  <a class="wordmark" href="#" onclick="scrollTo({top:0,behavior:'smooth'});return false" aria-label="Political Health — back to top">
+  <a class="wordmark" href="index.html" aria-label="The Reachable — home">
     <svg width="30" height="30" viewBox="-50 -50 100 100" aria-hidden="true">
       <circle cx="-16" cy="-12" r="15" fill="#C3DCEB"/>
       <circle cx="18" cy="-18" r="11" fill="#FFD733"/>
@@ -407,9 +437,12 @@ h1{
       <circle cx="-10" cy="24" r="10" fill="#E74D4E"/>
       <circle cx="4" cy="-2" r="7" fill="#7FCCC8"/>
     </svg>
-    <span>Political Health</span>
+    <span>The Reachable</span>
   </a>
-  <div class="tag">Design Prototype</div>
+  <nav class="mastnav" aria-label="Explainers">
+    <a href="index.html"><span class="aro l">&lsaquo;</span> <span class="nl">Home</span></a>
+    <a href="belief-based-communication.html"><span class="nl">Noise &amp; Belief</span> <span class="aro r">&rsaquo;</span></a>
+  </nav>
 </header>
 
 <div class="hero measure">
