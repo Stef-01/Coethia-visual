@@ -1,0 +1,2566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How Does Politics Shape American Health? — Political Health Persona Explainer</title>
+<meta name="description" content="Party affiliation predicts American health behavior but never explains it. Five political health personas — segmented by belief and barrier, not ballot — show who can be reached and how.">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#F8F6F1">
+<meta property="og:title" content="How Does Politics Shape American Health?">
+<meta property="og:description" content="Segment by belief, not by ballot: five political health personas and the interventions that reach them.">
+<meta property="og:type" content="article">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='44' fill='%23F37940'/%3E%3Ccircle cx='50' cy='50' r='20' fill='%23F8F6F1'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@300;400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- D3 from the folder first so the piece runs with no network at all; the CDN
+     is the fallback for when this file travels on its own. -->
+<script src="d3.v7.min.js"></script>
+<script>
+window.d3 || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"><\/script>');
+</script>
+<style>
+:root{
+  --bg:#F8F6F1;
+  --ink:#212E36;
+  --ink-body:#333333;
+  --ink-mute:#6F6F6F;   /* 4.65:1 on the cream; #A9A9A9 measured 2.18:1 and failed AA wherever it carried meaning */
+  --accent:#F37940;
+  --teal:#7FCCC8;
+
+  --serif: Optima, "Gill Sans", "Gill Sans MT", Candara, "Libre Franklin", sans-serif;
+  --sans: "Libre Franklin", Helvetica, Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--bg); color:var(--ink-body);
+  font-family:var(--sans); font-weight:300; font-size:17px; line-height:1.85;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  font-kerning:normal;
+  /* real apostrophes and quotes are already in the copy; this keeps figures
+     lining up in the prose the way they do in the chart */
+  font-variant-numeric:proportional-nums;
+}
+strong{font-weight:700;color:var(--ink)}
+::selection{background:#F9C9B4;color:var(--ink)}
+
+/* ---------- MASTHEAD + READING PROGRESS ---------- */
+.masthead{
+  background:#FFFFFF;border-bottom:1px solid #E9E5DC;
+  padding:20px 24px;display:flex;align-items:center;justify-content:space-between;
+}
+.masthead .wordmark{display:flex;align-items:center;gap:12px;text-decoration:none}
+.masthead .wordmark svg{display:block;transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.masthead .wordmark:hover svg{transform:rotate(-8deg) scale(1.06)}
+.masthead .wordmark span{transition:color .2s ease}
+.masthead .wordmark:hover span{color:#B8492E}
+.masthead .wordmark:focus-visible{outline:3px solid var(--ink);outline-offset:4px}
+.masthead .wordmark span{
+  font-family:var(--serif);font-size:21px;color:var(--ink);letter-spacing:.01em;
+}
+.masthead .tag{
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:#6F6F6F;
+}
+/* scroll-driven reading progress — no JS, hidden where unsupported */
+.progress{display:none}
+@supports (animation-timeline: scroll()) {
+  .progress{
+    display:block;position:fixed;top:0;left:0;width:100%;height:3px;z-index:60;
+    background:var(--accent);transform-origin:0 50%;transform:scaleX(0);
+    animation:readprogress linear both;animation-timeline:scroll(root);
+    pointer-events:none;
+  }
+  @keyframes readprogress{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+  /* the masthead earns a shadow only once there is something scrolled beneath
+     it — flat while it sits on the page, lifted while it floats over content */
+  .masthead{
+    animation:mastLift linear both;
+    animation-timeline:scroll(root);animation-range:0 140px;
+  }
+  @keyframes mastLift{
+    from{box-shadow:0 1px 0 rgba(33,46,54,0)}
+    to{box-shadow:0 2px 16px rgba(33,46,54,.09)}
+  }
+}
+
+/* ---------- PAPER GRAIN — tactile print texture, fixed + inert ---------- */
+.grain{
+  position:fixed;inset:0;z-index:55;pointer-events:none;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  background-size:240px 240px;
+}
+
+.measure{max-width:808px;margin:0 auto;padding-left:24px;padding-right:24px}
+
+/* ---------- HERO ---------- */
+.hero{padding-top:90px;padding-bottom:40px;text-align:center}
+/* entrance: kicker → headline → deck → cast → copy, one quiet rise apiece */
+@media (prefers-reduced-motion: no-preference){
+  .hero .kicker,.hero h1,.hero .deck,.hero .portrait-row,.hero p,.hero .qgrid,.hero .scrollcue{
+    animation:riseIn .7s cubic-bezier(.16,1,.3,1) both;
+  }
+  .hero h1{animation-delay:.08s}
+  .hero .deck{animation-delay:.16s}
+  .hero .portrait-row{animation-delay:.26s}
+  .hero p{animation-delay:.34s}
+  .hero .qgrid{animation-delay:.42s}
+  .hero .scrollcue{animation-delay:.5s}
+}
+@keyframes riseIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.kicker{
+  font-family:var(--mono); font-size:13px; font-weight:400; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--ink); display:inline-block;
+  border-bottom:1px solid var(--accent); padding-bottom:7px;
+}
+h1{
+  font-family:var(--serif); font-weight:400; font-size:clamp(38px,6vw,74px);
+  line-height:1.07; color:var(--ink); margin:38px 0 22px; letter-spacing:-.01em;
+  text-wrap:balance;
+}
+.deck{
+  font-family:var(--serif); font-weight:500; font-size:clamp(20px,2.4vw,30px);
+  line-height:1.16; color:var(--ink); margin:0 auto 44px; max-width:700px; text-wrap:balance;
+}
+.portrait-row{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:48px}
+.portrait-row svg{transition:transform .18s cubic-bezier(.16,1,.3,1)}
+.portrait-row svg:hover{transform:translateY(-4px) scale(1.05)}
+.hero p{max-width:640px;margin:0 auto 22px}
+.qgrid{display:flex;justify-content:center;gap:56px;flex-wrap:wrap;margin:56px 0 26px}
+.qgrid .q{max-width:190px}
+.qgrid .qlabel{
+  font-family:var(--mono);font-size:15px;letter-spacing:.14em;color:var(--ink);
+  font-weight:500;margin:14px 0 4px
+}
+.qgrid .qtext{font-size:15px;line-height:1.6}
+.scrollcue{
+  font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+  color:#6F6F6F;margin:70px 0 30px
+}
+/* only the arrow moves — the word stays put, so the cue reads as a gesture
+   rather than a blinking widget */
+.cue-arrow{display:inline-block}
+@media (prefers-reduced-motion: no-preference){
+  .cue-arrow{animation:cueBob 2.8s ease-in-out 1.4s infinite}
+}
+@keyframes cueBob{
+  0%,72%,100%{transform:translateY(0)}
+  84%{transform:translateY(5px)}
+}
+
+/* ---------- SCROLLER ---------- */
+.scroller{display:flex;align-items:flex-start;max-width:1352px;margin:0 auto;padding:0 24px}
+.graphic{
+  flex:1 1 auto; position:sticky; top:0; height:100vh;
+  display:flex; align-items:center; justify-content:center; min-width:0;
+}
+.graphic svg{width:100%;height:100%;display:block}
+.scroll-scenes{flex:0 0 450px;width:450px;border-left:1px solid var(--ink)}
+.step{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:8vh 0}
+.step-inner{padding:0 22px}
+
+/* Each scene's prose rises as it comes under the crosshair, its parts arriving
+   in reading order rather than all at once. Gated behind a class the script
+   only adds once the observer that clears it exists, so a scene can never be
+   left invisible by a script that failed halfway. */
+@media (prefers-reduced-motion: no-preference){
+  .reveal-ready .step-inner > *{
+    opacity:0; transform:translateY(16px);
+    transition:opacity .62s cubic-bezier(.16,1,.3,1), transform .62s cubic-bezier(.16,1,.3,1);
+  }
+  .reveal-ready .step-inner.in > *{opacity:1;transform:none}
+  .reveal-ready .step-inner.in > *:nth-child(2){transition-delay:.05s}
+  .reveal-ready .step-inner.in > *:nth-child(3){transition-delay:.11s}
+  .reveal-ready .step-inner.in > *:nth-child(4){transition-delay:.18s}
+  .reveal-ready .step-inner.in > *:nth-child(5){transition-delay:.24s}
+}
+.step h2{
+  font-family:var(--serif); font-weight:500; font-size:26px; line-height:1.26;
+  color:var(--ink); margin:0 0 13px; text-wrap:balance;
+}
+.step hr{border:0;border-top:1px solid var(--ink);margin:0 0 20px}
+/* the rule under each scene heading draws itself across rather than fading in,
+   which is the same gesture the trees and the brace make in the graphic */
+@media (prefers-reduced-motion: no-preference){
+  .reveal-ready .step-inner > hr{
+    transform:none;transform-origin:0 50%;
+    clip-path:inset(0 100% 0 0);
+    transition:clip-path .72s cubic-bezier(.16,1,.3,1), opacity .3s ease;
+  }
+  .reveal-ready .step-inner.in > hr{clip-path:inset(0 0 0 0)}
+}
+/* narration runs large and light — the reference sets 20px/35px w300 */
+.step p{margin:0 0 18px;font-size:19px;line-height:1.76}
+.hint{font-size:15px;color:#B8492E;display:flex;gap:9px;align-items:flex-start;margin-top:26px;line-height:1.5}
+.hint svg{flex:0 0 auto;margin-top:3px}
+.note{font-size:12px;line-height:1.55;opacity:.8;margin-top:22px}
+
+/* inline colour chips keyed to the bubble palette */
+.chip{
+  background:var(--c); color:var(--t,#fff); padding:1px 7px 2px;
+  font-weight:600; font-size:.93em; border-radius:2px; white-space:nowrap;
+}
+
+/* ---------- OUTRO ---------- */
+.outro{padding-top:90px;padding-bottom:10px}
+.outro p{max-width:680px}
+.outro h2{font-family:var(--serif);font-weight:500;font-size:clamp(26px,3.2vw,38px);line-height:1.2;color:var(--ink);margin:0 0 10px}
+.outro hr{border:0;border-top:1px solid var(--ink);margin:0 0 26px}
+/* ---------- CTA — white band, asymmetric two-column, pill action ---------- */
+.cta{background:#FFFFFF;margin-top:70px;padding:78px 0}
+.cta-inner{
+  max-width:1000px;margin:0 auto;padding:0 24px;
+  display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;
+}
+.cta .t{font-family:var(--serif);font-size:clamp(28px,3.4vw,44px);font-weight:400;color:var(--ink);line-height:1.14;text-wrap:balance}
+.cta .lead{font-size:17px;line-height:1.75;margin:0 0 26px}
+.btn{
+  display:inline-block;font-family:var(--sans);font-size:15px;font-weight:600;
+  color:#FFFFFF;background:#B8492E;padding:14px 28px;text-decoration:none;
+  border-radius:999px;transition:background .18s ease,transform .18s ease;
+}
+.btn:hover{background:var(--ink)}
+.btn:active{transform:scale(.98)}
+/* the arrow leads the way out on hover — the button says "go", so it moves */
+.btn .arrow{display:inline-block;transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.btn:hover .arrow{transform:translateX(5px)}
+@media (prefers-reduced-motion: reduce){
+  .btn .arrow{transition:none}
+  .btn:hover .arrow{transform:none}
+}
+.btn:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.btn[aria-disabled="true"]{opacity:.55;cursor:not-allowed}
+.btn[aria-disabled="true"]:hover{background:#B8492E}
+.cta-note{font-size:13px;color:#6F6F6F;margin-top:14px}
+@media (max-width:760px){
+  .cta-inner{grid-template-columns:1fr;gap:26px}
+}
+
+/* ---------- METHODS — credits + method, two columns at desktop ---------- */
+/* ---------- DATA TABLE — the chart's numbers, in words ---------- */
+.datawrap{max-width:1000px;margin:54px auto 0;padding:0 24px}
+.datatable summary{
+  font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink);cursor:pointer;padding:14px 0;border-top:1px solid var(--ink);
+  border-bottom:1px solid #D9D4C8;list-style:none;
+}
+.datatable summary::-webkit-details-marker{display:none}
+.datatable summary::before{content:'+ ';font-family:var(--mono)}
+.datatable[open] summary::before{content:'– '}
+.datatable summary:hover{color:#B8492E}
+.datatable summary:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.datatable summary::before{transition:none}
+.datatable table{border-collapse:collapse;width:100%;margin:26px 0 10px;font-size:14px}
+.datatable tbody tr{transition:background-color .18s ease}
+.datatable tbody tr:hover{background:#F1EDE4}
+@media (prefers-reduced-motion: no-preference){
+  /* the table unfolds rather than appearing: same rise the hero uses */
+  .datatable[open] .tablescroll{animation:riseIn .5s cubic-bezier(.16,1,.3,1) both}
+  .datatable[open] .scrollhint{animation:riseIn .5s cubic-bezier(.16,1,.3,1) .08s both}
+}
+.datatable caption{text-align:left;font-size:13px;color:#6F6F6F;padding-bottom:14px}
+.datatable th,.datatable td{
+  text-align:left;vertical-align:top;padding:11px 14px 11px 0;
+  border-bottom:1px solid #E4E0D6;line-height:1.5;
+}
+.datatable thead th{
+  font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink);border-bottom:1px solid var(--ink);font-weight:500;
+}
+.datatable tbody th{font-weight:700;color:var(--ink);white-space:nowrap}
+.datatable td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.datatable .swatch{
+  display:inline-block;width:10px;height:10px;border-radius:50%;
+  background:var(--c);margin-right:9px;vertical-align:baseline;
+}
+.tablescroll{overflow-x:auto}
+.tablescroll:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.datatable .scrollhint{display:none}
+@media (max-width:700px){
+  /* the table keeps its shape and scrolls sideways inside its own box, so the
+     page itself never scrolls horizontally */
+  .datatable table{font-size:13px;min-width:560px}
+  .datatable th,.datatable td{padding:9px 12px 9px 0}
+  /* the caption belongs to the table, so it inherits the table's min-width and
+     would be cut off; pinning it to the left of the scroll box lets it wrap to
+     the screen and stay put while the columns move under it */
+  .datatable caption{position:sticky;left:0;width:calc(100vw - 48px)}
+  .datatable .scrollhint{
+    display:block;font-family:var(--mono);font-size:11px;letter-spacing:.1em;
+    text-transform:uppercase;color:#6F6F6F;padding-top:10px;
+  }
+}
+
+.methods{padding-top:64px;padding-bottom:110px;font-size:13px;line-height:1.8}
+.methods-grid{display:grid;grid-template-columns:5fr 7fr;gap:48px;max-width:1000px;margin:0 auto;padding:0 24px}
+.methods .col p{opacity:.78}
+.methods h3{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);margin:0 0 12px;font-weight:500}
+@media (max-width:760px){
+  .methods-grid{grid-template-columns:1fr;gap:8px}
+}
+
+/* ---------- TOOLTIP ---------- */
+#tip{
+  position:fixed;pointer-events:none;opacity:0;
+  background:var(--ink);color:var(--bg);font-size:12px;line-height:1.5;
+  padding:9px 12px;max-width:250px;z-index:99;font-family:var(--sans);
+  /* settles in rather than blinking on: a short fade with a longer, softer
+     travel, so the panel feels placed instead of switched */
+  transform:translateY(7px) scale(.97);transform-origin:top left;
+  transition:opacity .15s ease, transform .3s cubic-bezier(.16,1,.3,1);
+  box-shadow:0 8px 26px rgba(33,46,54,.20);
+}
+#tip.on{opacity:1;transform:none}
+#tip b{font-weight:600}
+@media (prefers-reduced-motion: reduce){
+  #tip{transition:opacity .1s linear;transform:none}
+}
+
+@media (max-width:960px){
+  .scroller{display:block;padding:0 18px}
+  /* The graphic stays pinned while the narration scrolls beneath it —
+     without this every scene change happens off-screen on a phone. */
+  /* sized to what the tightened mobile frames render to, so the chart fills
+     the band instead of floating in it, and the narration keeps the rest. A
+     tablet has the height to spare, so it gets a deeper band and a bigger chart. */
+  .graphic{position:sticky;top:0;height:56vh;height:56svh;z-index:2;
+    background:var(--bg);border-bottom:1px solid var(--ink)}
+  .scroll-scenes{width:100%;border-left:0;border-top:0}
+  .step{min-height:64vh;padding:38px 0 12vh;display:block;justify-content:flex-start}
+  .step-inner{padding:0}
+}
+@media (max-width:600px){
+  /* a phone has no height to give away: the band shrinks and the narration
+     gets the screen back */
+  .graphic{height:44vh;height:44svh}
+}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  /* Decorative travel comes off; colour feedback and the tiny press on a
+     button stay, because those answer an action the reader just took rather
+     than moving on their own. Scroll-linked indicators (the progress hairline,
+     the masthead lift) also stay: they track the reader's own scrolling and
+     never animate by themselves. */
+  .portrait-row svg,.masthead .wordmark svg{transition:none}
+  .portrait-row svg:hover{transform:none}
+  .masthead .wordmark:hover svg{transform:none}
+  .cue-arrow{animation:none}
+}
+
+/* ---------- PRINT ----------
+   A scrollytelling piece cannot print its motion, but the argument is prose
+   and a table, and both print fine. The scroller is unstacked so every scene
+   reads in order, the reveal states are forced open so nothing prints blank,
+   and the interactive furniture (progress, grain, hover hints) is dropped. */
+@media print{
+  .progress,.grain,.scrollcue,.hint,.masthead .tag,.scrollhint,
+  .datatable summary,.cta-note{display:none !important}
+  body{background:#fff;color:#000;font-size:10.5pt;line-height:1.5}
+  .masthead{border-bottom:1px solid #000;padding:0 0 10px;margin-bottom:20px;box-shadow:none}
+  .measure{max-width:none;padding:0}
+  .hero{padding-top:0;text-align:left}
+  h1{font-size:26pt}
+  .deck{font-size:14pt;margin-left:0}
+  .hero p,.qgrid{max-width:none}
+  .qgrid{gap:24px;justify-content:flex-start}
+
+  /* the scroller becomes a normal document: graphic, then every scene */
+  .scroller{display:block;padding:0}
+  .graphic{position:static !important;height:auto !important;border:0 !important;
+    break-inside:avoid;margin-bottom:16px}
+  .graphic svg{height:300px}
+  .scroll-scenes{width:100% !important;border:0 !important}
+  .step{min-height:0 !important;padding:0 0 14px !important;break-inside:avoid}
+  /* whatever the reveal left mid-flight, print it finished */
+  .step-inner,.step-inner > *{opacity:1 !important;transform:none !important;
+    clip-path:none !important;animation:none !important;transition:none !important}
+  .step h2{font-size:13pt}
+  .step p{font-size:10.5pt;line-height:1.45}
+
+  .datatable table{font-size:8.5pt;min-width:0}
+  .tablescroll{overflow:visible}
+  .datatable tbody tr{break-inside:avoid}
+  .cta{background:none;padding:18px 0;margin-top:24px}
+  .btn{background:none;color:#000;border:1px solid #000}
+  a{color:#000}
+}
+</style>
+</head>
+<body>
+
+<div class="progress" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="masthead">
+  <a class="wordmark" href="#" onclick="scrollTo({top:0,behavior:'smooth'});return false" aria-label="Political Health — back to top">
+    <svg width="30" height="30" viewBox="-50 -50 100 100" aria-hidden="true">
+      <circle cx="-16" cy="-12" r="15" fill="#C3DCEB"/>
+      <circle cx="18" cy="-18" r="11" fill="#FFD733"/>
+      <circle cx="24" cy="14" r="14" fill="#F37940"/>
+      <circle cx="-10" cy="24" r="10" fill="#E74D4E"/>
+      <circle cx="4" cy="-2" r="7" fill="#7FCCC8"/>
+    </svg>
+    <span>Political Health</span>
+  </a>
+  <div class="tag">Design Prototype</div>
+</header>
+
+<div class="hero measure">
+  <div class="kicker">Political Health &nbsp;/&nbsp; USA &nbsp;/&nbsp; Explainer</div>
+  <h1>How Does Politics Shape American Health?</h1>
+  <div class="deck">To Close the Gap, We Need to Segment by Belief, Not by Ballot — and Meet People Where Their Trust Already Lives</div>
+  <div class="portrait-row" id="heroPortraits"></div>
+  <p><strong>The premise this prototype assumes</strong> is that political identity now rivals income and education as a predictor of American health behavior. Grant the premise and the interesting problem starts immediately: knowing someone’s party still tells you almost nothing about <em>why</em> they act the way they do, or what would change it.</p>
+  <p><strong>It starts with answering three key questions:</strong></p>
+  <div class="qgrid" id="qgrid"></div>
+  <div class="scrollcue"><span class="cue-arrow" aria-hidden="true">↓</span> &nbsp;scroll</div>
+</div>
+
+<section class="scroller">
+  <!-- role="group", not role="img": an image is an atomic leaf, and a screen
+       reader is entitled to skip its interior, but this chart contains five
+       focusable persona buttons that must stay reachable. The decorative layers
+       are marked aria-hidden individually instead, so the only things exposed
+       inside are the controls and this summary. -->
+  <div class="graphic"><svg id="viz" preserveAspectRatio="xMidYMid meet" role="group"
+    aria-label="Interactive chart. American adults, first grouped by the five traditional demographics, then reorganized into five political health personas. Colored bands show each persona's share of the population and a teal band shows the share of adults up to date on recommended care. The same figures are available in the data table below."></svg></div>
+  <div class="scroll-scenes" id="scenes"></div>
+</section>
+
+<div class="datawrap">
+  <details class="datatable">
+    <summary>Read the data as a table</summary>
+    <div class="tablescroll" tabindex="0" role="region" aria-label="Persona data table, scrolls horizontally"><table id="dataTable"></table></div>
+    <div class="scrollhint" aria-hidden="true">Scroll the table sideways for barriers and solutions</div>
+  </details>
+</div>
+
+<div class="outro measure">
+  <h2>The Reachable Are the Whole Ballgame</h2>
+  <hr>
+  <p>In this model, sixty-two percent of adults <em>start</em> in the middle three personas, and by the third wave forty-eight percent are still there. That gap is the whole argument. These are not people ideologically committed against the health system: they are tired, broke, confused by contradictory guidance, or burned by a past experience. Those are solvable problems, and the model only moves when you solve them.</p>
+  <p>Targeting by party sorts these people into the wrong buckets. A Republican Cost-Constrained voter and a Democratic Cost-Constrained voter need the same intervention: <strong>remove the cost.</strong> A Pragmatic Skeptic of either party needs the same thing: <strong>a messenger who isn’t a politician.</strong></p>
+  <p><strong>Segment by barrier, and the political map stops mattering.</strong></p>
+</div>
+
+<div class="cta">
+  <div class="cta-inner">
+    <div class="t">Identify a Political Health Persona</div>
+    <div>
+      <p class="lead">Do you know someone who has drifted away from the health system? Knowing which barrier is actually in their way is how a useful conversation starts.</p>
+      <a class="btn" href="#" role="button" aria-disabled="true" onclick="return false">Try the Typing Tool&nbsp;&nbsp;<span class="arrow" aria-hidden="true">&rarr;</span></a>
+      <div class="cta-note">Design prototype — the typing tool ships with the live survey version.</div>
+    </div>
+  </div>
+</div>
+
+<div class="methods">
+  <div class="methods-grid">
+    <div class="col">
+      <h3>Credits</h3>
+      <p>Structure, layout grammar and motion vocabulary adapted from Surgo Ventures’ <em>COVID-19 Vaccine Persona Explainer</em> (design: Daisy Chung; development: Julia Janicki). All artwork, code and data here are original.</p>
+    </div>
+    <div class="col">
+      <h3>Data and Methods</h3>
+      <p><strong>This is a design prototype.</strong> All figures shown are synthetic placeholders constructed to be structurally plausible — they are not survey results and should not be cited. The data schema is designed to be swapped for real survey output without changing any layout code.</p>
+      <p><strong>Nothing here is a finding.</strong> Where the piece says segmentation work “routinely reports” something about trust, treat that as the premise the design is built on, not as a result this prototype establishes. No literature is cited because none is relied on: the argument being tested is about how you would <em>segment</em> a population, and it stands or falls on its own logic.</p>
+      <p>The intended method mirrors standard psychobehavioral segmentation practice: a k-medoids partitioning-around-medoids clustering algorithm with a Gower distance metric, run over seven variables — <strong>trust in federal health agencies</strong>, <strong>trust in personal physician</strong>, <strong>perceived politicization of medical guidance</strong>, <strong>cost and coverage barriers</strong>, <strong>media diet homogeneity</strong>, <strong>individual-versus-collective responsibility for health</strong>, and <strong>perceived fairness of the health system</strong>.</p>
+    </div>
+  </div>
+</div>
+
+<div id="tip" aria-hidden="true"></div>
+
+<script>
+// graceful failure if the D3 CDN is unreachable (e.g. the file is opened offline)
+window.addEventListener('DOMContentLoaded', function(){
+  if (typeof d3 !== 'undefined') return;
+  var s = document.querySelector('.scroller');
+  if (s) s.insertAdjacentHTML('beforebegin',
+    '<div class="measure" style="border:1px solid #212E36;padding:18px 22px;margin:30px auto;font-size:15px">' +
+    'The interactive graphics could not load (the D3 library needs a network connection). The narration below is still readable.</div>');
+});
+</script>
+<script>
+/* =====================================================================
+   1. DATA
+   ===================================================================== */
+
+const PERSONAS = [
+  { id:'inst', name:'The Institutionalists', short:'Institutionalists',
+    share:24, share2:30, share3:38, score:8.1, color:'#C3DCEB',
+    blurb:'Trust the system and use it routinely. Their barriers are logistical, not ideological.',
+    barriers:['Appointment availability','Time off work'],
+    interventions:['Default scheduling','Extended clinic hours'] },
+
+  { id:'prag', name:'The Pragmatic Skeptics', short:'Pragmatic Skeptics',
+    share:22, share2:20, share3:17, score:6.2, color:'#FFD733',
+    blurb:'Not anti-science — anti-whiplash. Contradictory guidance eroded their confidence.',
+    barriers:['Conflicting guidance','Partisan messengers'],
+    interventions:['Clinicians, not officials','Transparent uncertainty'] },
+
+  { id:'cost', name:'The Cost-Constrained', short:'Cost-Constrained',
+    share:19, share2:15, share3:12, score:5.4, color:'#EFC08A',
+    blurb:'They want care but cannot afford the gap between coverage and reality.',
+    barriers:['Financial cost','Coverage gaps','Unpaid time off'],
+    interventions:['Zero cost at the door','Upfront price clarity'] },
+
+  { id:'disi', name:'The Disillusioned', short:'Disillusioned',
+    share:21, share2:20, share3:19, score:3.8, color:'#F37940',
+    blurb:'Mistreated before, and the system has not earned its way back.',
+    barriers:['Institutional trust','Past mistreatment','Access inequity'],
+    interventions:['Trusted local messengers','Community-sited care'] },
+
+  { id:'sovr', name:'The Sovereigntists', short:'Sovereigntists',
+    share:14, share2:15, share3:14, score:2.1, color:'#E74D4E',
+    blurb:'Health decisions read as identity claims. Mandates harden; they do not move.',
+    barriers:['Bodily autonomy','Identity protection'],
+    interventions:['Frame as choice','Peer, in-group voices'] }
+];
+
+// engagement outcome: the share of adults up to date on recommended care
+const OUTCOME = { label:'Up to date on care', color:'#7FCCC8', v:[38, 52, 66] };
+
+const FAMILIES = [
+  { id:'gender', label:'Gender', icon:'gender', cats:[
+      {n:'Women', c:'#B85D85'}, {n:'Men', c:'#792946'},
+      {n:'Non-binary*', c:'#F2C6DD'}, {n:'No answer', c:'#DC98BD'} ] },
+  { id:'geo', label:'Geography', icon:'geo', cats:[
+      {n:'Urban', c:'#42833E'}, {n:'Suburban', c:'#87C26B'}, {n:'Rural', c:'#2E6B2B'} ] },
+  { id:'race', label:'Race', icon:'race', cats:[
+      {n:'White', c:'#003F5C'}, {n:'Black', c:'#0056A3'}, {n:'Hispanic', c:'#69ACBF'},
+      {n:'Asian', c:'#A8C8DC'}, {n:'Other', c:'#3A5D74'} ] },
+  { id:'party', label:'Party', icon:'party', cats:[
+      {n:'Democrat', c:'#6B1F18'}, {n:'Independent', c:'#DE8F81'},
+      {n:'Republican', c:'#DD4A34'}, {n:'Other / none', c:'#FBDDD7'} ] },
+  { id:'income', label:'Income', icon:'income', cats:[
+      {n:'Under $35k', c:'#E3D5F0'}, {n:'$35k–$75k', c:'#BFA3DC'},
+      {n:'$75k–$150k', c:'#9070BC'}, {n:'$150k+', c:'#5F3E91'} ] }
+];
+
+// bubbles that carry the teal highlight ring in the second demographic scene
+const RING_CATS = ['Women','Rural','Black','Republican','Under $35k'];
+
+let _s = 20260726;
+function rnd(){ _s = (_s * 1103515245 + 12345) & 0x7fffffff; return _s / 0x7fffffff; }
+
+/* One dataset of 100 nodes, used by every scene.
+   count1 is non-zero only on the anchor row of each subcategory, so the
+   demographic scene shows 20 large bubbles; count2 splits each subcategory
+   across the five personas, so the grid scene shows all 100.
+
+   Two invariants the earlier version broke, and the reason the numbers on
+   screen used to disagree with each other:
+
+   1. EVERY FAMILY PARTITIONS THE SAME SAMPLE. Each family's categories are
+      drawn as weights and normalised to SAMPLE, so gender, geography, race,
+      party and income each sum to 3,000 people. Previously every category was
+      drawn independently, so the five rows carried different total ink and
+      none of them summed to the stated sample.
+
+   2. THE GRID PARTITIONS THE STATED SHARES. Each subcategory is split across
+      the personas by weights that are TILTED around each persona's declared
+      share, so summing count2 down a persona column reproduces 24/22/19/21/14
+      rather than a random walk. Previously the split used unbiased random
+      weights, so the bubble grid and the lobe band disagreed about which
+      persona was largest. The tilt still lets a persona be over- or
+      under-represented inside any one subcategory, which is the whole point of
+      the scene, but the column totals now tell the truth. */
+const SAMPLE = 3000;
+const NODES = [];
+let nid = 0;
+FAMILIES.forEach((f, fi) => {
+  // family partitions the sample
+  const raw = f.cats.map(() => 0.55 + rnd());
+  const rawSum = d3.sum(raw);
+  f.cats.forEach((c, ci) => {
+    const total = Math.round(SAMPLE * raw[ci] / rawSum);
+    // persona weights centred on the declared share, jittered +/-30%
+    const w = PERSONAS.map(p => p.share * (0.7 + rnd() * 0.6));
+    const wSum = d3.sum(w);
+    PERSONAS.forEach((p, pi) => {
+      NODES.push({
+        id: nid++, persona: p.id, pIndex: pi, family: f.id, fIndex: fi,
+        cat: c.n, color: c.c,
+        count1: pi === 0 ? total : 0,
+        count2: Math.round(total * w[pi] / wSum),
+        anchor: pi === 0,
+        ring: pi === 0 && RING_CATS.includes(c.n)
+      });
+    });
+  });
+});
+
+const rScale = d3.scaleSqrt().domain([0, d3.max(NODES, d => d.count1)]).range([0, 38]);
+
+// short forms so the on-bubble labels fit inside their marks
+const SHORT = {
+  'Non-binary*':'Non-bin.*', 'No answer':'No ans.', 'Independent':'Indep.',
+  'Other / none':'Other', 'Under $35k':'<$35k', '$35k–$75k':'$35–75k',
+  '$75k–$150k':'$75–150k', '$150k+':'$150k+'
+};
+/* ONE radius scale, no fudge factor, in both scenes: area is population, so
+   the five persona bubbles a demographic bubble breaks into sum back to it.
+   The old grid radius multiplied its count by 2.1 before scaling, which
+   inflated the encoded population of the split by the same factor and made a
+   mark mean two different things depending on which scene you were in. */
+const r1 = d => d.count1 === 0 ? 0 : Math.max(6, rScale(d.count1));
+const r2 = d => Math.max(3.5, rScale(d.count2));
+
+/* =====================================================================
+   2. ILLUSTRATIONS — original flat-vector scenes, drawn in code
+   ===================================================================== */
+
+// shared person silhouette used across the persona scenes
+function person(g, skin, cloth, hair){
+  g.append('path').attr('d','M -17 26 Q -17 4 0 4 Q 17 4 17 26 Z').attr('fill',cloth);
+  g.append('circle').attr('cx',0).attr('cy',-10).attr('r',11.6).attr('fill',hair);
+  g.append('circle').attr('cx',0).attr('cy',-7).attr('r',10.2).attr('fill',skin);
+  // eyes — a face makes the figures read as people rather than mannequins
+  g.append('circle').attr('cx',-3.6).attr('cy',-6.5).attr('r',1.25).attr('fill','#22304D');
+  g.append('circle').attr('cx',3.6).attr('cy',-6.5).attr('r',1.25).attr('fill','#22304D');
+}
+
+// an arm that actually attaches to a shoulder and ends in a hand
+function arm(g, x1,y1, cx,cy, x2,y2, skin, sleeve){
+  if (sleeve) g.append('path').attr('d',`M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`)
+    .attr('stroke',sleeve).attr('stroke-width',9).attr('fill','none').attr('stroke-linecap','round');
+  g.append('path').attr('d',`M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`)
+    .attr('stroke',skin).attr('stroke-width',6).attr('fill','none').attr('stroke-linecap','round');
+  g.append('circle').attr('cx',x2).attr('cy',y2).attr('r',4.4).attr('fill',skin);
+}
+
+const SKIN='#F0B79B', CLOTH='#8FD0D2', HAIR='#2E3F63';
+
+/* Persona-scene palettes. The two OPENERS deliberately share one palette —
+   their sameness is the argument — but the five personas are five different
+   people, so they get five different skin tones, hair colours and clothes. */
+const LOOKS = {
+  inst:{ skin:'#F0B79B', cloth:'#8FD0D2', hair:'#2E3F63' },
+  prag:{ skin:'#C68642', cloth:'#5FA8A0', hair:'#20160E' },
+  cost:{ skin:'#8D5524', cloth:'#7A5C8E', hair:'#241B16' },
+  disi:{ skin:'#B97A57', cloth:'#5B7B9A', hair:'#4A2C20' },
+  sovr:{ skin:'#EAC086', cloth:'#4E6E58', hair:'#6E3B23' }
+};
+
+// four-point sparkle — a small hand-made accent, used sparingly
+function sparkle(g, x, y, s, color){
+  g.append('path')
+    .attr('d',`M ${x} ${y-s*2} L ${x+s*0.6} ${y-s*0.6} L ${x+s*2} ${y} L ${x+s*0.6} ${y+s*0.6} L ${x} ${y+s*2} L ${x-s*0.6} ${y+s*0.6} L ${x-s*2} ${y} L ${x-s*0.6} ${y-s*0.6} Z`)
+    .attr('fill',color);
+}
+
+const SCENES_ART = {
+  // ---- demographic icons ----
+  gender(g){
+    g.append('circle').attr('r',46).attr('fill','#F2C6DD');
+    // three distinct silhouettes, not one shape in three tints — different
+    // shoulder widths and hair lengths so they read as different people
+    const figs = [
+      { dx:-15, c:'#792946', sh:15, hair:'M -10 -9 A 10 10 0 0 1 10 -9 L 12 6 L 8 6 L 9 -8 L -9 -8 L -8 6 L -12 6 Z' },
+      { dx:1,   c:'#B85D85', sh:12, hair:'M -9.5 -8 A 9.5 9.5 0 0 1 9.5 -8 L 9.5 -12 Q 6 -18 0 -18 Q -6 -18 -9.5 -12 Z' },
+      { dx:16,  c:'#DC98BD', sh:13, hair:'M -9.5 -8 A 9.5 9.5 0 0 1 9.5 -8 L 11 -2 Q 6 -7 0 -7 Q -6 -7 -11 -2 Z' }
+    ];
+    figs.forEach(f=>{
+      const h=g.append('g').attr('transform',`translate(${f.dx},5)`);
+      h.append('path').attr('d',`M ${-f.sh} 22 Q ${-f.sh} 2 0 2 Q ${f.sh} 2 ${f.sh} 22 Z`).attr('fill',f.c);
+      h.append('circle').attr('cy',-9).attr('r',9).attr('fill',f.c);
+      h.append('path').attr('d',f.hair).attr('fill',f.c).attr('opacity',.55);
+    });
+  },
+  geo(g){
+    g.append('circle').attr('r',46).attr('fill','#DCEFD2');
+    // hill line first, buildings planted ON it
+    const hill = 'M -46 14 Q -20 -4 2 10 Q 24 22 46 8 L 46 46 L -46 46 Z';
+    g.append('path').attr('d',hill).attr('fill','#87C26B');
+    // suburban house on the left slope
+    g.append('rect').attr('x',-31).attr('y',-10).attr('width',18).attr('height',20).attr('fill','#42833E');
+    g.append('path').attr('d','M -34 -10 L -22 -21 L -10 -10 Z').attr('fill','#2E6B2B');
+    g.append('rect').attr('x',-25).attr('y',-3).attr('width',6).attr('height',13).attr('fill','#DCEFD2');
+    // city blocks in the middle, bases below the hill crest
+    g.append('rect').attr('x',-4).attr('y',-26).attr('width',13).attr('height',36).attr('fill','#2E6B2B');
+    g.append('rect').attr('x',11).attr('y',-14).attr('width',11).attr('height',26).attr('fill','#42833E');
+    [[-1,-22],[5,-22],[-1,-14],[5,-14],[14,-10],[14,-2]].forEach(([x,y])=>{
+      g.append('rect').attr('x',x).attr('y',y).attr('width',3.4).attr('height',4).attr('fill','#DCEFD2');
+    });
+    // two trees, one each side — "rural" half of the story.
+    // x kept inside sqrt(46² − y²) so the canopy isn't sliced by the clip
+    [[-35,6,7],[31,4,8]].forEach(([x,y,s])=>{
+      g.append('rect').attr('x',x-1.4).attr('y',y).attr('width',2.8).attr('height',s*0.8).attr('fill','#2E6B2B');
+      g.append('circle').attr('cx',x).attr('cy',y-s*0.5).attr('r',s).attr('fill','#2E6B2B');
+      g.append('circle').attr('cx',x-s*0.5).attr('cy',y-s*0.1).attr('r',s*0.7).attr('fill','#3B7A38');
+    });
+  },
+  race(g){
+    g.append('circle').attr('r',46).attr('fill','#E8F3F8');
+    // five tones, all with enough contrast against the pale disc
+    const cols=['#003F5C','#0056A3','#5C9BB0','#3A5D74','#7FB3C4'];
+    const rows=[[0],[-1,0,1],[-1,0,1]];
+    let k=0;
+    rows.forEach((cells,row)=>{
+      cells.forEach(col=>{
+        const x=col*21, y=(row-1)*19 - 2;
+        const c=cols[k++%5];
+        const p=g.append('g').attr('transform',`translate(${x},${y})`);
+        p.append('path').attr('d','M -7.6 11 Q -7.6 1 0 1 Q 7.6 1 7.6 11 Z').attr('fill',c);
+        p.append('circle').attr('cy',-4.6).attr('r',5).attr('fill',c);
+      });
+    });
+  },
+  party(g){
+    g.append('circle').attr('r',46).attr('fill','#F8D5D5');
+    // two opposing ballot slips leaning away from each other
+    g.append('g').attr('transform','translate(-15,4) rotate(-12)')
+      .call(s=>{ s.append('rect').attr('x',-13).attr('y',-18).attr('width',26).attr('height',34).attr('fill','#973027');
+                 s.append('path').attr('d','M -6 -4 L -1 2 L 7 -8').attr('stroke','#F8D5D5').attr('stroke-width',3).attr('fill','none').attr('stroke-linecap','round').attr('stroke-linejoin','round'); });
+    g.append('g').attr('transform','translate(15,4) rotate(12)')
+      .call(s=>{ s.append('rect').attr('x',-13).attr('y',-18).attr('width',26).attr('height',34).attr('fill','#D53F3B');
+                 s.append('path').attr('d','M -6 -4 L -1 2 L 7 -8').attr('stroke','#F8D5D5').attr('stroke-width',3).attr('fill','none').attr('stroke-linecap','round').attr('stroke-linejoin','round'); });
+  },
+  income(g){
+    // follows the income family's own hue so the icon and its bubbles agree
+    g.append('circle').attr('r',46).attr('fill','#F0E8F8');
+    // pot gives the stem somewhere to grow from
+    g.append('path').attr('d','M -15 20 L 15 20 L 11 40 L -11 40 Z').attr('fill','#E08A45');
+    g.append('rect').attr('x',-17).attr('y',15).attr('width',34).attr('height',6).attr('rx',1.5).attr('fill','#F2A05A');
+    g.append('path').attr('d','M 0 16 L 0 -8').attr('stroke','#7FA84E').attr('stroke-width',3.2).attr('fill','none').attr('stroke-linecap','round');
+    g.append('path').attr('d','M 0 6 Q -13 3 -17 -8').attr('stroke','#7FA84E').attr('stroke-width',2.8).attr('fill','none').attr('stroke-linecap','round');
+    g.append('path').attr('d','M 0 -1 Q 13 -5 17 -15').attr('stroke','#7FA84E').attr('stroke-width',2.8).attr('fill','none').attr('stroke-linecap','round');
+    // three well-separated coins, uniform glyph sizing
+    [[0,-15,11.5,'#BFA3DC'],[-19,-12,8,'#5F3E91'],[19,-20,8,'#9070BC']].forEach(([x,y,r,c])=>{
+      g.append('circle').attr('cx',x).attr('cy',y).attr('r',r).attr('fill',c);
+      g.append('circle').attr('cx',x).attr('cy',y).attr('r',r-2.4).attr('fill','none')
+        .attr('stroke','#F0E8F8').attr('stroke-width',1).attr('opacity',.6);
+      g.append('text').attr('x',x).attr('y',y+r*0.34).attr('text-anchor','middle')
+        .attr('font-family','Libre Franklin, sans-serif').attr('font-size',r*0.95)
+        .attr('font-weight',700).attr('fill','#F0E8F8').text('$');
+    });
+  },
+
+  // ---- persona scenes ----
+  inst(g){
+    const L=LOOKS.inst;
+    g.append('circle').attr('r',46).attr('fill','#DCEBF5');
+    const p=g.append('g').attr('transform','translate(-7,8)'); person(p,L.skin,L.cloth,L.hair);
+    // arm from the shoulder, ending in a hand that holds the badge
+    arm(g, 6,16, 19,6, 21,-13, L.skin, L.cloth);
+    g.append('circle').attr('cx',24).attr('cy',-26).attr('r',11).attr('fill','#7FCCC8');
+    g.append('path').attr('d','M 19 -27 L 23 -23 L 30 -31').attr('stroke','#fff').attr('stroke-width',2.6)
+      .attr('fill','none').attr('stroke-linecap','round').attr('stroke-linejoin','round');
+    sparkle(g, 37, -13, 2.6, '#3E8E89');
+    sparkle(g, 11, -35, 2, '#3E8E89');
+  },
+  prag(g){
+    const L=LOOKS.prag;
+    g.append('circle').attr('r',46).attr('fill','#FFF0B0');
+    const p=g.append('g').attr('transform','translate(-5,8)'); person(p,L.skin,L.cloth,L.hair);
+    // forearm up to the chin, hand resting on the jaw
+    arm(g, 4,18, 12,14, 2,6, L.skin, L.cloth);
+    // two question marks, largest nearest the head
+    [[19,-24,1],[30,-10,.72]].forEach(([x,y,s])=>{
+      g.append('path').attr('d','M -4 -4 A 4.4 4.4 0 1 1 0 2.4 L 0 4.6')
+        .attr('transform',`translate(${x},${y}) scale(${s})`)
+        .attr('stroke','#F37940').attr('stroke-width',2.4/s).attr('fill','none')
+        .attr('stroke-linecap','round');
+      g.append('circle').attr('cx',x).attr('cy',y+8*s).attr('r',1.5*s).attr('fill','#F37940');
+    });
+  },
+  cost(g){
+    const L=LOOKS.cost;
+    g.append('circle').attr('r',46).attr('fill','#FBE0C6');
+    const p=g.append('g').attr('transform','translate(-11,8)'); person(p,L.skin,L.cloth,L.hair);
+    // piggy bank, cradled — arm goes under it
+    const pig=g.append('g').attr('transform','translate(16,12)');
+    pig.append('path').attr('d','M -13 6 L -13 12 M 5 6 L 5 12').attr('stroke','#D888A8').attr('stroke-width',4.5).attr('stroke-linecap','round');
+    pig.append('ellipse').attr('rx',15).attr('ry',11).attr('fill','#F2A5C4');
+    pig.append('path').attr('d','M 6 -9 L 14 -13 L 12 -4 Z').attr('fill','#D888A8');
+    pig.append('circle').attr('cx',13).attr('cy',0).attr('r',6).attr('fill','#F2A5C4');
+    pig.append('ellipse').attr('cx',16.5).attr('cy',0).attr('rx',1.4).attr('ry',2).attr('fill','#C4718F');
+    pig.append('circle').attr('cx',7).attr('cy',-4).attr('r',1.4).attr('fill','#C4718F');
+    pig.append('path').attr('d','M -6 -10 L 2 -10').attr('stroke','#C4718F').attr('stroke-width',2.4).attr('stroke-linecap','round');
+    // hand stops at the near edge of the pig so it isn't buried behind it
+    arm(g, -3,20, 1,26, 7,23, LOOKS.cost.skin, LOOKS.cost.cloth);
+    // coin going in — two drop ticks show it mid-fall
+    g.append('path').attr('d','M 11 -2.5 L 11 1 M 17 -2.5 L 17 1').attr('stroke','#D8A94C')
+      .attr('stroke-width',1.6).attr('stroke-linecap','round');
+    g.append('circle').attr('cx',14).attr('cy',-12).attr('r',7).attr('fill','#FFD733');
+    g.append('text').attr('x',14).attr('y',-9).attr('text-anchor','middle')
+      .attr('font-family','Libre Franklin, sans-serif').attr('font-size',9)
+      .attr('font-weight',700).attr('fill','#FBE0C6').text('$');
+  },
+  disi(g){
+    const L=LOOKS.disi;
+    g.append('circle').attr('r',46).attr('fill','#FBD6BE');
+    // figure turned away: back of the head, no face
+    const p=g.append('g').attr('transform','translate(6,8)');
+    p.append('path').attr('d','M -17 26 Q -17 4 0 4 Q 17 4 17 26 Z').attr('fill',L.cloth);
+    p.append('circle').attr('cx',0).attr('cy',-8).attr('r',11).attr('fill',L.hair);
+    p.append('path').attr('d','M -4 3 Q 0 6 4 3').attr('stroke','#22304D').attr('stroke-width',1.6).attr('fill','none');
+    /* A cracked care symbol. Two chain links at 3px was too much meaning for a
+       30px motif; a split medical cross reads instantly as "the system, broken
+       for me" and needs no interpretation. */
+    const cross=g.append('g').attr('transform','translate(-19,-16) rotate(-10)');
+    cross.append('path').attr('d','M -4.5 -14 L 4.5 -14 L 4.5 -4.5 L 14 -4.5 L 14 4.5 L 4.5 4.5 L 4.5 14 L -4.5 14 L -4.5 4.5 L -14 4.5 L -14 -4.5 L -4.5 -4.5 Z')
+      .attr('fill','#C25236');
+    // the fracture: a jagged gap knocked through in the disc's own colour
+    cross.append('path').attr('d','M -2 -16 L 2.5 -6 L -2.5 -1 L 3 6 L -1 16')
+      .attr('stroke','#FBD6BE').attr('stroke-width',3.4).attr('fill','none')
+      .attr('stroke-linejoin','round').attr('stroke-linecap','round');
+  },
+  // ---- opening segue figures ----
+  declines(g){
+    g.append('circle').attr('r',46).attr('fill','#F8D5D5');
+    const p=g.append('g').attr('transform','translate(-9,8)'); person(p,SKIN,CLOTH,HAIR);
+    // arm up, palm out — declining, not refusing angrily
+    arm(g, 3,16, 15,4, 19,-7, SKIN, CLOTH);
+    g.append('circle').attr('cx',19).attr('cy',-7).attr('r',6.2).attr('fill',SKIN);
+    // the capsule being waved off
+    g.append('g').attr('transform','translate(25,-19) rotate(-28)').call(s=>{
+      s.append('rect').attr('x',-4).attr('y',-9).attr('width',8).attr('height',18).attr('rx',4).attr('fill','#C25236');
+      s.append('path').attr('d','M -4 0 L 4 0').attr('stroke','#F8D5D5').attr('stroke-width',1.3);
+    });
+  },
+  selfdirects(g){
+    g.append('circle').attr('r',46).attr('fill','#DCEFD2');
+    const p=g.append('g').attr('transform','translate(-11,8)'); person(p,SKIN,CLOTH,HAIR);
+    arm(g, -2,18, 7,21, 12,15, SKIN, CLOTH);
+    // supplement bottle, held
+    g.append('g').attr('transform','translate(19,7)').call(s=>{
+      s.append('rect').attr('x',-9).attr('y',-13).attr('width',18).attr('height',25).attr('rx',3).attr('fill','#E8A34E');
+      s.append('rect').attr('x',-6).attr('y',-18).attr('width',12).attr('height',6).attr('rx',1.5).attr('fill','#C4802F');
+      s.append('rect').attr('x',-7).attr('y',-5).attr('width',14).attr('height',9).attr('rx',1).attr('fill','#DCEFD2');
+    });
+    g.append('path').attr('d','M 7 -24 C 16 -32 28 -30 30 -21 C 22 -15 11 -17 7 -24 Z').attr('fill','#7FA84E');
+    g.append('path').attr('d','M 9 -23 Q 19 -24 28 -21').attr('stroke','#DCEFD2').attr('stroke-width',1.2).attr('fill','none');
+  },
+
+  /* ---- the three opening questions ----
+     These need their own drawings. Borrowing a persona portrait meant the same
+     face stood for "The Pragmatic Skeptics" in one row and "WHY" in the next,
+     which teaches the reader that the faces do not mean anything in particular.
+     A magnifier, a question and a lightbulb are about the ASKING, so they never
+     collide with a persona or a demographic. */
+  qwho(g){
+    g.append('circle').attr('r',46).attr('fill','#E8F3F8');
+    // three figures, the nearest one under the lens
+    [[-24,10,1,'#3A5D74'],[-8,13,.85,'#0056A3'],[7,10,.95,'#69ACBF']].forEach(([x,y,s,c])=>{
+      const p=g.append('g').attr('transform',`translate(${x},${y}) scale(${s})`);
+      p.append('path').attr('d','M -9 14 Q -9 2 0 2 Q 9 2 9 14 Z').attr('fill',c);
+      p.append('circle').attr('cy',-6).attr('r',6.2).attr('fill',c);
+    });
+    // magnifier over the group
+    const m=g.append('g').attr('transform','translate(14,-11)');
+    m.append('circle').attr('r',17).attr('fill','#F8F6F1').attr('opacity',.55);
+    m.append('circle').attr('r',17).attr('fill','none').attr('stroke','#003F5C').attr('stroke-width',4);
+    m.append('path').attr('d','M 12 12 L 26 26').attr('stroke','#003F5C')
+      .attr('stroke-width',5).attr('stroke-linecap','round');
+  },
+  qwhy(g){
+    g.append('circle').attr('r',46).attr('fill','#FFF0B0');
+    // a speech bubble: the question belongs to a person, not to the air
+    const b=g.append('g').attr('transform','translate(0,-4)');
+    b.append('rect').attr('x',-27).attr('y',-24).attr('width',54).attr('height',42)
+      .attr('rx',12).attr('fill','#F6B93B');
+    b.append('path').attr('d','M -9 17 L -3 30 L 4 17 Z').attr('fill','#F6B93B');
+    b.append('path').attr('d','M -7.5 -9.5 A 7.5 7.5 0 1 1 0 1.5 L 0 5')
+      .attr('stroke','#FFF6D6').attr('stroke-width',4.6).attr('fill','none')
+      .attr('stroke-linecap','round');
+    b.append('circle').attr('cy',11).attr('r',2.6).attr('fill','#FFF6D6');
+  },
+  qhow(g){
+    g.append('circle').attr('r',46).attr('fill','#DCEFD2');
+    // lightbulb: the answer, not the person
+    g.append('path').attr('d','M -12 6 A 13.5 13.5 0 1 1 12 6 Q 8 12 7 19 L -7 19 Q -8 12 -12 6 Z')
+      .attr('fill','#F6C445');
+    g.append('rect').attr('x',-7).attr('y',20).attr('width',14).attr('height',5).attr('rx',2).attr('fill','#7FA84E');
+    g.append('rect').attr('x',-5.5).attr('y',27).attr('width',11).attr('height',5).attr('rx',2).attr('fill','#7FA84E');
+    // filament
+    g.append('path').attr('d','M -4 2 L -1.5 -3 L 1.5 2 L 4 -3').attr('stroke','#B8862A')
+      .attr('stroke-width',2).attr('fill','none').attr('stroke-linecap','round').attr('stroke-linejoin','round');
+    // three rays
+    [[0,-34,0],[-24,-22,-45],[24,-22,45]].forEach(([x,y,r])=>{
+      g.append('path').attr('d','M 0 -5 L 0 5').attr('transform',`translate(${x},${y}) rotate(${r})`)
+        .attr('stroke','#7FA84E').attr('stroke-width',3).attr('stroke-linecap','round');
+    });
+  },
+
+  sovr(g){
+    const L=LOOKS.sovr;
+    g.append('circle').attr('r',46).attr('fill','#F7C4C2');
+    const p=g.append('g').attr('transform','translate(-13,8)'); person(p,L.skin,L.cloth,L.hair);
+    // hand grips the near rim of the shield rather than disappearing behind it
+    arm(g, -4,18, 2,16, 1,9, L.skin, L.cloth);
+    g.append('g').attr('transform','translate(19,0)').call(s=>{
+      s.append('path').attr('d','M 0 -20 L 16 -13 L 16 1 C 16 11 7 18 0 21 C -7 18 -16 11 -16 1 L -16 -13 Z')
+        .attr('fill','#C93B3C');
+      s.append('path').attr('d','M 0 -14 L 10 -9 L 10 0 C 10 7 4 12 0 14 C -4 12 -10 7 -10 0 L -10 -9 Z')
+        .attr('fill','#F7C4C2');
+    });
+  }
+};
+
+function drawArt(sel, key, scale){
+  sel.selectAll('*').remove();
+  const g = sel.append('g').attr('transform',`scale(${scale||1})`);
+  const clip = 'clip-' + key + '-' + Math.random().toString(36).slice(2,8);
+  const cp = g.append('clipPath').attr('id',clip);
+  cp.append('circle').attr('r',46);
+  const inner = g.append('g').attr('clip-path',`url(#${clip})`);
+  SCENES_ART[key](inner);
+}
+
+/* =====================================================================
+   3. SCENE COPY
+   ===================================================================== */
+
+const chip = (t,c,dark) => `<span class="chip" style="--c:${c}${dark?';--t:#212E36':''}">${t}</span>`;
+
+/* Two illustrative composites who open the piece. They are deliberately given
+   the same clothing, posture and visual weight as every other figure — the
+   whole argument is that sorting people by tribe is the mistake, so the
+   artwork must not do it either. Props describe behaviour (a declined
+   capsule, a supplement bottle), never identity. */
+// authored as explicit lines — the gutter either side of the figures is only
+// ~180px, so these wrap at write time rather than being measured at runtime
+// chip colours match the FAMILIES party palette exactly — the same reader
+// meets these two parties again in the demographic scenes
+const OPENERS = [
+  { id:'a', art:'declines', chip:'Republican', chipColor:'#D53F3B',
+    beliefs:[ ['Distrusts federal','health agencies'],
+              ['Distrusts drug','companies'],
+              ['Declined the vaccine.','No doctor in four years.'] ] },
+  { id:'b', art:'selfdirects', chip:'Democrat', chipColor:'#973027',
+    beliefs:[ ['Distrusts industry-','funded research'],
+              ['Distrusts the','medical establishment'],
+              ['Self-directs her care.','No doctor in four years.'] ] }
+];
+const CONVERGE_TEXT = 'Neither trusts the institution';
+const PLAYBOOK_TEXT = 'Trusted messenger · Honest uncertainty · Their choice';
+const STAGE_KEYS = ['blank','personA','personB','converge','sameplay'];
+
+const SCENES = [
+  { key:'blank', frame:'stage', h:'Before Any of the Data, Two People',
+    body:`<p>They will not agree on much.</p>
+          <p>They vote differently, read different things, and would give you opposite accounts of what has gone wrong with American health care.</p>`,
+    note:'Illustrative composites, not survey respondents.' },
+
+  { key:'personA', frame:'stage', h:'He Skipped It',
+    body:`<p>He votes Republican. He thinks federal health agencies overreached during the pandemic and were not straight with the public, and he does not believe a pharmaceutical company has his interests at heart.</p>
+          <p>So he declined the vaccine. He has not seen a doctor in four years.</p>` },
+
+  { key:'personB', frame:'stage', h:'She Skipped It Too',
+    body:`<p>She votes Democrat. She thinks the medical establishment is too close to the industry that is supposed to regulate it, and she does not believe a trial paid for by a drug company will tell her the truth.</p>
+          <p>So she manages her own health — a naturopath, and supplements she chose herself. She has not seen a doctor in four years either.</p>` },
+
+  { key:'converge', frame:'stageCard', h:'Opposite Politics, Same Variable',
+    body:`<p>Opposite parties. Opposite media. Opposite explanations for the same decision.</p>
+          <p><strong>Underneath, one shared variable: neither of them trusts the institution.</strong></p>
+          <p>Sort these two by party and they land in different buckets. Sort them by what actually drives the behavior and they land in the same one.</p>` },
+
+  { key:'sameplay', frame:'stageCard', h:'One Playbook Reaches Both',
+    body:`<p>A messenger who is neither the government nor the industry. Information that shows its own uncertainty. A decision framed as theirs to make.</p>
+          <p><strong>Two people a pollster would never group together, and one intervention that works on both.</strong></p>
+          <p>Now scale that up.</p>` },
+
+  { key:'demo1', frame:'demo', h:'Looking at Party Isn’t Enough',
+    body:`<p>Segmentation divides a population into approachable groups so interventions can be personalized. In American health policy, that has collapsed almost entirely onto one variable: <strong>party</strong>.</p>
+          <p>The circles show a modeled sample of U.S. adults, grouped the traditional way — by gender, geography, race, party and income.</p>
+          <p>Keep subdividing and you get smaller boxes, not better answers. Partisan targeting identifies the <strong>who</strong>. It never reaches the <strong>why</strong>.</p>`,
+    hint:'Hover any circle to see the group size',
+    note:'Synthetic sample standing in for ~3,000 U.S. adults. * Includes those who prefer to self-describe.' },
+
+  { key:'demo2', frame:'demo', h:'The Same Person Is in Every Bucket',
+    body:`<p>Segmentation decks routinely report lower trust in health institutions among ${chip('women','#A94F76')}, ${chip('rural','#2E6B2B')} residents, ${chip('Black','#0056A3')} Americans, ${chip('Republicans','#C23834')} and ${chip('lower-income','#5F3E91')} adults. Take every one of those as given. They are still nearly useless for targeting.</p>
+          <p>One person can sit inside all five of those circles at once — and the next person with the identical profile behaves the opposite way. One skipped the appointment because it cost $340. The other skipped it because they did not think it was necessary.</p>
+          <p><strong>The same intervention cannot reach both.</strong></p>`,
+    hint:'Hover any circle to see the group size', note:'' },
+
+  { key:'split', frame:'grid', hint2:'Hover any circle for its persona and count', h:'We Need to Target Beliefs and Barriers',
+    body:`<p><strong>Psychobehavioral segmentation</strong> instead divides people by what actually drives their behavior — trust, constraints, and beliefs about who health guidance is for.</p>
+          <p>Clustering on seven belief and access variables produces five political health personas. Critically, <strong>every persona contains members of every demographic group</strong>, including every party.</p>`,
+    hint:'Hover a column to read its profile',
+    note:'Placeholder clusters. The live version runs k-medoids on Gower distance.' },
+
+  { key:'named', frame:'lobes', h:'The Five Political Health Personas',
+    body:`<p>The depth of each band is the share of American adults it holds.</p>
+          <p>Roughly a quarter — <strong>The Institutionalists</strong> — engage with the health system readily and hit only logistical friction. At the other end, <strong>The Sovereigntists</strong> treat health decisions as expressions of identity; for them a mandate is not a nudge but a threat.</p>`,
+    hint:'Hover a column to read its profile', note:'' },
+
+  { key:'likelihood', frame:'lobes', h:'These Personas Differ in Health Engagement',
+    body:`<p>Each persona sits at a different point on a 0–10 composite of preventive care uptake, screening adherence, and willingness to follow clinical guidance.</p>
+          <p>Three of these segments — <strong>“The Reachable”</strong> — can plausibly be moved, because their barriers are structural or informational rather than identity-bound.</p>`,
+    hint:'Hover a column to read its profile', note:'' },
+
+  { key:'barriers', frame:'table', h:'Only the Right Barrier Closes the Gap',
+    body:`<p><strong>Key perceptual and structural barriers</strong> differ sharply between personas, and applying the wrong one is worse than doing nothing: a cost intervention aimed at a trust problem reads as condescension.</p>
+          <p><strong>Prioritize barriers, not demographics.</strong></p>`,
+    hint:'Hover a column to explore its barriers', note:'' },
+
+  { key:'interventions', frame:'table', h:'Customized Solutions for Each Persona',
+    body:`<p>Here is a roadmap of intervention types matched to the real or perceived barrier of each persona.</p>
+          <p><strong>And it has to be local.</strong> A trusted intermediary in rural Kentucky is not a trusted intermediary in South Los Angeles. The persona tells you the strategy; local context tells you the messenger.</p>`,
+    hint:'Hover a column to explore its solutions', note:'' },
+
+  { key:'shift', frame:'outcome', h:'How the Personas Shift Over Time',
+    body:`<p>Beliefs move. People migrate between personas as costs change, as guidance stabilizes or fractures, and as trust is earned or spent.</p>
+          <p>Remove the cost barrier and the <strong>Cost-Constrained</strong> shrink. Depoliticize the messenger and the <strong>Pragmatic Skeptics</strong> convert. The teal band below is the outcome that follows: adults up to date on recommended care.</p>`,
+    hint:'', note:'Illustrative shift across three hypothetical survey waves.' },
+
+  { key:'final', frame:'outcome', h:'The Time to Act Is Now',
+    body:`<p>The politicization of American health is not a fixed condition. It is the accumulated result of specific, addressable failures: care nobody can afford, guidance that contradicted itself, and institutions that spent down trust they have not since rebuilt.</p>
+          <p>The faint outlines show where each persona started. Reaching <strong>The Reachable</strong> does not require winning an argument about politics — only removing the thing standing in the way.</p>
+          <p><strong>One band does not move.</strong> For roughly one in seven adults, a health decision is an identity claim, and no messenger fixes that. That is an argument for spending the effort on the sixty-two percent, not for pretending the fourteen are not there.</p>`,
+    hint:'', note:'' }
+];
+
+/* =====================================================================
+   4. HERO DECORATION
+   ===================================================================== */
+
+const hp = d3.select('#heroPortraits');
+PERSONAS.forEach(p => {
+  const s = hp.append('svg').attr('width',84).attr('height',84).attr('viewBox','-50 -50 100 100')
+    .attr('role','img').attr('aria-label',p.name);
+  drawArt(s, p.id, 0.86);          // clears the svg, so the title goes on after
+  s.append('title').text(p.name);
+});
+
+const QS = [
+  { l:'WHO', t:'is or isn’t engaging with the health system?', a:'qwho' },
+  { l:'WHY', t:'are they engaging, or holding back?', a:'qwhy' },
+  { l:'HOW', t:'do we respond — without making it partisan?', a:'qhow' }
+];
+const qg = d3.select('#qgrid');
+QS.forEach(q => {
+  const d = qg.append('div').attr('class','q');
+  const s = d.append('svg').attr('width',78).attr('height',78).attr('viewBox','-50 -50 100 100')
+    .attr('aria-hidden','true');
+  drawArt(s, q.a, 0.82);
+  d.append('div').attr('class','qlabel').text(q.l);
+  d.append('div').attr('class','qtext').text(q.t);
+});
+
+/* =====================================================================
+   4b. DATA TABLE
+
+   The chart is a picture of these numbers; this is the numbers themselves.
+   It serves a screen reader, a keyboard, a reader who would rather read a
+   table, and anyone checking a figure they saw in a lobe — so it is a
+   disclosure everyone can open, not a hidden accessibility annex.
+   ===================================================================== */
+
+(function buildDataTable(){
+  const t = d3.select('#dataTable');
+  if (t.empty()) return;
+  t.append('caption').text(
+    'Five political health personas. Shares are the modeled percentage of U.S. adults ' +
+    'in each wave; engagement is a 0–10 composite of preventive care uptake, screening ' +
+    'adherence and willingness to follow clinical guidance. Synthetic data — design ' +
+    'prototype, not survey results.');
+
+  const head = t.append('thead').append('tr');
+  ['Persona','Wave 1','Wave 2','Wave 3','Engagement','Key barriers','Solutions']
+    .forEach((h,i) => head.append('th').attr('scope','col')
+      .attr('class', i>=1 && i<=4 ? 'num' : null).text(h));
+
+  const body = t.append('tbody');
+  PERSONAS.forEach(p => {
+    const tr = body.append('tr');
+    const th = tr.append('th').attr('scope','row');
+    th.append('span').attr('class','swatch').attr('style',`--c:${p.color}`).attr('aria-hidden','true');
+    th.append('span').text(p.name);
+    tr.append('td').attr('class','num').text(p.share + '%');
+    tr.append('td').attr('class','num').text(p.share2 + '%');
+    tr.append('td').attr('class','num').text(p.share3 + '%');
+    tr.append('td').attr('class','num').text(p.score.toFixed(1));
+    tr.append('td').text(p.barriers.join(', '));
+    tr.append('td').text(p.interventions.join(', '));
+  });
+
+  const foot = body.append('tr');
+  foot.append('th').attr('scope','row').text(OUTCOME.label);
+  OUTCOME.v.forEach(v => foot.append('td').attr('class','num').text(v + '%'));
+  foot.append('td');
+  foot.append('td').attr('colspan',2).text('Share of adults up to date on recommended care, by wave.');
+})();
+
+/* =====================================================================
+   5. SCENE PANELS
+   ===================================================================== */
+
+const HAND = `<svg width="15" height="17" viewBox="0 0 15 17" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 8V2.6a1.3 1.3 0 0 1 2.6 0V8m0-1.6a1.3 1.3 0 0 1 2.6 0V8m0-1a1.3 1.3 0 0 1 2.6 0v4.4c0 2.6-1.7 5-4.6 5-2.6 0-4-1.4-5-3.2L1.3 10a1.3 1.3 0 0 1 2.2-1.3L4.5 10"/></svg>`;
+
+// touch screens have no hover — the affordance hint must say what the reader
+// can actually do there
+const TOUCH = typeof matchMedia === 'function' && matchMedia('(hover: none)').matches;
+const hintText = t => TOUCH ? t.replace(/^Hover/, 'Tap') : t;
+
+const scenesSel = d3.select('#scenes');
+SCENES.forEach(s => {
+  const st = scenesSel.append('div').attr('class','step').attr('data-key', s.key);
+  const inner = st.append('div').attr('class','step-inner');
+  inner.append('h2').text(s.h);
+  inner.append('hr');
+  inner.append('div').html(s.body);
+  const h = s.hint2 || s.hint;
+  if (h) inner.append('div').attr('class','hint').html(HAND + '<span>' + hintText(h) + '</span>');
+  if (s.note) inner.append('div').attr('class','note').text(s.note);
+});
+
+/* =====================================================================
+   6. GEOMETRY
+   ===================================================================== */
+
+const W = 1000, H = 980;
+const svg = d3.select('#viz');
+const SANS = 'Libre Franklin, Helvetica, Arial, sans-serif';
+
+/* ---------------------------------------------------------------------
+   RESPONSIVE TYPE SCALE
+
+   The chart lives in a fixed 948-unit viewBox scaled to fit. On a 375px
+   phone that scale is 0.36, so a 13-unit label lands at 4.6 physical px —
+   unreadable. (The Surgo reference sidesteps this by drawing in real pixel
+   coordinates; it still only reaches 7.5px.) Instead of abandoning the
+   viewBox — which is what makes the frame transitions possible — every
+   chrome label carries its base size in `data-fs` and is multiplied by TK,
+   recomputed from the live render scale. Desktop lands on TK=1, so the
+   composition the piece was tuned at is untouched.
+
+   Illustration text (the coins, the '$') is deliberately NOT tagged: it is
+   part of the drawing and must scale with it.
+   ------------------------------------------------------------------- */
+let TK = 1;                                  // chrome type multiplier
+let TKT = 1;                                 // table type multiplier (gentler)
+const MIN_LABEL_PX = 9.6;                    // smallest chrome label, in real px
+const BASE_LABEL = 12;                       // its base size in user units
+
+/* Measured against the frame the scene is heading TO, never the live viewBox
+   attribute: during a frame transition that attribute is a half-interpolated
+   value, and sizing type off it makes the labels breathe in and out. */
+function renderScale(frame){
+  const n = svg.node(); if (!n) return 1;
+  const r = n.getBoundingClientRect();
+  const vbAttr = frame || svg.attr('viewBox'); if (!vbAttr || !r.width) return 1;
+  const vb = vbAttr.split(/[\s,]+/).map(Number);
+  if (!vb[2] || !vb[3]) return 1;
+  return Math.min(r.width / vb[2], r.height / vb[3]);   // xMidYMid meet
+}
+function computeTK(frame){
+  const s = renderScale(frame);
+  TK  = Math.max(1, Math.min(2.35, MIN_LABEL_PX / (BASE_LABEL * s)));
+  // the barrier/solution table is the densest block in the piece; it grows
+  // more slowly so three wrapped entries still fit the column
+  TKT = 1 + (TK - 1) * 0.72;
+}
+const MOBILE = () => TK > 1.3;
+
+// tag a base size so the scale can be re-applied on resize
+function typed(sel, base){
+  return sel.attr('data-fs', base).attr('font-size', base * TK);
+}
+function typedT(sel, base){
+  return sel.attr('data-fst', base).attr('font-size', base * TKT);
+}
+function typedFn(sel, baseFn){
+  return sel.attr('data-fs', baseFn)
+            .attr('font-size', function(d,i){ return baseFn.call(this,d,i) * TK; });
+}
+function applyTypeScale(){
+  svg.selectAll('text[data-fs],tspan[data-fs]')
+     .attr('font-size', function(){ return +this.getAttribute('data-fs') * TK; });
+  svg.selectAll('text[data-fst],tspan[data-fst]')
+     .attr('font-size', function(){ return +this.getAttribute('data-fst') * TKT; });
+  // multi-line labels: the line step has to grow with the type or line two
+  // climbs into line one
+  svg.selectAll('tspan[data-dy]')
+     .attr('dy', function(){ return +this.getAttribute('data-dy') * TK; });
+}
+
+const GRID_L = 150, GRID_R = 950, GRID_W = GRID_R - GRID_L;
+const COL_W  = GRID_W / 5;                       // 160
+const COL_X  = d3.range(5).map(i => GRID_L + COL_W * (i + 0.5));   // 230…870
+const GUT_X  = GRID_L - 22;                      // right-aligned row labels
+
+const TITLE_Y = 34, APEX_Y = 58;
+const ICON_Y = 150, ICON_R = 46;
+const LABEL_Y = ICON_Y + ICON_R + 24;            // 220
+const SHARE_Y = LABEL_Y + 22;                    // 242
+const MINI_Y = 238, MINI_H = 34;
+
+/* The lobes now get their own band ABOVE the grid. Hanging them into the top
+   two rows of bubbles — as the reference does — turns into colour mud once the
+   lobes are deep enough to read, so the two encodings are separated. */
+const LOBE_Y0 = 262, LOBE_MAX = 84;              // band 262…346 at full depth
+const ROW_Y0 = 390, ROW_DY = 56;                 // 390…614
+const DEMO_Y = 470;                              // force target for the cloud
+const BAR_Y = 678, BAR_W = COL_W - 46, BAR_H = 11;
+const BRACE_Y = 716, BRACE_H = 36;
+const CT_Y0 = 730, CT_DY = 44;
+const OUT_Y0 = 678, OUT_MAX = 150;
+const LEG_Y = 762;
+
+/* Only two frame heights across the whole piece. Growing the canvas scene by
+   scene made the graphic shrink ~20% by the ending — exactly where the
+   argument should land hardest. The outcome band moves up into the space the
+   bars and table vacate instead of extending the canvas. */
+/* x origin differs by 45 between demo and the rest because the demographic
+   scenes carry no left gutter labels, so their ink sits further right. */
+/* Opening segue. Framed tight on two figures; the cut to `demo` is a genuine
+   camera pull-back from two people to three thousand. */
+const FIG_Y = 300, FIG_SCALE = 2.2, FIG_R = 46 * FIG_SCALE;
+const A_SOLO_X = 480, A_X = 320, B_X = 640;
+const CO_Y = [222, 300, 378];                    // callout block centres
+const CO_A_SOLO = 365, CO_A_PAIR = 205, CO_B = 755;
+const CHIP_Y = FIG_Y + FIG_R + 34;
+const STAGE_MID = (A_X + B_X) / 2;               // visual midpoint of the pair
+const CARD_Y = 596, CARD_W = 430, CARD_H = 60;
+
+const FRAMES = {
+  stage:   '26 150 948 380',
+  stageCard: '26 40 948 660',
+  demo:    '75 8 940 800',
+  grid:    '30 8 940 800',
+  lobes:   '30 8 940 800',
+  table:   '30 8 940 850',
+  outcome: '30 8 940 880'
+};
+
+/* Phone frames. Two different jobs:
+
+   The segue crops hard around the two figures — with the callout labels gone
+   there is nothing in the margins to keep, so the crop buys back scale and the
+   figures land twice as large.
+
+   The data frames keep the full width (five columns is the argument; you
+   cannot crop one out) but run TALLER. Height is free here: the width is what
+   binds the fit, so extra viewBox height costs no scale and simply gives the
+   scaled-up table and legend somewhere to live. The demo frame also gives back
+   the left gutter that the bigger row labels need. */
+/* Heights are cut to what each scene actually draws. Width binds the fit, so a
+   frame taller than its content buys no scale — it just parks empty viewBox
+   under the chart and pushes the narration down the phone. */
+const FRAMES_MOBILE = {
+  stage:   '196 150 608 380',
+  stageCard: '196 40 608 700',
+  demo:    '8 8 968 880',
+  grid:    '8 8 968 830',
+  lobes:   '8 8 968 850',
+  table:   '8 8 968 990',
+  outcome: '8 8 968 920'
+};
+/* Tied to the same 960px breakpoint the stylesheet uses. Below it the graphic
+   is a band stacked above the narration and the fit becomes height-bound, which
+   drives the type scale up exactly as on a phone; the frames have to switch at
+   the same moment or a tablet gets phone-sized labels in a desktop gutter and
+   clips them. TK cannot be the signal here — TK is derived from the frame. */
+function isNarrow(){ return innerWidth <= 960; }
+const frameFor = name => (isNarrow() ? FRAMES_MOBILE : FRAMES)[name];
+
+/* draw order: lobes behind bubbles, labels above everything */
+const gTitle  = svg.append('g').attr('opacity',0);
+const gTree   = svg.append('g');
+const gMini   = svg.append('g').attr('opacity',0);
+const gIcon   = svg.append('g').attr('opacity',0);
+const gLobe   = svg.append('g').attr('opacity',0);
+const gGhost  = svg.append('g').attr('opacity',0);
+const gOut    = svg.append('g').attr('opacity',0);
+const gRows   = svg.append('g').attr('opacity',0);
+const gNodes  = svg.append('g');
+const gAnno   = svg.append('g').attr('opacity',0);
+const gLabels = svg.append('g').attr('opacity',0);
+const gBars   = svg.append('g').attr('opacity',0);
+const gText   = svg.append('g').attr('opacity',0);
+const gBrace  = svg.append('g').attr('opacity',0);
+const gLegend = svg.append('g').attr('opacity',0);
+const gStage  = svg.append('g').attr('opacity',0);
+const gHit    = svg.append('g');
+/* Provenance stamp. The legend's disclaimer only appears on the two
+   demographic scenes, which left ten scenes — including the finale that sets
+   66% in display type — asserting numbers with no visible marker that they are
+   invented. This rides above everything, on every data frame. */
+const gStamp  = svg.append('g').attr('opacity',0).attr('pointer-events','none');
+
+/* Every drawing layer is hidden from assistive tech. All of these are opacity
+   -toggled rather than display:none, so without this a screen reader would
+   meet the bar values, table cells and legend numbers of ten scenes at once,
+   with nothing to say which scene they belonged to. The chart's meaning is
+   carried by the svg's own label, the five persona buttons in gHit, and the
+   data table below it. */
+[gTitle,gTree,gMini,gIcon,gLobe,gGhost,gOut,gRows,gNodes,gAnno,
+ gLabels,gBars,gText,gBrace,gLegend,gStage,gStamp]
+  .forEach(g => g.attr('aria-hidden','true'));
+const stampText = gStamp.append('text')
+  .attr('text-anchor','start').attr('font-family',SANS)
+  .attr('font-weight',500).attr('fill','#6F6F6F')
+  .text('Synthetic data · illustrative prototype, not survey results');
+
+/* =====================================================================
+   7. MOTION HELPERS
+   ===================================================================== */
+
+const REDUCE  = typeof matchMedia === 'function'
+  && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const ELASTIC = REDUCE ? 1 : 1000;   // signature: shape morphs overshoot and settle
+const FADE    = REDUCE ? 1 : 500;    // everything else
+/* The signature morph stays a spring, but a tuned one. d3's stock elastic
+   (amplitude 1, period 0.3) overshoots hard enough to read rubbery; easing the
+   amplitude and lengthening the period keeps the sense of something with mass
+   arriving and settling, without the wobble. */
+const SHAPE_EASE = REDUCE ? d3.easeLinear : d3.easeElastic.amplitude(0.9).period(0.42);
+/* Anything whose SIZE IS A NUMBER uses this instead: it still arrives with
+   weight, but it never overshoots, so the lobe depth and the outcome band are
+   never briefly drawing a share nobody has. */
+const VALUE_EASE = REDUCE ? d3.easeLinear : d3.easeCubicOut;
+/* The four largest movements in the piece: the camera cut between frames, the
+   demographic settle, and the two halves of the hundred-bubble split. These
+   used hardcoded durations, so reduced-motion readers still got the full
+   travel even though every smaller motion had been collapsed. */
+const CAMERA  = REDUCE ? 1 : 900;   // viewBox move between scenes
+const SETTLE  = REDUCE ? 1 : 1100;  // demographic cloud settling
+const SPLIT_A = REDUCE ? 1 : 1050;  // anchor bubbles during the split
+const SPLIT_B = REDUCE ? 1 : 950;   // their four hidden siblings
+const REGROUP = REDUCE ? 1 : 800;   // arriving in the grid without a split
+const STAGE_D = REDUCE ? 1 : 700;   // the opening segue's own layout moves
+
+// stroke-dasharray reveal — every tree in the piece draws itself on
+function drawOn(sel, dur, delayFn){
+  sel.each(function(d, i){
+    let L = 0;
+    try { L = this.getTotalLength(); } catch(e){ L = 0; }
+    if (!L || REDUCE){ d3.select(this).style('opacity',1).attr('stroke-dashoffset',0); return; }
+    d3.select(this)
+      .attr('stroke-dasharray', L + ' ' + L)
+      .attr('stroke-dashoffset', L)
+      .style('opacity', 1)
+      .transition('draw').duration(dur || ELASTIC)
+      .delay(delayFn ? delayFn(d, i) : 0)
+      .ease(d3.easeCubicInOut)
+      .attr('stroke-dashoffset', 0)
+      .on('end interrupt', function(){
+        d3.select(this).attr('stroke-dasharray', null).attr('stroke-dashoffset', null);
+      });
+  });
+}
+
+// true count-up tweening — a deliberate improvement on the reference,
+// which snaps digits while only the label position animates
+/* Resume from the value actually on screen, not a stored target. Caching the
+   target meant an interrupted count restarted from a number the reader never
+   saw, so fast scrolling made the digits jump. */
+function countTo(sel, accessor, fmt, dur){
+  sel.transition('count').duration(dur || ELASTIC).ease(d3.easeCubicOut)
+    .textTween(function(d, i){
+      const shown = parseFloat(String(this.textContent).replace(/[^0-9.\-]/g, ''));
+      const prev = Number.isFinite(shown) ? shown : 0;
+      const next = accessor(d, i);
+      const lerp = d3.interpolateNumber(prev, next);
+      return t => fmt(lerp(t));
+    });
+}
+
+const pct = v => Math.round(v) + '%';
+function show(sel, v, dur){ sel.transition('vis').duration(dur || FADE).attr('opacity', v); }
+
+/* =====================================================================
+   8. TREES — one d3.tree() layout drives all three
+   ===================================================================== */
+
+function buildTree(childCount, w, h){
+  const data = [{id:'root', parentId:''}];
+  for (let i=0;i<childCount;i++) data.push({id:'c'+i, parentId:'root'});
+  const root = d3.hierarchy(d3.stratify()(data));
+  return d3.tree().size([w, h])(root).links();
+}
+
+const linkV = d3.linkVertical().x(d=>d.x).y(d=>d.y);
+// genuinely mirrored: reflect y about the group height so the arms sit at the
+// TOP and converge downward into a single trunk. Swapping source/target only
+// reverses traversal and leaves the geometry identical.
+const flipY = h => d => linkV({
+  source:{ x:d.source.x, y:h - d.source.y },
+  target:{ x:d.target.x, y:h - d.target.y }
+});
+
+/* d3.tree() insets leaves by half a separation unit: for n leaves across
+   width w it places them at (i+0.5)·w/n. Passing the FULL grid width (not
+   width-minus-a-column) therefore lands them exactly on the column centres. */
+const mainLinks = buildTree(5, GRID_W, ICON_Y - ICON_R - APEX_Y - 12);
+const treePaths = gTree.append('g')
+  .attr('transform', `translate(${GRID_L},${APEX_Y})`)
+  .selectAll('path').data(mainLinks).join('path')
+  .attr('class','trunk').attr('d', linkV)
+  .attr('fill','none').attr('stroke','#212E36').attr('stroke-width',1)
+  .style('opacity',0);
+
+// five mini trees — the "keep subdividing and it still won't tell you why" beat
+const miniLinks = buildTree(2, COL_W * 0.42, MINI_H);
+COL_X.forEach(cx => {
+  gMini.append('g').attr('transform', `translate(${cx - COL_W*0.21},${MINI_Y})`)
+    .selectAll('path').data(miniLinks).join('path')
+    .attr('class','mini').attr('d', linkV)
+    .attr('fill','none').attr('stroke','#212E36').attr('stroke-width',1)
+    .style('opacity',0);
+});
+
+// flipped brace spanning the middle three columns — same inset rule
+const braceW = COL_W * 3;
+const braceLinks = buildTree(3, braceW, BRACE_H);
+const bracePaths = gBrace.append('g')
+  .attr('transform', `translate(${COL_X[2] - braceW/2},${BRACE_Y})`)
+  .selectAll('path').data(braceLinks).join('path')
+  .attr('class','brace').attr('d', flipY(BRACE_H))
+  .attr('fill','none').attr('stroke','#212E36').attr('stroke-width',2.6)
+  .style('opacity',0);
+const braceLabel = gBrace.append('text')
+  .attr('x',COL_X[2]).attr('y',BRACE_Y + BRACE_H + 26).attr('text-anchor','middle')
+  .attr('font-family',SANS).call(typed,14).attr('font-weight',700)
+  .attr('fill','#212E36');
+braceLabel.append('tspan').text('“The Reachable” — ');
+// counted, like every other number in the piece
+const braceNum = braceLabel.append('tspan');
+const REACHABLE = PERSONAS.slice(1,4).reduce((s,p)=>s+p.share, 0);
+
+/* =====================================================================
+   9. ICONS + LABELS
+   ===================================================================== */
+
+// explicit opacity, or the first hover interpolates from null and blinks out
+const iconG = gIcon.selectAll('g').data(d3.range(5)).join('g')
+  .attr('transform', i => `translate(${COL_X[i]},${ICON_Y})`)
+  .attr('opacity', 1)
+  .style('cursor','pointer');
+/* The swap from five demographics to five personas is the hinge of the whole
+   argument, and it used to be a hard cut: the old drawing was deleted and the
+   new one appeared in the same frame. Now the two cross-dissolve in place, the
+   outgoing one lifting away slightly and the incoming one settling in, so the
+   reader sees one thing BECOME another rather than being replaced. They are
+   staggered left to right, which reads as a wave crossing the row instead of
+   five simultaneous swaps. */
+function setIcons(mode, animate){
+  iconG.each(function(i){
+    const g = d3.select(this);
+    const key = mode === 'demo' ? FAMILIES[i].icon : PERSONAS[i].id;
+    if (g.attr('data-icon') === key) return;         // already showing it
+    g.attr('data-icon', key);
+
+    const old = g.selectAll('g.art');
+    const layer = g.append('g').attr('class','art');
+    drawArt(layer, key, 1);
+
+    if (animate === false || REDUCE){ old.remove(); return; }
+    const delay = i * 70;
+    layer.attr('opacity',0).attr('transform','scale(.86)')
+      .transition('icon').delay(delay).duration(560).ease(d3.easeCubicOut)
+      .attr('opacity',1).attr('transform','scale(1)');
+    old.transition('icon').delay(delay).duration(380).ease(d3.easeCubicIn)
+      .attr('opacity',0).attr('transform','scale(1.14)')
+      .remove();
+  });
+}
+setIcons('demo', false);
+
+// hover ring, drawn over the art rather than baked into it
+const iconRing = gIcon.selectAll('circle.ring').data(PERSONAS).join('circle')
+  .attr('class','ring')
+  .attr('cx',(p,i)=>COL_X[i]).attr('cy',ICON_Y).attr('r',ICON_R+5)
+  .attr('fill','none').attr('stroke',p=>p.color).attr('stroke-width',2.5)
+  .attr('opacity',0).attr('pointer-events','none');
+
+const labelG = gLabels.selectAll('g').data(d3.range(5)).join('g')
+  .attr('transform', i => `translate(${COL_X[i]},0)`)
+  .attr('opacity', 1);
+labelG.append('text').attr('class','pname')
+  .attr('y',LABEL_Y).attr('text-anchor','middle')
+  .attr('font-family',SANS).call(typed,13.5).attr('font-weight',700)
+  .attr('fill','#212E36');
+/* The share rides its lobe's tip, which at the finale puts it straight through
+   the dashed ghost outline of where that persona started. A halo in the page
+   colour lets the number sit on top of the dashes instead of tangling with
+   them, the same trick the on-bubble labels use. */
+labelG.append('text').attr('class','pshare')
+  .attr('y',SHARE_Y).attr('text-anchor','middle')
+  .attr('font-family','IBM Plex Mono, monospace').call(typed,13).attr('font-weight',500)
+  .attr('fill','#212E36')
+  .attr('stroke','#F8F6F1').attr('stroke-width',3).attr('stroke-opacity',.95)
+  .attr('paint-order','stroke fill')
+  .attr('opacity',0);
+
+/* At phone scale a persona name is ~2.4x its desktop size and no longer fits
+   its column. Whitespace wrapping cannot save it — four of the five names are a
+   single unbreakable word — so each carries an authored two-line break, taken
+   at a syllable the way a print column would set it. A fit pass then shrinks
+   anything still overrunning, which keeps the promise that no label ever
+   crosses into its neighbour's column. Desktop is untouched: one line, the
+   size the composition was tuned at. */
+const PNAME_LINES = {
+  inst:['Institution-','alists'],
+  prag:['Pragmatic','Skeptics'],
+  cost:['Cost-','Constrained'],
+  disi:['Disillu-','sioned'],
+  sovr:['Sovereign-','tists']
+};
+let labelMode = null;
+function setLabels(mode){
+  labelMode = mode;
+  labelG.select('.pname').each(function(i){
+    const t = d3.select(this);
+    const full = mode === 'demo' ? FAMILIES[i].label : PERSONAS[i].short;
+    t.selectAll('tspan').remove();
+
+    if (!MOBILE()){
+      t.attr('data-fs',13.5).attr('font-size',13.5*TK).text(full);
+      return;
+    }
+
+    const lines = mode === 'demo' ? [full] : (PNAME_LINES[PERSONAS[i].id] || [full]);
+    let size = 13.5 * TK, step = 13 * TK;
+    t.text(null);
+    lines.forEach((ln,k) => t.append('tspan').attr('x',0).attr('dy', k ? step : 0)
+                             .attr('font-size', size).text(ln));
+
+    const avail = COL_W - 12;
+    let widest = 0;
+    t.selectAll('tspan').each(function(){
+      try { widest = Math.max(widest, this.getComputedTextLength()); } catch(e){}
+    });
+    if (widest > avail){
+      const shrink = Math.max(0.68, avail / widest);
+      size *= shrink; step *= shrink;
+      t.selectAll('tspan').attr('font-size', size)
+        .each(function(_, j){ if (j) this.setAttribute('dy', step); });
+    }
+    // sized by fit, not by the global scale — keep applyTypeScale off it
+    t.attr('data-fs', null).attr('font-size', size);
+  });
+}
+
+// demographic row labels, right-aligned into the gutter. "Geography" spelled
+// out overruns the gutter once the type scales up, so the phone gets the
+// abbreviation rather than a clipped word.
+const ROW_SHORT = { Geography:'Geo.' };
+const rowLabels = gRows.selectAll('text').data(FAMILIES).join('text')
+  .attr('x', GUT_X).attr('y', (f,i)=>ROW_Y0 + i*ROW_DY + 4).attr('text-anchor','end')
+  .attr('font-family',SANS).call(typed,13).attr('font-weight',700)
+  .attr('fill','#212E36');
+function setRowLabels(){
+  rowLabels.text(f => MOBILE() ? (ROW_SHORT[f.label] || f.label) : f.label);
+}
+setRowLabels();
+setLabels('demo');
+
+/* =====================================================================
+   10. AREA LOBES — the second visual system
+   ===================================================================== */
+
+const areaX = d3.scaleLinear().domain([0.5, 5.5]).range([0, GRID_W]);
+const areaY = d3.scaleLinear().domain([0, 40]).range([0, LOBE_MAX]);
+const areaGen = d3.area()
+  .x(d => areaX(d.id))
+  .y0(areaY(0))
+  .y1(d => areaY(d.v))
+  .curve(d3.curveLinear);
+
+/* A Catmull-Rom through three points puts its first control point on the start
+   point, which yields a straight leading edge — an arrowhead, not a bell.
+   Sampling a raised cosine gives a true symmetric bell with zero slope where it
+   meets the baseline. */
+const BELL_N = 28;
+function bell(gen, x0, span, v){
+  const pts = [];
+  for (let k = 0; k <= BELL_N; k++){
+    const t = k / BELL_N;
+    pts.push({ id: x0 + t*span, v: v * 0.5 * (1 - Math.cos(2*Math.PI*t)) });
+  }
+  return gen(pts);
+}
+const lobeD = (i, v) => bell(areaGen, i + 0.5, 1, v);
+
+const outY = d3.scaleLinear().domain([0, 70]).range([0, OUT_MAX]);
+const outGen = d3.area().x(d=>areaX(d.id)).y0(outY(0)).y1(d=>outY(d.v)).curve(d3.curveLinear);
+const outD = v => bell(outGen, 1.6, 2.8, v);
+
+const lobes = gLobe.attr('transform',`translate(${GRID_L},${LOBE_Y0})`)
+  .selectAll('path').data(PERSONAS).join('path')
+  .attr('d',(p,i)=>lobeD(i,0)).attr('fill',p=>p.color).attr('opacity',.85);
+
+/* Ghost outlines of the opening state. Drawn ABOVE the fills and at a weight
+   you can actually see — at 1.5px dashed behind the bubble grid they were
+   invisible at reading distance. */
+gGhost.attr('transform',`translate(${GRID_L},${LOBE_Y0})`)
+  .selectAll('path').data(PERSONAS).join('path')
+  .attr('d',(p,i)=>lobeD(i,p.share)).attr('fill','none')
+  .attr('stroke','#212E36').attr('stroke-width',1.6)
+  .attr('stroke-dasharray','6 4').attr('opacity',.85);
+
+/* the outcome band — a sixth lobe carrying the thing we actually care about.
+   Its caption sits just above the band, and once the type scales up that
+   caption lands on the bottom row of bubbles, so on narrow screens the whole
+   band drops to clear them. */
+function placeOutcome(){
+  gOut.attr('transform',`translate(${GRID_L},${MOBILE() ? OUT_Y0 + 46 : OUT_Y0})`);
+}
+placeOutcome();
+
+/* The stamp sits in the frame's own bottom-left corner, so it stays put as the
+   camera moves between scenes of different heights instead of drifting with
+   the chart geometry. */
+function placeStamp(frame){
+  const vb = (frame || svg.attr('viewBox') || '0 0 1000 1000').split(/[\s,]+/).map(Number);
+  stampText.attr('data-fs', 10.5).attr('font-size', 10.5 * TK)
+    .attr('x', vb[0] + 4).attr('y', vb[1] + vb[3] - 6);
+}
+const outPath = gOut.append('path').attr('d',outD(0)).attr('fill',OUTCOME.color).attr('opacity',.9);
+gOut.append('text').attr('x',areaX(3)).attr('y',-12).attr('text-anchor','middle')
+  .attr('font-family',SANS).call(typed,13).attr('font-weight',700)
+  .attr('fill','#212E36').text(OUTCOME.label);
+const outLabel = gOut.append('text').attr('x',areaX(3)).attr('text-anchor','middle')
+  .attr('font-family','Optima, Gill Sans, Libre Franklin, sans-serif')
+  .call(typed,38).attr('font-weight',400)
+  .attr('fill','#212E36').attr('y',outY(0)+34);
+
+/* =====================================================================
+   10b. OPENING SEGUE
+   ===================================================================== */
+
+const stageFig = gStage.selectAll('g.fig').data(OPENERS).join('g')
+  .attr('class','fig').attr('opacity',0)
+  .attr('transform',(o,i)=>`translate(${i===0?A_SOLO_X:B_X},${FIG_Y}) scale(${FIG_SCALE})`);
+stageFig.each(function(o){ drawArt(d3.select(this), o.art, 1); });
+
+const stageChip = gStage.selectAll('g.partychip').data(OPENERS).join('g')
+  .attr('class','partychip').attr('opacity',0);
+stageChip.append('rect').attr('x',-52).attr('y',-15).attr('width',104).attr('height',30)
+  .attr('rx',15).attr('fill',o=>o.chipColor);
+stageChip.append('text').attr('text-anchor','middle').attr('y',5)
+  .attr('font-family',SANS).call(typed,14).attr('font-weight',700)
+  .attr('fill','#FFFFFF').text(o=>o.chip);
+
+/* A pill whose label scales but whose geometry does not is a pill with the
+   word hanging out of both ends. Both pills in the piece are cut to their own
+   measured text instead of a fixed width. */
+function fitChips(){
+  const h = Math.max(30, 21 * TK);
+  stageChip.each(function(){
+    const g = d3.select(this), txt = g.select('text');
+    let w = 104;
+    try { w = Math.max(104, txt.node().getComputedTextLength() + 30 * TK); } catch(e){}
+    g.select('rect').attr('x',-w/2).attr('width',w)
+      .attr('y',-h/2).attr('height',h).attr('rx',h/2);
+    txt.attr('y', h * 0.17);
+  });
+}
+
+// three callout blocks per figure, one text element per line — bare labels,
+// no leader lines (they read as stray marks over these short gaps)
+const CO_LINES = [];
+OPENERS.forEach((o, fi) => o.beliefs.forEach((lines, bi) => {
+  lines.forEach((t, li) => CO_LINES.push({
+    fi, bi, li, text:t, anchor: fi===0 ? 'end' : 'start',
+    y: CO_Y[bi] + (li - (lines.length-1)/2) * 17 + 5
+  }));
+}));
+
+const stageNote = gStage.selectAll('text.colabel').data(CO_LINES).join('text')
+  .attr('class','colabel').attr('opacity',0)
+  .attr('text-anchor',c=>c.anchor).attr('y',c=>c.y)
+  .attr('font-family',SANS).call(typed,13.5).attr('fill','#212E36')
+  .text(c=>c.text);
+
+/* The shared-variable statement sits centred above the pair. No connector
+   geometry — the earlier hump-and-node construct read as a stray mark; the
+   greyed chips and the copy carry the convergence on their own. */
+const gNode = gStage.append('g').attr('opacity',0);
+gNode.append('text').attr('x',STAGE_MID).attr('y',FIG_Y - FIG_R - 40)
+  .attr('text-anchor','middle')
+  .attr('font-family',SANS).call(typed,18).attr('font-weight',700)
+  .attr('fill','#212E36').text(CONVERGE_TEXT);
+
+// shared-playbook card: grows in width like the engagement bars
+const gCard = gStage.append('g').attr('opacity',0);
+const cardRect = gCard.append('rect')
+  .attr('x',STAGE_MID).attr('y',CARD_Y).attr('width',0).attr('height',CARD_H)
+  .attr('rx',CARD_H/2).attr('fill','#7FCCC8');
+const cardText = gCard.append('text')
+  .attr('x',STAGE_MID).attr('y',CARD_Y + CARD_H/2 + 5).attr('text-anchor','middle')
+  .attr('font-family',SANS).call(typed,13.5).attr('font-weight',600)
+  .attr('fill','#1E3A38').attr('opacity',0).text(PLAYBOOK_TEXT);
+
+// same rule as the party chips: the card is as wide as the line it carries
+function cardMetrics(){
+  const h = Math.max(CARD_H, 44 * TK);
+  let w = CARD_W;
+  try { w = Math.max(CARD_W, cardText.node().getComputedTextLength() + 46 * TK); } catch(e){}
+  return { w, h };
+}
+function fitCard(){
+  const m = cardMetrics();
+  cardRect.attr('height', m.h).attr('rx', m.h/2).attr('y', CARD_Y);
+  cardText.attr('y', CARD_Y + m.h/2 + 5*TK);
+}
+
+function figX(fi, twoUp){ return fi === 0 ? (twoUp ? A_X : A_SOLO_X) : B_X; }
+function noteX(fi, twoUp){ return fi === 0 ? (twoUp ? CO_A_PAIR : CO_A_SOLO) : CO_B; }
+
+function stageLayout(twoUp, converged, dur){
+  const D = dur == null ? STAGE_D : dur;
+  stageFig.transition('stage').duration(D).ease(d3.easeCubicInOut)
+    .attr('transform',(o,i)=>`translate(${figX(i,twoUp)},${FIG_Y}) scale(${FIG_SCALE})`);
+  stageChip.transition('stage').duration(D).ease(d3.easeCubicInOut)
+    .attr('transform',(o,i)=>`translate(${figX(i,twoUp)},${CHIP_Y})`);
+  stageNote.transition('stage').duration(D).ease(d3.easeCubicInOut)
+    .attr('x', c => noteX(c.fi, twoUp));
+}
+
+// set the un-transitioned starting state
+stageLayout(false, false, 0);
+
+/* =====================================================================
+   11. BARS
+   ===================================================================== */
+
+const barG = gBars.selectAll('g').data(PERSONAS).join('g')
+  .attr('transform',(p,i)=>`translate(${COL_X[i]-BAR_W/2},${BAR_Y})`);
+barG.append('rect').attr('width',BAR_W).attr('height',BAR_H).attr('fill','#E2DFD8');
+barG.append('rect').attr('class','fill').attr('width',0).attr('height',BAR_H).attr('fill',p=>p.color);
+const barNum = barG.append('text').attr('x',BAR_W/2).attr('y',-9).attr('text-anchor','middle')
+  .attr('font-family',SANS).call(typed,13).attr('font-weight',700).attr('fill','#212E36');
+
+const barCap = gBars.append('text').attr('x',GUT_X).attr('y',BAR_Y+2).attr('text-anchor','end')
+  .attr('font-family',SANS).call(typed,12).attr('font-weight',700).attr('fill','#212E36');
+barCap.append('tspan').attr('x',GUT_X).text('Engagement');
+barCap.append('tspan').attr('x',GUT_X).attr('data-dy',15).attr('dy',15).text('0–10 scale');
+
+/* =====================================================================
+   12. BARRIER / SOLUTION TABLE
+   ===================================================================== */
+
+const ctLabel = gText.append('text').attr('x',GUT_X).attr('y',CT_Y0).attr('text-anchor','end')
+  .attr('font-family',SANS).call(typed,13).attr('font-weight',700).attr('fill','#212E36');
+ctLabel.append('tspan').attr('x',GUT_X).text('Key');
+ctLabel.append('tspan').attr('class','l2').attr('x',GUT_X).attr('data-dy',17).attr('dy',17).text('Barriers');
+
+const colTextG = gText.selectAll('g.ct').data(PERSONAS).join('g').attr('class','ct')
+  .attr('transform',(p,i)=>`translate(${COL_X[i]},0)`);
+
+/* `lh` is the desktop line step and `base`, when given, tags each tspan so the
+   responsive type scale can re-apply to wrapped lines too. Both the step and
+   the fallback width estimate follow whichever scale the caller is on, or the
+   second line of a wrapped label lands on top of the first at phone size. */
+function wrap(sel, text, width, lh, base){
+  const step = (lh || 15) * (base ? TK : TKT);
+  const k = base ? TK : TKT;
+  const words = text.split(/\s+/);
+  let line = [];
+  const mk = () => {
+    const t = sel.append('tspan').attr('x',0);
+    if (base) t.attr('data-fs', base).attr('font-size', base * TK);
+    return t;
+  };
+  let tspan = mk().attr('dy',0);
+  words.forEach(w => {
+    line.push(w);
+    tspan.text(line.join(' '));
+    let len = 0;
+    try { len = tspan.node().getComputedTextLength(); } catch(e){ len = line.join(' ').length * 6.3 * k; }
+    if (len > width && line.length > 1){
+      line.pop(); tspan.text(line.join(' '));
+      line = [w];
+      tspan = mk().attr('dy',step).text(w);
+    }
+  });
+}
+
+let colTextMode = null, colTextTKT = null;
+function setColText(mode){
+  // rebuild when the mode changes OR when the type scale moved under it
+  if (mode === colTextMode && colTextTKT === TKT) return;
+  colTextMode = mode; colTextTKT = TKT;
+  ctLabel.select('.l2').text(mode === 'barriers' ? 'Barriers' : 'Solutions');
+  // entries are spaced by the type they contain, so wrapped rows never collide
+  const step = CT_DY * TKT;
+  colTextG.each(function(p){
+    const g = d3.select(this);
+    g.selectAll('text').remove();
+    (mode === 'barriers' ? p.barriers : p.interventions).forEach((txt,k) => {
+      g.append('text').attr('y', CT_Y0 + k*step).attr('text-anchor','middle')
+        .attr('font-family',SANS).call(typedT,12.5).attr('fill','#212E36')
+        .call(wrap, txt, COL_W - 22);
+    });
+  });
+}
+
+/* =====================================================================
+   13. LEGEND
+   ===================================================================== */
+
+const legExtent = d3.extent(NODES.filter(d=>d.count1>0), d=>d.count1);
+const LEG = [0,0.35,0.7,1].map(t => Math.round((legExtent[0] + (legExtent[1]-legExtent[0])*t)/10)*10);
+const legMaxR = rScale(d3.max(LEG));
+gLegend.attr('transform',`translate(${GRID_L},${LEG_Y})`);
+gLegend.append('text').attr('x',0).attr('y',-(legMaxR*2)-16)
+  .attr('font-family',SANS).call(typed,12).attr('font-weight',700)
+  .attr('fill','#212E36').text('Number of people (modeled)');
+let lx = 0;
+LEG.forEach(v => {
+  const r = rScale(v);
+  gLegend.append('circle').attr('cx',lx+r).attr('cy',-r).attr('r',r)
+    .attr('fill','none').attr('stroke','#212E36').attr('stroke-width',1);
+  gLegend.append('text').attr('x',lx+r).attr('y',16).attr('text-anchor','middle')
+    .attr('font-family',SANS).call(typed,11).attr('fill','#212E36').text(v);
+  lx += r*2 + 22;
+});
+/* Provenance now lives on the permanent stamp (see gStamp), which rides every
+   data scene rather than only the two that show the legend. */
+const LEG_END = lx;
+/* =====================================================================
+   14. CIRCLES + ANNOTATIONS
+   ===================================================================== */
+
+const circles = gNodes.selectAll('circle').data(NODES, d=>d.id).join('circle')
+  .attr('class','dot')
+  .attr('r', d=>r1(d)).attr('fill', d=>d.color).attr('opacity',.9)
+  .attr('cx', W/2).attr('cy', 400)
+  .attr('stroke', '#7FCCC8').attr('stroke-width', 0)
+  .style('cursor','pointer');
+
+// white or dark label depending on the fill it sits on
+function luminance(hex){
+  const c = d3.rgb(hex);
+  return (0.299*c.r + 0.587*c.g + 0.114*c.b) / 255;
+}
+const annoNodes = NODES.filter(d => d.anchor);
+/* Labels sit on top of their bubble. Two rules keep them readable:
+   short forms, and a font size fitted to the bubble's diameter. A halo in the
+   contrasting colour means the ends of a label that overruns its mark stay
+   legible against whatever is behind it. */
+const annoFit = d => {
+  const chars = (SHORT[d.cat] || d.cat).length;
+  return Math.max(9, Math.min(12.5, (2*r1(d) - 6) / (chars * 0.56)));
+};
+const annos = gAnno.selectAll('text').data(annoNodes).join('text')
+  .attr('text-anchor','middle')
+  .attr('font-family',SANS).attr('font-weight',600)
+  .attr('pointer-events','none')
+  .text(d => SHORT[d.cat] || d.cat)
+  .attr('font-size', annoFit);
+
+/* A label fitted to a 27px bubble is ~4px on a phone: clutter, not information.
+   There, only the five ringed categories the scene is actually arguing about
+   keep a label, and it moves out from under the mark to a readable caption
+   beneath it. Inside a bubble, white-on-fill with a dark halo; below it, dark
+   ink on the page. */
+function styleAnnos(){
+  annos.each(function(d){
+    const t = d3.select(this), mob = MOBILE();
+    const dark = luminance(d.color) > 0.62;
+    if (mob){
+      t.attr('font-size', 11 * TK)
+       .attr('fill','#212E36').attr('stroke','#F8F6F1')
+       .attr('stroke-width', 3.4).attr('stroke-opacity',.9)
+       .attr('paint-order','stroke fill')
+       .attr('opacity', d.ring ? 1 : 0);
+    } else {
+      t.attr('font-size', annoFit(d))
+       .attr('fill', dark ? '#212E36' : '#FFFFFF')
+       .attr('stroke', dark ? '#F8F6F1' : '#1A2530')
+       .attr('stroke-width', 2.6).attr('stroke-opacity',.75)
+       .attr('paint-order','stroke fill')
+       .attr('opacity', 1);
+    }
+  });
+}
+const annoY = d => MOBILE() ? d.y + r1(d) + 13*TK : d.y + 4;
+styleAnnos();
+
+const tip = d3.select('#tip');
+const tipNode = tip.node();
+function placeTip(ev){
+  const pad = 14, b = tipNode.getBoundingClientRect();
+  let x = ev.clientX + pad, y = ev.clientY + pad;
+  if (x + b.width  > innerWidth  - 8) x = ev.clientX - b.width  - pad;
+  if (y + b.height > innerHeight - 8) y = ev.clientY - b.height - pad;
+  tip.style('left', Math.max(8,x)+'px').style('top', Math.max(8,y)+'px');
+}
+function hideTip(){ tip.classed('on',false); }
+addEventListener('scroll', hideTip, { passive:true });
+
+// null until the first layout runs, so the initial call isn't skipped
+let baseOpacity = .9, gridMode = null;
+// hover and scene changes both write circle opacity; while a scene is settling
+// the hover dim is suppressed so the two don't fight over the same attribute
+let sceneBusy = false, busyTimer = null;
+/* A bubble under the cursor lifts toward the reader: it brightens AND grows a
+   little, on a short spring, then settles back. Opacity alone was easy to miss
+   against a hundred other marks. The radius is restored from the scale the
+   scene is in, so this never fights the layout transitions. */
+const hoverR = d => (gridMode ? r2(d) : r1(d));
+circles
+  .on('mousemove', function(ev,d){
+    const n = gridMode ? d.count2 : d.count1;
+    if (!n) return;
+    const p = PERSONAS.find(x=>x.id===d.persona);
+    tip.html(`<b>${d.cat}</b><br>${FAMILIES.find(f=>f.id===d.family).label}${gridMode?' · '+p.short:''}<br>${n.toLocaleString()} people`)
+       .classed('on',true);
+    placeTip(ev);
+    const sel = d3.select(this).attr('opacity',1);
+    if (!REDUCE && !sel.property('__lift')){
+      sel.property('__lift', true)
+        .transition('lift').duration(220).ease(d3.easeCubicOut)
+        .attr('r', hoverR(d) + 3.5);
+    }
+  })
+  .on('mouseleave', function(ev,d){
+    hideTip();
+    const sel = d3.select(this).attr('opacity',baseOpacity).property('__lift', false);
+    if (!REDUCE) sel.transition('lift').duration(260).ease(d3.easeCubicOut).attr('r', hoverR(d));
+  });
+
+/* Focusable, so the five persona profiles are reachable without a mouse: tab
+   into the strip, arrow between columns, Escape to leave. Everything a hover
+   gives you — the highlight and the profile panel — a focus gives you too. */
+const hits = gHit.selectAll('rect').data(PERSONAS).join('rect')
+  .attr('x',(p,i)=>COL_X[i]-COL_W/2).attr('y',ICON_Y-ICON_R-10)
+  .attr('width',COL_W).attr('height', BAR_Y+4-(ICON_Y-ICON_R-10))
+  .attr('fill','transparent').style('cursor','pointer').style('pointer-events','none')
+  .attr('tabindex',-1).attr('role','button')
+  .attr('aria-label', p => personaLabel(p, 0));
+
+/* The share a column announces has to be the share it is currently drawing.
+   Built once at construction, these names stayed frozen at wave 1 and so
+   contradicted the chart on both of the scenes where the number changes. */
+function personaLabel(p, wave){
+  const share = [p.share, p.share2, p.share3][wave];
+  return `${p.name}. ${share}% of adults. ${p.blurb} `
+       + `Barriers: ${p.barriers.join(', ')}. Solutions: ${p.interventions.join(', ')}.`;
+}
+
+// a ring the keyboard can see; the mouse path never turns it on
+const focusRing = gHit.append('rect')
+  .attr('fill','none').attr('stroke','#212E36').attr('stroke-width',2).attr('rx',10)
+  .attr('opacity',0).attr('pointer-events','none');
+
+// share shown in the tip tracks the survey wave the reader is looking at
+const waveOf = k => k === 'final' ? 2 : k === 'shift' ? 1 : 0;
+function personaTipMove(ev, p){
+  const share = [p.share, p.share2, p.share3][waveOf(current)];
+  tip.html(`<b>${p.name}</b> · ${share}%<br>${p.blurb}<br><br><b>Barriers:</b> ${p.barriers.join(' · ')}<br><b>Solutions:</b> ${p.interventions.join(' · ')}`)
+     .classed('on',true);
+  placeTip(ev); focusColumn(p.id);
+}
+function personaTipLeave(){ hideTip(); focusColumn(null); }
+hits.on('mousemove',personaTipMove).on('mouseleave',personaTipLeave);
+
+/* Keyboard path. The tooltip follows the pointer for a mouse, which a keyboard
+   does not have, so it is pinned under the focused column instead. */
+function tipAtColumn(i, p){
+  const share = [p.share, p.share2, p.share3][waveOf(current)];
+  tip.html(`<b>${p.name}</b> · ${share}%<br>${p.blurb}<br><br><b>Barriers:</b> ${p.barriers.join(' · ')}<br><b>Solutions:</b> ${p.interventions.join(' · ')}`)
+     .classed('on',true);
+  const node = hits.nodes()[i];
+  const r = node.getBoundingClientRect(), b = tipNode.getBoundingClientRect();
+  let x = r.left + r.width/2 - b.width/2;
+  let y = r.bottom + 10;
+  if (y + b.height > innerHeight - 8) y = Math.max(8, r.top - b.height - 10);
+  tip.style('left', Math.min(Math.max(8,x), innerWidth - b.width - 8)+'px')
+     .style('top', y+'px');
+}
+/* Arriving, the ring collapses onto the column from slightly outside it, which
+   points at the target rather than just appearing over it. Moving between
+   columns it slides instead, so arrowing along the row is one continuous
+   object travelling, not five separate rings blinking. */
+function showFocusRing(i){
+  const n = hits.nodes()[i];
+  const x = +n.getAttribute('x'), y = +n.getAttribute('y');
+  const w = +n.getAttribute('width'), h = +n.getAttribute('height');
+  const pad = 5;
+  const target = { x:x-pad, y:y-pad, w:w+2*pad, h:h+2*pad };
+  const travelling = +focusRing.attr('opacity') > 0;
+
+  if (REDUCE){
+    focusRing.interrupt('ring')
+      .attr('x',target.x).attr('y',target.y)
+      .attr('width',target.w).attr('height',target.h).attr('opacity',1);
+    return;
+  }
+  if (!travelling){
+    const grow = 14;
+    focusRing.interrupt('ring')
+      .attr('x',target.x-grow).attr('y',target.y-grow)
+      .attr('width',target.w+2*grow).attr('height',target.h+2*grow)
+      .attr('opacity',0);
+  }
+  focusRing.transition('ring')
+    .duration(travelling ? 320 : 260)
+    .ease(travelling ? d3.easeCubicInOut : d3.easeCubicOut)
+    .attr('x',target.x).attr('y',target.y)
+    .attr('width',target.w).attr('height',target.h)
+    .attr('opacity',1);
+}
+let kbIndex = -1;
+function focusPersona(i){
+  if (i < 0 || i > 4) return;
+  kbIndex = i;
+  const p = PERSONAS[i];
+  hits.nodes()[i].focus({ preventScroll:true });
+  showFocusRing(i);
+  focusColumn(p.id);
+  tipAtColumn(i, p);
+}
+function blurPersona(){
+  kbIndex = -1; focusRing.attr('opacity',0); hideTip(); focusColumn(null);
+}
+hits
+  .on('focus', function(ev,p){ const i = PERSONAS.indexOf(p); kbIndex = i; showFocusRing(i); focusColumn(p.id); tipAtColumn(i,p); })
+  /* Arrowing along the row blurs one column before focusing the next. Tearing
+     the ring down on that blur meant it was rebuilt from scratch at the new
+     column and never actually travelled. Check on the next tick whether focus
+     merely moved to a sibling column, and if so leave the ring alone to slide. */
+  .on('blur', function(){
+    setTimeout(() => {
+      if (hits.nodes().indexOf(document.activeElement) !== -1) return;
+      focusRing.interrupt('ring').attr('opacity',0); hideTip(); focusColumn(null);
+    }, 0);
+  })
+  .on('keydown', function(ev,p){
+    const i = PERSONAS.indexOf(p);
+    if (ev.key === 'ArrowRight' || ev.key === 'ArrowDown'){ ev.preventDefault(); focusPersona(Math.min(4, i+1)); }
+    else if (ev.key === 'ArrowLeft' || ev.key === 'ArrowUp'){ ev.preventDefault(); focusPersona(Math.max(0, i-1)); }
+    else if (ev.key === 'Home'){ ev.preventDefault(); focusPersona(0); }
+    else if (ev.key === 'End'){ ev.preventDefault(); focusPersona(4); }
+    else if (ev.key === 'Escape'){ this.blur(); blurPersona(); }
+  });
+
+/* One tab stop for the whole strip, the way a radio group behaves: tab in,
+   arrow across, tab out. Only live on the scenes where the columns ARE the
+   personas — the scene controller flips this with pointer-events. */
+function setColumnTabbing(on){
+  hits.attr('tabindex', (p,i) => on ? (i === 0 ? 0 : -1) : null);
+  if (!on && kbIndex >= 0) blurPersona();
+}
+// the engagement bars and the barrier/solution rows belong to their columns —
+// hovering them reads the same as hovering the column itself
+barG.style('cursor','pointer').on('mousemove',personaTipMove).on('mouseleave',personaTipLeave);
+colTextG.style('cursor','pointer').on('mousemove',personaTipMove).on('mouseleave',personaTipLeave);
+gBars.style('pointer-events','none');
+gText.style('pointer-events','none');
+
+let focused = null;
+function focusColumn(id){
+  if (sceneBusy && id) return;      // don't fight an in-flight scene change
+  if (id === focused) return;       // no work when nothing actually changed
+  focused = id;
+  /* transform and opacity share ONE transition — two same-name transitions on
+     the same selection cancel each other, which silently killed the lift */
+  iconG.transition('hover').duration(180)
+    .attr('transform',(d,i)=> `translate(${COL_X[i]},${ICON_Y}) scale(${PERSONAS[i].id===id ? 1.06 : 1})`)
+    .attr('opacity', (d,i)=> !id || PERSONAS[i].id===id ? 1 : .3);
+  iconRing.transition('hover').duration(180)
+    .attr('opacity',(p)=> p.id===id ? 1 : 0);
+  labelG.transition('hover').duration(180).attr('opacity', (d,i)=> !id || PERSONAS[i].id===id ? 1 : .3);
+  lobes.transition('hover').duration(180).attr('opacity', p => !id || p.id===id ? .85 : .25);
+  circles.transition('hover').duration(180)
+    .attr('opacity', d => !id ? baseOpacity : (d.persona===id ? .95 : baseOpacity*.25));
+}
+
+/* =====================================================================
+   15. LIVE FORCE SIMULATION
+   ===================================================================== */
+
+const famX = d3.scaleBand().domain(FAMILIES.map(f=>f.id)).range([GRID_L, GRID_R]);
+const perX = d3.scaleBand().domain(PERSONAS.map(p=>p.id)).range([GRID_L, GRID_R]);
+
+// seed on a phyllotaxis spiral so the first settle is symmetric
+NODES.forEach((d,k)=>{
+  const a = k*2.39996, rr = 10*Math.sqrt(k);
+  d.x = 550 + rr*Math.cos(a); d.y = 400 + rr*Math.sin(a); d.vx = 0; d.vy = 0;
+});
+
+// zero collide on the 80 hidden nodes, or they crowd the demographic scene
+// with invisible 9px discs and shove the real bubbles out of their columns
+const collideDemo = d => d.count1 === 0 ? 0 : r1(d) + 9;
+
+const sim = d3.forceSimulation(NODES)
+  .force('collide', d3.forceCollide(collideDemo).strength(.55))
+  .force('x', d3.forceX(d => famX(d.family) + famX.bandwidth()/2).strength(.5))
+  .force('y', d3.forceY(DEMO_Y).strength(.09))
+  .velocityDecay(.55)
+  .alphaDecay(.07)
+  /* No position clamping here. Rewriting x/y every tick without touching
+     velocity makes a node accelerate into the wall and buzz against it — that
+     was the visible jitter. The positional forces keep the pack in frame. */
+  .on('tick', () => {
+    circles.attr('cx',d=>d.x).attr('cy',d=>d.y);
+    annos.attr('x',d=>d.x).attr('y',annoY);
+  })
+  .on('end', () => { if (current === 'demo2') show(gAnno, 1, 400); });
+
+/* Under reduced motion the pack is solved synchronously and painted once
+   rather than animating live for ~1.5s. */
+function reheat(a){
+  if (!REDUCE){ sim.alpha(a).restart(); return; }
+  // alpha must be raised before ticking — otherwise this spins a dead
+  // simulation 400 times and the layout never moves
+  sim.stop();
+  sim.alpha(Math.max(a, 1));
+  for (let i = 0; i < 400; i++) sim.tick();
+  circles.attr('cx',d=>d.x).attr('cy',d=>d.y);
+  annos.attr('x',d=>d.x).attr('y',annoY);
+}
+
+/* Only ever reheat when the layout target actually changes. Re-running the
+   physics on every scene step made the whole pack re-settle and jostle each
+   time the reader scrolled, even between two scenes with identical layouts. */
+function toDemographic(){
+  if (gridMode === false) return;
+  gridMode = false;
+  clearTimeout(splitTimer);
+  sim.force('collide', d3.forceCollide(collideDemo).strength(.55))
+     .force('x', d3.forceX(d => famX(d.family) + famX.bandwidth()/2).strength(.5))
+     .force('y', d3.forceY(DEMO_Y).strength(.09));
+  /* Radius eased over the same span as the settle, so growth and travel read
+     as one motion rather than two — and staggered by demographic family, so
+     the five groups arrive as a wave across the row instead of the whole cloud
+     inflating at once. */
+  circles.transition('scene').duration(SETTLE).ease(d3.easeCubicInOut)
+    .delay(d => REDUCE ? 0 : d.fIndex * 55)
+    .attr('r', d=>r1(d)).attr('opacity', d=>d.count1?baseOpacity:0);
+  reheat(.9);
+}
+
+const ANCHOR_OF = new Map();
+NODES.filter(d => d.anchor).forEach(a => ANCHOR_OF.set(a.family + '|' + a.cat, a));
+
+/* The four hidden siblings of each subcategory carry no collide during the
+   demographic scene, so the positional forces pull them all onto a single
+   point per column. Released as-is they erupt from five stacked spots — which
+   is what made the split read as broken. Seeding each one inside the bubble it
+   actually belongs to turns the same motion into twenty bubbles each breaking
+   into its five personas, which is the argument the scene is making. */
+function seedFromAnchors(){
+  NODES.forEach(d => {
+    if (d.anchor) return;
+    const a = ANCHOR_OF.get(d.family + '|' + d.cat);
+    if (!a) return;
+    const ang = (d.pIndex / 5) * Math.PI * 2 - Math.PI / 2;
+    const rad = Math.max(3, r1(a) * 0.45);
+    d.x = a.x + Math.cos(ang) * rad;
+    d.y = a.y + Math.sin(ang) * rad;
+    d.vx = 0; d.vy = 0;
+  });
+}
+
+// collide tightens from +9/0.55 to +1/0.9 at the same moment the radius
+// switches encoding, which is what makes the reshuffle feel like it packs
+function applyGridForces(){
+  sim.force('collide', d3.forceCollide(d => r2(d) + 1).strength(.9))
+     .force('x', d3.forceX(d => perX(d.persona) + perX.bandwidth()/2).strength(.34))
+     // strong y so each demographic row stays a legible band instead of
+     // bleeding into the lobes above and the bars below
+     .force('y', d3.forceY(d => ROW_Y0 + d.fIndex*ROW_DY).strength(.9));
+}
+
+/* Solved once, synchronously, at load. The grid is the layout the piece spends
+   most of its scenes in, so it must be exact and instant — not the outcome of
+   physics that may or may not have converged by the time the reader looks. */
+const GRID_POS = (() => {
+  const saved = NODES.map(d => ({x:d.x, y:d.y, vx:d.vx, vy:d.vy}));
+  NODES.forEach((d,k) => {
+    const a = k * 2.39996, rr = 9 * Math.sqrt(k);
+    d.x = perX(d.persona) + perX.bandwidth()/2 + Math.cos(a)*rr*0.25;
+    d.y = ROW_Y0 + d.fIndex*ROW_DY + Math.sin(a)*rr*0.25;
+    d.vx = 0; d.vy = 0;
+  });
+  const solver = d3.forceSimulation(NODES).stop()
+    .force('collide', d3.forceCollide(d => r2(d) + 1).strength(.95))
+    .force('x', d3.forceX(d => perX(d.persona) + perX.bandwidth()/2).strength(.5))
+    .force('y', d3.forceY(d => ROW_Y0 + d.fIndex*ROW_DY).strength(.9))
+    .alpha(1).alphaDecay(.03);
+  for (let i = 0; i < 600; i++) solver.tick();
+  const out = NODES.map(d => ({x:d.x, y:d.y}));
+  NODES.forEach((d,i) => Object.assign(d, saved[i]));
+  return out;
+})();
+
+let splitTimer = null;
+
+// `fromDemo` is only true when the reader actually scrolled out of a
+// demographic scene — a deep link into a later scene settles directly instead
+function toGrid(fromDemo){
+  if (gridMode === true) return;
+  const splitting = fromDemo && gridMode === false;
+  gridMode = true;
+  clearTimeout(splitTimer);
+  sim.stop();                       // the tick handler must not fight the transition
+  /* Forces are still pointed at the grid even though the move is a transition,
+     so if anything ever reheats the simulation while we are in grid mode it
+     relaxes toward these cells instead of snapping back to the demo cloud. */
+  applyGridForces();
+
+  if (splitting){
+    // each hidden sibling starts inside the demographic bubble it belongs to,
+    // so the move reads as twenty bubbles breaking into their five personas
+    seedFromAnchors();
+    circles.interrupt('scene').attr('cx', d=>d.x).attr('cy', d=>d.y);
+  }
+
+  circles.transition('scene')
+    .duration(d => splitting ? (d.anchor ? SPLIT_A : SPLIT_B) : REGROUP)
+    .delay(d => (splitting && !d.anchor && !REDUCE) ? 180 : 0)
+    .ease(d3.easeCubicInOut)
+    .attr('cx', (d,i) => GRID_POS[i].x)
+    .attr('cy', (d,i) => GRID_POS[i].y)
+    .attr('r',  d => r2(d))
+    .attr('opacity', baseOpacity);
+
+  /* Commit the model to the same coordinates the view is animating toward, so
+     tooltips, annotations and every downstream measurement agree with what is
+     on screen instead of lagging a stopped simulation. */
+  NODES.forEach((d,i) => { d.x = GRID_POS[i].x; d.y = GRID_POS[i].y; d.vx = 0; d.vy = 0; });
+}
+
+/* =====================================================================
+   16. SCENE CONTROLLER
+   ===================================================================== */
+
+let treesDrawn = false;
+
+/* Segue playback. Each beat is additive, so scrolling back up simply hides
+   what the later beats added rather than rebuilding the stage. */
+function renderStage(key, prev){
+  const step = STAGE_KEYS.indexOf(key);
+  const twoUp     = step >= 2;
+  const converged = step >= 3;
+  const fresh     = !STAGE_KEYS.includes(prev);   // arriving from outside
+
+  show(gStage, 1);
+
+  stageFig.transition('vis').duration(FADE)
+    .attr('opacity', (o,i) => step >= 1 + i ? 1 : 0);
+  stageChip.transition('vis').duration(FADE)
+    .attr('opacity', (o,i) => step >= 1 + i ? 1 : 0);
+  // party colour drains away at the convergence — the reader watches party
+  // stop being the useful signal
+  stageChip.select('rect').transition('vis').duration(STAGE_D).ease(d3.easeCubicInOut)
+    .attr('fill', o => converged ? '#6F6F6F' : o.chipColor);
+
+  /* On a phone the callouts are dropped: the gutter either side of the figures
+     is ~9 units once the type scales up, so they would be clipped to nothing,
+     and the narration beside the graphic already carries every one of them in
+     prose. Losing them is what lets the segue crop tight and the figures read
+     twice as large. */
+  const visible = c => step >= 1 + c.fi && !MOBILE();
+  stageNote.transition('vis').duration(FADE)
+    .delay(c => (visible(c) && !converged) ? c.bi * 120 : 0)
+    .attr('opacity', c => visible(c) ? 1 : 0);
+
+  stageLayout(twoUp, converged, fresh ? 0 : 700);
+
+  show(gNode, converged ? 1 : 0);
+  show(gCard, step >= 4 ? 1 : 0);
+  /* Elastic overshoots past its target by design, which on a width is an
+     invalid negative rect and a console error on every play. Tween it by hand
+     and clamp: the card still springs, it just cannot spring inside out. */
+  fitCard();
+  const full = cardMetrics().w;
+  const cardW = step >= 4 ? full : 0;
+  cardRect.transition('scene').duration(ELASTIC).ease(SHAPE_EASE)
+    .attrTween('width', function(){
+      const a = +this.getAttribute('width') || 0;
+      return t => Math.max(0, a + (cardW - a) * t);
+    })
+    .attrTween('x', function(){
+      const a = +this.getAttribute('x') || STAGE_MID;
+      const b = step >= 4 ? STAGE_MID - full/2 : STAGE_MID;
+      return t => a + (b - a) * t;
+    });
+  cardText.transition('scene').duration(FADE).delay(step >= 4 ? 320 : 0)
+    .attr('opacity', step >= 4 ? 1 : 0);
+}
+
+let current = null;
+function render(key){
+  if (key === current) return;
+  const prev = current; current = key;
+  const scene = SCENES.find(s=>s.key===key);
+
+  const stageScene = STAGE_KEYS.includes(key);
+  const demoScene  = key === 'demo1' || key === 'demo2';
+  const colScene   = !demoScene && !stageScene;
+  const lobeScene  = ['named','likelihood','barriers','interventions','shift','final'].includes(key);
+  const tableScene = key === 'barriers' || key === 'interventions';
+  const outScene   = key === 'shift' || key === 'final';
+  const wave = key === 'final' ? 2 : key === 'shift' ? 1 : 0;
+
+  /* Set before any layout call — toGrid/toDemographic bake baseOpacity into
+     their own transition, and reading a stale value made a second, competing
+     opacity transition correct it a frame later as a visible flicker. */
+  /* the barrier/solution beats are about the table — the bubble grid recedes
+     to a whisper rather than competing with the text */
+  baseOpacity = tableScene ? .3 : .9;
+
+  /* Release any hover first. When the scene changes under a hovered column the
+     pointer-events flip before mouseleave can fire, so the dim would otherwise
+     stick and leave three columns greyed out for the rest of the piece. */
+  hideTip();
+  focusColumn(null);
+
+  sceneBusy = true;
+  clearTimeout(busyTimer);
+  busyTimer = setTimeout(() => { sceneBusy = false; }, 900);
+
+  // ---- frame + the type scale that frame implies ----
+  const frame = frameFor(scene.frame);
+  const prevTK = TK;
+  computeTK(frame);
+  if (TK !== prevTK){
+    applyTypeScale();
+    setRowLabels(); setLabels(labelMode || 'demo'); styleAnnos(); fitChips(); placeOutcome();
+    colTextMode = null;                    // force the table to rebuild at the new step
+  }
+  svg.transition('frame').duration(CAMERA).ease(d3.easeCubicInOut).attr('viewBox', frame);
+
+  // ---- the segue owns the stage; everything else stays hidden ----
+  if (stageScene){
+    renderStage(key, prev);
+    /* A layout transition may still be in flight from the scene we came from,
+       and it writes opacity under a different transition name, so whichever
+       runs longer wins. Jumping back into the segue from a data scene used to
+       leave the demographic cloud sitting behind the two figures. Cancel the
+       layout's claim on these circles before making our own. */
+    circles.interrupt('scene').interrupt('lift')
+      .transition('op').duration(FADE).attr('opacity', 0);
+    [gTitle,gTree,gMini,gIcon,gLabels,gRows,gLobe,gGhost,gOut,gBars,gText,gBrace,gLegend,gAnno,gStamp]
+      .forEach(g => show(g, 0));
+    hits.style('pointer-events','none');
+    circles.style('pointer-events','none');
+    return;
+  }
+  show(gStage, 0);
+
+  // ---- trees draw themselves on the first time the data appears ----
+  if (!treesDrawn && demoScene){
+    treesDrawn = true;
+    drawOn(treePaths, ELASTIC);
+    drawOn(gMini.selectAll('path'), ELASTIC);
+    gMini.attr('opacity',1);
+  }
+
+  setTitle(demoScene ? 'Traditional demographic segmentation' : 'Psychobehavioral segmentation');
+  show(gTitle, 1);
+  show(gIcon, 1); show(gLabels, 1);
+  show(gMini,   demoScene ? 1 : 0);
+  show(gRows,   colScene ? 1 : 0, FADE);
+  show(gLobe,   lobeScene ? 1 : 0);
+  show(gGhost,  key === 'final' ? 1 : 0);
+  /* "The faint outlines show where each persona started" — so let the reader
+     watch them arrive, left to right, instead of finding them already there. */
+  if (key === 'final' && prev !== 'final' && !REDUCE){
+    gGhost.selectAll('path')
+      .interrupt('ghost').attr('opacity',0)
+      .transition('ghost').duration(540).delay((d,i)=>260 + i*90).ease(d3.easeCubicOut)
+      .attr('opacity',.85);
+  }
+  show(gOut,    outScene ? 1 : 0);
+  show(gBars,   ['likelihood','barriers','interventions'].includes(key) ? 1 : 0);
+  show(gText,   tableScene ? 1 : 0);
+  show(gBrace,  key === 'likelihood' ? 1 : 0);
+  show(gLegend, demoScene ? 1 : 0);
+  /* Every data scene carries the stamp. The segue is two illustrated people
+     with no numbers on screen, so it does not need one. */
+  placeStamp(frame);
+  show(gStamp, stageScene ? 0 : 1);
+  show(gAnno,   key === 'demo2' ? 1 : 0);
+
+  /* The grid scene is where per-cell counts are most interesting, so circles
+     keep their tooltip there; column-level hover takes over once the personas
+     are the subject rather than the demographics. */
+  // keep the announced share in step with the drawn share
+  hits.attr('aria-label', p => personaLabel(p, wave));
+
+  const columnsLive = colScene && key !== 'split';
+  hits.style('pointer-events', columnsLive ? 'all' : 'none');
+  setColumnTabbing(columnsLive);
+  circles.style('pointer-events', (demoScene || key === 'split') ? 'all' : 'none');
+  // invisible groups must not swallow hover — they are only live when shown
+  gBars.style('pointer-events', ['likelihood','barriers','interventions'].includes(key) ? 'all' : 'none');
+  gText.style('pointer-events', tableScene ? 'all' : 'none');
+
+  // ---- icon + label identity swap at the segmentation break ----
+  if (demoScene && gridMode !== false){ setIcons('demo'); setLabels('demo'); }
+  if (colScene  && gridMode !== true ){ setIcons('persona'); setLabels('persona'); }
+  gLabels.selectAll('.pshare').transition('vis').duration(FADE)
+    .attr('opacity', lobeScene ? 1 : 0);
+  if (lobeScene){
+    countTo(gLabels.selectAll('.pshare'),
+      (d,i)=> [PERSONAS[i].share, PERSONAS[i].share2, PERSONAS[i].share3][wave], pct);
+  }
+
+  // ---- the teal rings: stroke-width grows, it does not fade ----
+  circles.transition('ring').duration(FADE)
+    .attr('stroke-width', d => (key === 'demo2' && d.ring) ? 8 : 0);
+
+  // ---- brace draw-on ----
+  if (key === 'likelihood'){ drawOn(bracePaths, ELASTIC); countTo(braceNum, () => REACHABLE, pct); }
+  else braceNum.text('');   // blank while hidden so it re-counts on return
+  treePaths.transition('vis').duration(FADE)
+    .attr('stroke-width', (d,i) => (key === 'likelihood' && i>=1 && i<=3) ? 2.6 : 1)
+    .style('opacity',   (d,i) => (key === 'likelihood' && (i===0||i===4)) ? .3 : 1);
+  gLabels.selectAll('.pname').transition('vis').duration(FADE)
+    .attr('fill', (d,i) => (key === 'likelihood' && (i===0||i===4)) ? '#6F6F6F' : '#212E36');
+
+  // ---- layout ----
+  if (stageScene) { /* no data layout during the segue */ }
+  else if (demoScene) toDemographic();
+  else if (gridMode !== true) toGrid(prev === 'demo1' || prev === 'demo2');
+
+  // ---- LOBES: the signature elastic morph ----
+  const shareOf = (p) => [p.share, p.share2, p.share3][wave];
+  /* Depth IS the number. An earlier version scaled the lobes to 0.5 on the
+     table scenes "to make room", while the % label kept printing the full
+     value, so the mark and its own label disagreed by a factor of two. There
+     is no room problem to solve: the band ends at 346 user units and the table
+     starts at 730. */
+  const depth   = 1;
+
+  if (lobeScene){
+    // re-entering after being hidden: reset flat, then bloom, so it reads as growth
+    if (!['named','likelihood','barriers','interventions','shift','final'].includes(prev)){
+      lobes.attr('d',(p,i)=>lobeD(i,0));
+      gLabels.selectAll('.pshare').attr('y', LOBE_Y0 + 20*TK);
+    }
+    /* Elastic is an accent, not a default. It belongs on the three reveal
+       beats — the bloom, and the two wave shifts. Using it for the half-depth
+       retreat that makes room for the table just made the shrink wobble. */
+    const reveal = key === 'named' || key === 'shift' || key === 'final';
+    lobes.transition('scene').duration(reveal ? ELASTIC : 700)
+      .ease(reveal ? VALUE_EASE : d3.easeCubicInOut)
+      .attr('d',(p,i)=>lobeD(i, shareOf(p)*depth))
+      .attr('opacity', p => (key==='likelihood' && (p.id==='inst'||p.id==='sovr')) ? .45 : .85);
+    // the share rides at each lobe's tip — depth IS the number, so they travel together
+    gLabels.selectAll('.pshare').transition('scene').duration(reveal ? ELASTIC : 700)
+      .ease(reveal ? VALUE_EASE : d3.easeCubicInOut)
+      .attr('y', (d,i) => LOBE_Y0 + areaY(shareOf(PERSONAS[i]) * depth) + 20*TK);
+  } else {
+    lobes.transition('scene').duration(FADE).attr('d',(p,i)=>lobeD(i,0));
+  }
+
+  // ---- outcome band ----
+  if (outScene){
+    const v = OUTCOME.v[wave === 0 ? 0 : wave];
+    if (prev !== 'shift' && prev !== 'final') outPath.attr('d', outD(0));
+    outPath.transition('scene').duration(ELASTIC).ease(VALUE_EASE).attr('d', outD(v));
+    outLabel.transition('scene').duration(ELASTIC).ease(VALUE_EASE).attr('y', outY(v) + 32);
+    countTo(outLabel, () => v, pct);
+  }
+
+  // ---- bars ----
+  gBars.selectAll('.fill').transition('scene').duration(ELASTIC).ease(d3.easeCubicInOut)
+    .attr('width', p => ['likelihood','barriers','interventions'].includes(key) ? (p.score/10)*BAR_W : 0);
+  if (['likelihood','barriers','interventions'].includes(key))
+    countTo(barNum, p => p.score, v => v.toFixed(1));
+
+  // ---- table ----
+  if (tableScene) setColText(key === 'barriers' ? 'barriers' : 'interventions');
+
+  circles.transition('op').duration(FADE)
+    .attr('opacity', d => (demoScene && !d.count1) ? 0 : baseOpacity);
+}
+
+const titleText = gTitle.append('text')
+  .attr('x',COL_X[2]).attr('y',TITLE_Y).attr('text-anchor','middle')
+  .attr('font-family',SANS).call(typed,18).attr('font-weight',700)
+  .attr('fill','#212E36').attr('opacity',1);
+
+// crossfade rather than hard-swap — the reference snaps this and it reads cheap
+function setTitle(txt){
+  if (titleText.text() === txt) return;
+  if (REDUCE){ titleText.text(txt); return; }
+  titleText.transition('title').duration(200).attr('opacity',0)
+    .on('end', function(){
+      d3.select(this).text(txt)
+        .transition('title').duration(280).attr('opacity',1);
+    });
+}
+
+/* An IntersectionObserver callback only reports steps whose intersection
+   STATE changed. Choosing the winner from that batch alone picks the wrong
+   scene whenever the step still sitting under the crosshair didn't happen to
+   change state — which is every jump-scroll, and is what made the piece render
+   a scene the reader had already passed. Track the full active set instead. */
+const activeSteps = new Set();
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => e.isIntersecting ? activeSteps.add(e.target) : activeSteps.delete(e.target));
+  if (!activeSteps.size) return;
+  const mid = innerHeight / 2;
+  let best = null, bestD = Infinity;
+  activeSteps.forEach(el => {
+    const r = el.getBoundingClientRect();
+    const d = Math.abs((r.top + r.bottom) / 2 - mid);
+    if (d < bestD){ bestD = d; best = el; }
+  });
+  if (best) render(best.dataset.key);
+}, { rootMargin:'-45% 0px -45% 0px', threshold:0 });
+
+document.querySelectorAll('.step').forEach(el => io.observe(el));
+
+/* Prose reveal. Separate from the scene observer because it answers a
+   different question: not "which scene is the graphic on" but "has the reader
+   arrived at this paragraph". It fires once per step and then stops watching,
+   so scrolling back up does not replay the entrance. */
+if (!REDUCE){
+  document.documentElement.classList.add('reveal-ready');
+  const revealIO = new IntersectionObserver((entries, obs) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('in');
+      obs.unobserve(e.target);
+    });
+  }, { rootMargin:'0px 0px -22% 0px', threshold:0.1 });
+  document.querySelectorAll('.step-inner').forEach(el => revealIO.observe(el));
+}
+
+/* Rotating a phone, or dragging a desktop window narrow, moves the render
+   scale and therefore every label size. Re-derive the scale and replay the
+   current scene so the frame, the type and the layout all agree again. */
+let resizeTimer = null;
+addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    const key = current;
+    if (!key) return;
+    const scene = SCENES.find(s => s.key === key);
+    if (!scene) return;
+    const frame = frameFor(scene.frame);
+    computeTK(frame);
+    applyTypeScale();
+    setRowLabels(); setLabels(labelMode || 'demo'); styleAnnos(); fitChips(); placeOutcome();
+    annos.attr('x',d=>d.x).attr('y',annoY);
+    colTextMode = null;
+    svg.attr('viewBox', frame);
+    current = null;                 // force a full re-render of the same scene
+    render(key);
+  }, 180);
+}, { passive:true });
+
+/* CSS cannot force a closed <details> open, so the table is opened for the
+   print and every scene is marked revealed — otherwise a reader who prints
+   before scrolling gets pages of blank narration. */
+addEventListener('beforeprint', () => {
+  const d = document.querySelector('.datatable'); if (d) d.open = true;
+  document.querySelectorAll('.step-inner').forEach(el => el.classList.add('in'));
+});
+
+computeTK(frameFor('stage'));
+applyTypeScale();
+setRowLabels(); setLabels('demo'); styleAnnos(); fitChips(); placeOutcome();
+svg.attr('viewBox', frameFor('stage'));
+render('blank');
+</script>
+</body>
+</html>
