@@ -662,42 +662,42 @@ const SCENES = [
     body:`<p>Noise goes in one side. Matched, trusted, evidence-faithful messages come out the other — one for each belief state, all carrying the same science.</p>
           <p><strong>Belief moves, and medicine hears it move.</strong> Public belief and scientific response finally talk to each other — which is where this story was always trying to end.</p>` },
 
-  { key:'case', frame:'wide', h:'A Well-Made Campaign',
+  { key:'case', frame:'case', h:'A Well-Made Campaign',
     body:`<p>Ground it in a familiar pattern. A state health department runs a genuinely good testing campaign — strong creative, the right languages, the right cities.</p>
           <p>Meanwhile the audience is somewhere else entirely, watching creators the campaign never briefed. To see why, walk the media plan line by line.</p>`,
     note:'Illustrative composite of a common campaign pattern — not a critique of any specific campaign or creative team.' },
 
-  { key:'caseBought', frame:'wide', h:'What It Bought: the Who',
+  { key:'caseBought', frame:'case', h:'What It Bought: the Who',
     body:`<p><strong>Demographic targeting</strong> — who people are on paper. <strong>Geographic targeting</strong> — where they live. The campaign bought both, and to be fair, it bought them well: the right languages in the right cities is exactly what these factors deliver.</p>
           <p>But the who factors end at the front door. They say nothing about what happens when the message arrives.</p>` },
 
-  { key:'caseBehav', frame:'wide', h:'Missed: Behavior',
+  { key:'caseBehav', frame:'case', h:'Missed: Behavior',
     body:`<p><strong>Behavioral targeting</strong> reads what people actually do — what they search, what they watch, what they ignored last time.</p>
           <p>It is the difference between reaching a zip code and reaching the person in it who has been searching “home testing kit” at midnight. It never made the plan.</p>` },
 
-  { key:'casePsych', frame:'wide', h:'Missed: Belief',
+  { key:'casePsych', frame:'case', h:'Missed: Belief',
     body:`<p><strong>Psychographic targeting</strong> reads what people believe — trust, appetite, motivation. It is the layer this entire piece has been building: <strong>the belief map is psychographic targeting, made operational.</strong></p>
           <p>Without it, the same creative lands as reassurance on one belief state and as condescension on the next. This is the missing line item.</p>` },
 
-  { key:'caseContext', frame:'wide', h:'Missed: Context',
+  { key:'caseContext', frame:'case', h:'Missed: Context',
     body:`<p><strong>Contextual targeting</strong> reads the setting the message lands in — the kitchen-table video, the podcast mid-roll, the feed it interrupts.</p>
           <p>A message that fits its surroundings borrows their credibility. One that does not reads as an ad, whatever it says.</p>` },
 
-  { key:'caseProg', frame:'wide', h:'Missed: the Machinery',
+  { key:'caseProg', frame:'case', h:'Missed: the Machinery',
     body:`<p><strong>Programmatic targeting</strong> buys attention algorithmically, wherever it already lives, instead of guessing at placements. <strong>Retargeting</strong> comes back for the almost-persuaded — the person who watched half the video and closed the tab.</p>
           <p>Neither was bought. Every impression was a first impression.</p>` },
 
-  { key:'caseSum', frame:'wide', h:'Two Bought. Five Missed.',
+  { key:'caseSum', frame:'case', h:'Two Bought. Five Missed.',
     body:`<p>Line the plan back up. The who factors, bought well. The five factors that decide whether anyone <em>believes</em> the message — behavioral, psychographic, contextual, programmatic, retargeting — never on it.</p>
           <p><strong>The belief map is the missing line item.</strong> And unlike the other four, it is the one nobody sells off the shelf.</p>`,
     note:'Factor definitions simplified for the walk-through; the pattern, not the vocabulary, is the point.' },
 
-  { key:'approach', frame:'wide', h:'The Same Brief, Run Through the Loop',
+  { key:'approach', frame:'appr', h:'The Same Brief, Run Through the Loop',
     body:`<p>Give the imagined system a concrete brief: raise testing and prevention uptake in a state’s major metros, among the communities carrying the highest risk.</p>
           <p>It answers with three moves, and each is just a loop station with a budget line: <strong>understand the audience</strong> (listen + map), <strong>craft credible messaging</strong> (translate, per belief state, with the evidence attached), and <strong>reach through voices the audience already trusts</strong> (activate).</p>`,
     hint:'Hover a pillar to see which stations it runs on' },
 
-  { key:'model', frame:'wide', h:'Three Ways In',
+  { key:'model', frame:'tiers', h:'Three Ways In',
     body:`<p>And it meets an organization wherever it stands. <strong>Information</strong>: syndicated belief reports — narrative and sentiment across priority audiences, self-serve. <strong>Training</strong>: workshops that teach a team to identify, vet and activate credible messengers, done-for-you first, train-the-trainer after. <strong>Service</strong>: full activation — creator sourcing, vetting, deployment, reporting.</p>
           <p><strong>It starts as information. It ends as a flywheel your team owns.</strong></p>`,
     note:'Concept-stage model. Tiers describe the imagined offering, not a shipped product.' }
@@ -789,13 +789,19 @@ const FRAMES = {
   stage:'148 24 704 640',
   row:  '40 30 920 590',
   map:  '130 10 740 650',
-  wide: '30 0 940 700'
+  wide: '30 0 940 700',
+  case: '30 0 940 700',
+  appr: '30 0 940 700',
+  tiers:'30 0 940 700'
 };
 const FRAMES_MOBILE = {
   stage:'160 24 680 700',
   row:  '20 20 960 640',
   map:  '120 0 760 730',
-  wide: '10 0 980 760'
+  wide: '10 0 980 760',
+  case: '240 20 530 650',
+  appr: '250 10 500 640',
+  tiers:'230 10 540 640'
 };
 function isNarrow(){ return innerWidth <= 960; }
 const frameFor = name => (isNarrow() ? FRAMES_MOBILE : FRAMES)[name];
@@ -1486,10 +1492,10 @@ const CASE_CARD_OF = { caseBought:'bought', caseBehav:'behav', casePsych:'psych'
 
 const casePosters = gCase.append('g');
 const caseCreators = gCase.append('g');
-gCase.append('text').attr('x',225).attr('y',86).attr('text-anchor','middle')
+gCase.append('text').attr('class','flankhead').attr('x',225).attr('y',86).attr('text-anchor','middle')
   .attr('font-family',SANS).call(typed,13).attr('font-weight',700)
   .attr('fill','#212E36').text('The campaign');
-gCase.append('text').attr('x',790).attr('y',86).attr('text-anchor','middle')
+gCase.append('text').attr('class','flankhead').attr('x',790).attr('y',86).attr('text-anchor','middle')
   .attr('font-family',SANS).call(typed,13).attr('font-weight',700)
   .attr('fill','#212E36').text('What the audience actually watches');
 
@@ -1560,9 +1566,9 @@ caseRows.each(function(f){
     .text(f.t);
   if (f.star){
     const bx = CLX + 76;
-    g.append('rect').attr('x',bx-8).attr('y',-13).attr('width',108).attr('height',26).attr('rx',13)
+    g.append('rect').attr('class','bpill').attr('x',bx-8).attr('y',-13).attr('width',108).attr('height',26).attr('rx',13)
       .attr('fill','#E7F2F1').attr('stroke','#7FCCC8').attr('stroke-width',1.6);
-    g.append('text').attr('x',bx+46).attr('y',4).attr('text-anchor','middle')
+    g.append('text').attr('class','bplabel').attr('x',bx+46).attr('y',4).attr('text-anchor','middle')
       .attr('font-family',SANS).call(typed,10).attr('font-weight',700)
       .attr('fill','#1E3A38').text('the belief map');
   }
@@ -1590,6 +1596,7 @@ const caseCardL2 = caseCard.append('text').attr('x',500-226).attr('y',584)
    recedes, everything not yet reached stays unseen — and the summary lines the
    whole plan back up. Pure function of the scene key, so scrolling back up
    replays it faithfully. */
+let caseCardKey = null;
 function renderCase(key){
   const st = CASE_STEP[key];
   if (!st) return;
@@ -1605,9 +1612,23 @@ function renderCase(key){
       const base = f.star ? 14 : 12.5;
       return (st.active.includes(f.id) && key!=='caseSum' ? base+1.5 : base) * TK;
     });
-  const flank = key==='case' || key==='caseSum' ? .95 : .3;
+  // the pill trails the label, which changes width with TK and the active bump
+  const starRow = caseRows.filter(f => f.star);
+  if (!starRow.empty()){
+    const sf = starRow.datum();
+    if (sf._w14 == null){
+      sf._w14 = starRow.select('.rowlabel').node().getComputedTextLength() / (14 * TK) * 14;
+    }
+    const sz = (st.active.includes(sf.id) && key!=='caseSum' ? 15.5 : 14) * TK;
+    const bx = (CLX - 42) + sf._w14 * (sz / 14) + 12;
+    starRow.select('rect.bpill').transition('case').duration(D).attr('x', bx);
+    starRow.select('text.bplabel').transition('case').duration(D).attr('x', bx + 54);
+  }
+
+  const flank = isNarrow() ? 0 : (key==='case' || key==='caseSum' ? .95 : .3);
   casePosters.transition('case').duration(D).attr('opacity',flank);
   caseCreators.transition('case').duration(D).attr('opacity',flank);
+  gCase.selectAll('text.flankhead').attr('display', isNarrow() ? 'none' : null);
   caseBought.transition('case').duration(D)
     .attr('opacity', (key==='caseBought'||key==='caseSum') ? 1 : 0);
   caseMissed.transition('case').duration(D)
@@ -1615,14 +1636,29 @@ function renderCase(key){
   const cardKey = CASE_CARD_OF[key];
   if (cardKey){
     const c = CASE_CARD[cardKey];
-    caseCardTitle.text(c.title);
-    caseCardL1.text(c.lines[0]);
-    caseCardL2.text(c.lines[1]);
-    caseCardRect.attr('stroke', c.ok ? '#7FCCC8' : '#B8492E')
-      .attr('stroke-dasharray', c.ok ? null : '7 5');
-    if (+caseCard.attr('opacity') < .5 && !REDUCE) caseCard.attr('transform','translate(0,12)');
-    caseCard.transition('case').duration(D).attr('opacity',1).attr('transform','translate(0,0)');
+    const dress = () => {
+      caseCardTitle.text(c.title);
+      caseCardL1.text(c.lines[0]);
+      caseCardL2.text(c.lines[1]);
+      caseCardRect.attr('stroke', c.ok ? '#7FCCC8' : '#B8492E')
+        .attr('stroke-dasharray', c.ok ? null : '7 5');
+    };
+    const visible = +caseCard.attr('opacity') > .5;
+    if (visible && caseCardKey && caseCardKey !== cardKey && !REDUCE){
+      caseCard.transition('case').duration(150).attr('opacity',0)
+        .on('end', () => {
+          dress();
+          caseCard.attr('transform','translate(0,10)')
+            .transition('case').duration(280).attr('opacity',1).attr('transform','translate(0,0)');
+        });
+    } else {
+      dress();
+      if (!visible && !REDUCE) caseCard.attr('transform','translate(0,12)');
+      caseCard.transition('case').duration(D).attr('opacity',1).attr('transform','translate(0,0)');
+    }
+    caseCardKey = cardKey;
   } else {
+    caseCardKey = null;
     caseCard.transition('case').duration(D).attr('opacity',0);
   }
 }
@@ -1641,14 +1677,20 @@ const PILLARS = [
 ];
 (function(){
   const b = gAppr.append('g').attr('transform','translate(500,96)');
-  b.append('rect').attr('x',-280).attr('y',-22).attr('width',560).attr('height',44).attr('rx',22)
+  b.append('rect').attr('class','briefrect').attr('x',-280).attr('y',-22).attr('width',560).attr('height',44).attr('rx',22)
     .attr('fill','#FFFFFF').attr('stroke','#DCD5C6').attr('stroke-width',1.2);
-  b.append('text').attr('x',-258).attr('y',5)
+  b.append('text').attr('class','brieflabel').attr('x',-258).attr('y',5)
     .attr('font-family',MONO).call(typed,8.5).attr('letter-spacing','.16em')
     .attr('fill','#B8492E').text('BRIEF');
-  b.append('text').attr('x',-198).attr('y',6)
+  b.append('text').attr('class','briefwide').attr('x',-198).attr('y',6)
     .attr('font-family',SANS).call(typed,12).attr('font-weight',600)
     .attr('fill','#212E36').text('Raise testing and prevention uptake in the metros at highest risk');
+  ['Raise testing and prevention uptake','in the metros at highest risk'].forEach((ln,k)=>{
+    b.append('text').attr('class','briefnarrow').attr('display','none')
+      .attr('x',-150).attr('y',k*18+4)
+      .attr('font-family',SANS).call(typed,11.5).attr('font-weight',600)
+      .attr('fill','#212E36').text(ln);
+  });
 
   PILLARS.forEach(pl=>{
     const g = gAppr.append('g').attr('class','pillar').attr('data-x',pl.x)
@@ -1657,23 +1699,24 @@ const PILLARS = [
       .attr('fill',pl.tint);
     pl.stations.forEach((st,k)=>{
       const off = (k - (pl.stations.length-1)/2) * 46;
-      const sg = g.append('g').attr('transform','translate('+off+',-82) scale(.8)');
+      const sg = g.append('g').attr('class','pst').attr('data-off',off)
+        .attr('transform','translate('+off+',-82) scale(.8)');
       sg.append('circle').attr('r',20).attr('fill','#F8F6F1').attr('stroke','#212E36').attr('stroke-width',1.6);
       stationGlyph(sg, st).attr('transform','scale(.72)');
     });
-    g.append('text').attr('x',0).attr('y',-30).attr('text-anchor','middle')
+    g.append('text').attr('class','ptitle').attr('x',0).attr('y',-30).attr('text-anchor','middle')
       .attr('font-family',SANS).call(typed,13.5).attr('font-weight',700)
       .attr('fill','#212E36').text(pl.title);
     pl.sub.forEach((ln,k)=>{
-      g.append('text').attr('x',0).attr('y',-6+k*18).attr('text-anchor','middle')
+      g.append('text').attr('class','psub').attr('x',0).attr('y',-6+k*18).attr('text-anchor','middle')
         .attr('font-family',SANS).call(typed,11).attr('fill','#333').text(ln);
     });
-    g.append('path').attr('d','M -34 96 L 34 96')
+    g.append('path').attr('class','prule').attr('d','M -34 96 L 34 96')
       .attr('stroke','#212E36').attr('stroke-width',1).attr('opacity',.25);
   });
-  gAppr.append('path').attr('d','M 500 118 L 500 190')
+  gAppr.append('path').attr('class','bconn').attr('d','M 500 118 L 500 190')
     .attr('stroke','#212E36').attr('stroke-width',1.4).attr('stroke-dasharray','5 5');
-  gAppr.append('path').attr('d','M 494 182 L 500 192 L 506 182')
+  gAppr.append('path').attr('class','bconn').attr('d','M 494 182 L 500 192 L 506 182')
     .attr('fill','none').attr('stroke','#212E36').attr('stroke-width',1.4)
     .attr('stroke-linecap','round').attr('stroke-linejoin','round');
 })();
@@ -1723,10 +1766,57 @@ pillarHits
   gTier.append('path').attr('class','ascent').attr('data-op',1).attr('d','M 780 '+(BASE-284)+' L 790 '+(BASE-292)+' L 778 '+(BASE-296))
     .attr('fill','none').attr('stroke','#B8492E').attr('stroke-width',1.6)
     .attr('stroke-linecap','round').attr('stroke-linejoin','round');
-  gTier.append('text').attr('x',500).attr('y',612).attr('text-anchor','middle')
+  gTier.append('text').attr('class','tcap').attr('x',500).attr('y',612).attr('text-anchor','middle')
     .attr('font-family',SANS).call(typed,12.5).attr('font-weight',700)
     .attr('fill','#212E36').text('Starts as information. Ends as a flywheel your team owns.');
 })();
+
+/* narrow screens restack the concept scenes: pillars in a column (subs live
+   in the prose + tooltips), tiers with the size metaphor moved onto width */
+function layoutPillars(){
+  const nar = isNarrow();
+  gAppr.selectAll('g.pillar').each(function(_, i){
+    const g = d3.select(this);
+    const x = nar ? 500 : +this.getAttribute('data-x');
+    const y = nar ? 228 + i*156 : 352;
+    this.setAttribute('data-ty', x + ',' + y);
+    g.attr('transform', 'translate(' + x + ',' + y + ')');
+    g.select('rect').attr('y', nar ? -62 : -120).attr('height', nar ? 124 : 240);
+    g.selectAll('g.pst').attr('transform', function(){
+      const off = +this.getAttribute('data-off');
+      return nar ? 'translate(' + off + ',-28) scale(.7)' : 'translate(' + off + ',-82) scale(.8)';
+    });
+    g.select('text.ptitle').attr('y', nar ? 26 : -30);
+    g.selectAll('text.psub').attr('display', nar ? 'none' : null);
+    g.select('path.prule').attr('display', nar ? 'none' : null);
+  });
+  gAppr.select('rect.briefrect').attr('x', nar ? -170 : -280).attr('width', nar ? 340 : 560)
+    .attr('y', nar ? -30 : -22).attr('height', nar ? 62 : 44);
+  gAppr.select('text.brieflabel').attr('x', nar ? -150 : -258).attr('y', nar ? -16 : 5);
+  gAppr.select('text.briefwide').attr('display', nar ? 'none' : null);
+  gAppr.selectAll('text.briefnarrow').attr('display', nar ? null : 'none');
+  gAppr.selectAll('path.bconn').attr('display', nar ? 'none' : null);
+  pillarHits
+    .attr('x', pl => nar ? 390 : pl.x - 110)
+    .attr('y', (pl, i) => nar ? 228 + i*156 - 62 : 232)
+    .attr('height', nar ? 124 : 240);
+}
+function layoutTiers(){
+  const nar = isNarrow();
+  const W = [190, 225, 260];
+  gTier.selectAll('g.tier').each(function(_, i){
+    const g = d3.select(this);
+    const w = nar ? W[i] : 250;
+    const x = nar ? 500 : +this.getAttribute('data-x');
+    const y = nar ? 44 + i*158 : +this.getAttribute('data-y');
+    const h = nar ? 136 : [150, 210, 270][i];
+    this.setAttribute('data-ty', x + ',' + y);
+    g.attr('transform', 'translate(' + x + ',' + y + ')');
+    g.select('rect').attr('x', -w/2).attr('width', w).attr('height', h);
+  });
+  gTier.selectAll('path.ascent').attr('display', nar ? 'none' : null);
+  gTier.select('text.tcap').attr('y', nar ? 566 : 612);
+}
 
 /* =====================================================================
    8. TOOLTIP + QUADRANT INTERACTION
@@ -1975,22 +2065,24 @@ function render(key){
   show(gCase,   CASE_KEYS.includes(key) ? 1 : 0);
   renderCase(key);
   show(gAppr,   key==='approach' ? 1 : 0);
+  if (key==='approach') layoutPillars();
   if (key==='approach' && prev!=='approach' && !REDUCE){
     gAppr.selectAll('g.pillar').interrupt('rise')
       .attr('opacity',0)
-      .attr('transform',function(){ return 'translate('+this.getAttribute('data-x')+',376)'; })
+      .attr('transform',function(){ const p=this.getAttribute('data-ty').split(','); return 'translate('+p[0]+','+(+p[1]+24)+')'; })
       .transition('rise').duration(620).delay((d,i)=>160+i*130).ease(d3.easeCubicOut)
       .attr('opacity',1)
-      .attr('transform',function(){ return 'translate('+this.getAttribute('data-x')+',352)'; });
+      .attr('transform',function(){ const p=this.getAttribute('data-ty').split(','); return 'translate('+p[0]+','+p[1]+')'; });
   }
   show(gTier,   key==='model' ? 1 : 0);
+  if (key==='model') layoutTiers();
   if (key==='model' && prev!=='model' && !REDUCE){
     gTier.selectAll('g.tier').interrupt('rise')
       .attr('opacity',0)
-      .attr('transform',function(){ return 'translate('+this.getAttribute('data-x')+','+(+this.getAttribute('data-y')+26)+')'; })
+      .attr('transform',function(){ const p=this.getAttribute('data-ty').split(','); return 'translate('+p[0]+','+(+p[1]+26)+')'; })
       .transition('rise').duration(640).delay((d,i)=>140+i*160).ease(d3.easeCubicOut)
       .attr('opacity',1)
-      .attr('transform',function(){ return 'translate('+this.getAttribute('data-x')+','+this.getAttribute('data-y')+')'; });
+      .attr('transform',function(){ const p=this.getAttribute('data-ty').split(','); return 'translate('+p[0]+','+p[1]+')'; });
     gTier.selectAll('path.ascent').interrupt('rise').attr('opacity',0)
       .transition('rise').duration(520).delay(REDUCE?0:760)
       .attr('opacity',function(){ return +this.getAttribute('data-op'); });
