@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>From Health Noise to Health Belief — a Design Argument</title>
+<title>From Health Noise to Health Belief — The Belief Layer</title>
 <meta name="description" content="Health advice is everywhere and agreement is nowhere. A scrollytelling design argument for sorting people by belief instead of by label — ending with the system that would close the loop.">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F8F6F1">
@@ -34,7 +34,14 @@ window.d3 || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
+html{
+  scroll-behavior:smooth;
+  /* A page with no horizontal scroll of its own hands a sideways trackpad
+     flick straight to the browser, which reads it as back/forward — so a
+     reader who flicks diagonally at the end of the piece gets thrown into
+     the other explainer without touching a link. Refuse the gesture. */
+  overscroll-behavior-x:none;
+}
 body{
   margin:0; background:var(--bg); color:var(--ink-body);
   font-family:var(--sans); font-weight:300; font-size:17px; line-height:1.85;
@@ -316,7 +323,7 @@ h1{
 <div class="grain" aria-hidden="true"></div>
 
 <header class="masthead">
-  <a class="wordmark" href="index.html" aria-label="The Reachable — home">
+  <a class="wordmark" href="index.html" aria-label="The Belief Layer — home">
     <svg width="30" height="30" viewBox="-50 -50 100 100" aria-hidden="true">
       <circle cx="-16" cy="-12" r="15" fill="#C3DCEB"/>
       <circle cx="18" cy="-18" r="11" fill="#FFD733"/>
@@ -324,7 +331,7 @@ h1{
       <circle cx="-10" cy="24" r="10" fill="#E74D4E"/>
       <circle cx="4" cy="-2" r="7" fill="#7FCCC8"/>
     </svg>
-    <span>The Reachable</span>
+    <span>The Belief Layer</span>
   </a>
   <nav class="mastnav" aria-label="Explainers">
     <a href="political-health-personas.html"><span class="aro l">&lsaquo;</span> <span class="nl">The Personas</span></a>
@@ -662,32 +669,32 @@ const SCENES = [
     body:`<p>Noise goes in one side. Matched, trusted, evidence-faithful messages come out the other — one for each belief state, all carrying the same science.</p>
           <p><strong>Belief moves, and medicine hears it move.</strong> Public belief and scientific response finally talk to each other — which is where this story was always trying to end.</p>` },
 
-  { key:'case', frame:'wide', h:'A Well-Made Campaign',
+  { key:'case', frame:'caseF', h:'A Well-Made Campaign',
     body:`<p>Ground it in a familiar pattern. A state health department runs a genuinely good testing campaign — strong creative, the right languages, the right cities.</p>
           <p>Meanwhile the audience is somewhere else entirely, watching creators the campaign never briefed. To see why, walk the media plan line by line.</p>`,
     note:'Illustrative composite of a common campaign pattern — not a critique of any specific campaign or creative team.' },
 
-  { key:'caseBought', frame:'wide', h:'What It Bought: the Who',
+  { key:'caseBought', frame:'caseF', h:'What It Bought: the Who',
     body:`<p><strong>Demographic targeting</strong> — who people are on paper. <strong>Geographic targeting</strong> — where they live. The campaign bought both, and to be fair, it bought them well: the right languages in the right cities is exactly what these factors deliver.</p>
           <p>But the who factors end at the front door. They say nothing about what happens when the message arrives.</p>` },
 
-  { key:'caseBehav', frame:'wide', h:'Missed: Behavior',
+  { key:'caseBehav', frame:'caseF', h:'Missed: Behavior',
     body:`<p><strong>Behavioral targeting</strong> reads what people actually do — what they search, what they watch, what they ignored last time.</p>
           <p>It is the difference between reaching a zip code and reaching the person in it who has been searching “home testing kit” at midnight. It never made the plan.</p>` },
 
-  { key:'casePsych', frame:'wide', h:'Missed: Belief',
+  { key:'casePsych', frame:'caseF', h:'Missed: Belief',
     body:`<p><strong>Psychographic targeting</strong> reads what people believe — trust, appetite, motivation. It is the layer this entire piece has been building: <strong>the belief map is psychographic targeting, made operational.</strong></p>
           <p>Without it, the same creative lands as reassurance on one belief state and as condescension on the next. This is the missing line item.</p>` },
 
-  { key:'caseContext', frame:'wide', h:'Missed: Context',
+  { key:'caseContext', frame:'caseF', h:'Missed: Context',
     body:`<p><strong>Contextual targeting</strong> reads the setting the message lands in — the kitchen-table video, the podcast mid-roll, the feed it interrupts.</p>
           <p>A message that fits its surroundings borrows their credibility. One that does not reads as an ad, whatever it says.</p>` },
 
-  { key:'caseProg', frame:'wide', h:'Missed: the Machinery',
+  { key:'caseProg', frame:'caseF', h:'Missed: the Machinery',
     body:`<p><strong>Programmatic targeting</strong> buys attention algorithmically, wherever it already lives, instead of guessing at placements. <strong>Retargeting</strong> comes back for the almost-persuaded — the person who watched half the video and closed the tab.</p>
           <p>Neither was bought. Every impression was a first impression.</p>` },
 
-  { key:'caseSum', frame:'wide', h:'Two Bought. Five Missed.',
+  { key:'caseSum', frame:'caseF', h:'Two Bought. Five Missed.',
     body:`<p>Line the plan back up. The who factors, bought well. The five factors that decide whether anyone <em>believes</em> the message — behavioral, psychographic, contextual, programmatic, retargeting — never on it.</p>
           <p><strong>The belief map is the missing line item.</strong> And unlike the other four, it is the one nobody sells off the shelf.</p>`,
     note:'Factor definitions simplified for the walk-through; the pattern, not the vocabulary, is the point.' },
@@ -785,17 +792,24 @@ function applyTypeScale(){
      .attr('dy', function(){ return +this.getAttribute('data-dy') * TK; });
 }
 
+/* `caseF` is `wide` with headroom. The graphic pane is taller than it is wide,
+   so a 940x700 frame is width-bound: it renders at the same scale as a taller
+   one and then letterboxes ~130px of nothing above and below. The case study
+   stacks three bands, so it takes the taller box and gets that space back —
+   same render scale, same type sizes, 160 more units to compose in. */
 const FRAMES = {
   stage:'148 24 704 640',
   row:  '40 30 920 590',
   map:  '130 10 740 650',
-  wide: '30 0 940 700'
+  wide: '30 0 940 700',
+  caseF:'30 0 940 860'
 };
 const FRAMES_MOBILE = {
   stage:'160 24 680 700',
   row:  '20 20 960 640',
   map:  '120 0 760 730',
-  wide: '10 0 980 760'
+  wide: '10 0 980 760',
+  caseF:'10 0 980 940'
 };
 function isNarrow(){ return innerWidth <= 960; }
 const frameFor = name => (isNarrow() ? FRAMES_MOBILE : FRAMES)[name];
@@ -1484,14 +1498,25 @@ const CASE_CARD = {
 const CASE_CARD_OF = { caseBought:'bought', caseBehav:'behav', casePsych:'psych',
                        caseContext:'context', caseProg:'prog' };
 
-const casePosters = gCase.append('g');
-const caseCreators = gCase.append('g');
-gCase.append('text').attr('x',225).attr('y',86).attr('text-anchor','middle')
-  .attr('font-family',SANS).call(typed,13).attr('font-weight',700)
-  .attr('fill','#212E36').text('The campaign');
-gCase.append('text').attr('x',790).attr('y',86).attr('text-anchor','middle')
-  .attr('font-family',SANS).call(typed,13).attr('font-weight',700)
-  .attr('fill','#212E36').text('What the audience actually watches');
+/* The case study holds three things: the creative that was made, the plan that
+   was bought, and what the audience was actually watching. Only the middle one
+   is the argument. An earlier layout ran all three across the middle of the
+   frame at equal weight, and it cost three things: the ledger's own "the belief
+   map" chip landed on top of a creator card, the flanks kept full-strength
+   headings while the art under them sat at .3, and the bottom third of the pane
+   stayed empty for the whole sequence. So: flanks small and quiet in a band
+   across the top, heading travelling with its own art, ledger owning the rest.
+   Each flank is one group so a single opacity governs art and label together. */
+const caseFlankL   = gCase.append('g');
+const caseFlankR   = gCase.append('g');
+const casePosters  = caseFlankL.append('g').attr('transform','translate(-6,-52)');
+const caseCreators = caseFlankR.append('g').attr('transform','translate(-163,-94) scale(1.2)');
+caseFlankL.append('text').attr('x',224).attr('y',78).attr('text-anchor','middle')
+  .attr('font-family',SANS).call(typed,12).attr('font-weight',700)
+  .attr('fill','#6F6F6F').text('The campaign');
+caseFlankR.append('text').attr('x',787).attr('y',78).attr('text-anchor','middle')
+  .attr('font-family',SANS).call(typed,12).attr('font-weight',700)
+  .attr('fill','#6F6F6F').text('What they actually watch');
 
 function poster(x, y, bg, quote1, quote2, look){
   const g = casePosters.append('g').attr('transform','translate('+x+','+y+')');
@@ -1533,10 +1558,12 @@ function creatorCard(x, y, tint, handle, cap){
 creatorCard(722, 232, '#FBD6BE', '@kitchen.checkin', '2.1M views');
 creatorCard(862, 276, '#C3DCEB', '@reallife.rn', '840k views');
 
-// the ledger — one row group per factor, driven entirely by the step state
-const CLX = 505, CLY0 = 128, CLDY = 50;
-gCase.append('text').attr('class','ledgerhead').attr('x',CLX).attr('y',CLY0-34).attr('text-anchor','middle')
-  .attr('font-family',SANS).call(typed,12.5).attr('font-weight',700)
+// the ledger — one row group per factor, driven entirely by the step state.
+// It sits below the flank band so the "the belief map" chip on the psychographic
+// row has the whole width to itself instead of colliding with a creator card.
+const CLX = 505, CLY0 = 392, CLDY = 50;
+gCase.append('text').attr('class','ledgerhead').attr('x',CLX-75).attr('y',CLY0-38).attr('text-anchor','start')
+  .attr('font-family',SANS).call(typed,14).attr('font-weight',700)
   .attr('fill','#212E36').text('The media plan, line by line');
 const caseRows = gCase.selectAll('g.crow').data(CASE_FACTORS).join('g').attr('class','crow')
   .attr('transform',(f,i)=>'translate(0,'+(CLY0+i*CLDY)+')')
@@ -1554,12 +1581,12 @@ caseRows.each(function(f){
       .attr('stroke-dasharray','3.5 3');
   }
   g.append('text').attr('class','rowlabel').attr('x',CLX-42).attr('y',4.5)
-    .attr('font-family',SANS).call(typed, f.star ? 14 : 12.5)
+    .attr('font-family',SANS).call(typed, f.star ? 15.5 : 14)
     .attr('font-weight',700)
     .attr('fill', f.ok ? '#212E36' : (f.star ? '#B8492E' : '#6F6F6F'))
     .text(f.t);
   if (f.star){
-    const bx = CLX + 76;
+    const bx = CLX + 100;
     g.append('rect').attr('x',bx-8).attr('y',-13).attr('width',108).attr('height',26).attr('rx',13)
       .attr('fill','#E7F2F1').attr('stroke','#7FCCC8').attr('stroke-width',1.6);
     g.append('text').attr('x',bx+46).attr('y',4).attr('text-anchor','middle')
@@ -1574,17 +1601,35 @@ const caseMissed = gCase.append('text').attr('x',CLX-92).attr('y',CLY0+2*CLDY+4)
   .attr('font-family',MONO).call(typed,8).attr('letter-spacing','.14em')
   .attr('fill','#B8492E').text('MISSED').attr('opacity',0);
 
-// one explainer card, re-dressed per step, in a stable clear zone below the ledger
+// one explainer card, re-dressed per step, in a stable clear zone below the
+// ledger — and centred on the ledger's axis (545), not the frame's (500)
 const caseCard = gCase.append('g').attr('opacity',0);
 const caseCardRect = caseCard.append('rect')
-  .attr('x',500-250).attr('y',512).attr('width',500).attr('height',96).attr('rx',16)
+  .attr('x',545-250).attr('y',744).attr('width',500).attr('height',96).attr('rx',16)
   .attr('fill','#FFFFFF').attr('stroke-width',2);
-const caseCardTitle = caseCard.append('text').attr('x',500-226).attr('y',544)
+const caseCardTitle = caseCard.append('text').attr('x',545-226).attr('y',776)
   .attr('font-family',SANS).call(typed,12.5).attr('font-weight',700).attr('fill','#212E36');
-const caseCardL1 = caseCard.append('text').attr('x',500-226).attr('y',566)
+const caseCardL1 = caseCard.append('text').attr('x',545-226).attr('y',798)
   .attr('font-family',SANS).call(typed,11).attr('fill','#333');
-const caseCardL2 = caseCard.append('text').attr('x',500-226).attr('y',584)
+const caseCardL2 = caseCard.append('text').attr('x',545-226).attr('y',816)
   .attr('font-family',SANS).call(typed,11).attr('fill','#333');
+
+/* The summary step used to hide the card and leave that band blank, so the
+   payoff scene was the emptiest frame in the piece. It gets the count instead —
+   the same two numbers the narration beside it is making. */
+const caseTally = gCase.append('g').attr('opacity',0);
+function tallyCluster(x, n, label, colour){
+  caseTally.append('text').attr('x',x).attr('y',790).attr('text-anchor','middle')
+    .attr('font-family',SANS).call(typed,38).attr('font-weight',700)
+    .attr('fill',colour).text(n);
+  caseTally.append('text').attr('x',x).attr('y',814).attr('text-anchor','middle')
+    .attr('font-family',MONO).call(typed,10).attr('letter-spacing','.16em')
+    .attr('fill','#6F6F6F').text(label);
+}
+tallyCluster(478, '2', 'BOUGHT', '#3E8E89');
+tallyCluster(612, '5', 'MISSED', '#B8492E');
+caseTally.append('line').attr('x1',545).attr('x2',545).attr('y1',760).attr('y2',816)
+  .attr('stroke','#DCD7CC').attr('stroke-width',1.4);
 
 /* The walk: the active factor holds the stage, everything already covered
    recedes, everything not yet reached stays unseen — and the summary lines the
@@ -1596,21 +1641,34 @@ function renderCase(key){
   const D = REDUCE ? 1 : 480;
   caseRows.transition('case').duration(D)
     .delay((f,i)=> key==='caseSum' && !REDUCE ? i*70 : 0)
+    /* The plan is seven line items whether or not the walk has reached them.
+       Hiding the unreached ones outright made the ledger change height at every
+       beat, stranded the explainer card below a block that kept shrinking, and
+       concealed how long the plan was until the final step — which is the one
+       thing the scene most wants the reader to feel. Barely-there, but there. */
     .attr('opacity', f =>
       st.active.includes(f.id) ? 1 :
-      (key==='caseSum' ? 1 : (st.seen.includes(f.id) ? .16 : 0)));
+      (key==='caseSum' ? 1 : (st.seen.includes(f.id) ? .16 : .1)));
   caseRows.select('.rowlabel').transition('case').duration(D)
     .attr('font-size', function(){
       const f = d3.select(this.parentNode).datum();
-      const base = f.star ? 14 : 12.5;
+      const base = f.star ? 15.5 : 14;
       return (st.active.includes(f.id) && key!=='caseSum' ? base+1.5 : base) * TK;
     });
-  const flank = key==='case' || key==='caseSum' ? .95 : .3;
-  casePosters.transition('case').duration(D).attr('opacity',flank);
-  caseCreators.transition('case').duration(D).attr('opacity',flank);
+  /* The establishing shot and the payoff are the only two beats where the
+     creative and the audience are the subject. Through the walk they were
+     sitting at .3 — loud enough to read as a third thing competing for the
+     eye, too faint to actually read. Drop them to the same ghost weight the
+     already-covered ledger rows use, so the walk has exactly one subject. */
+  const flank = key==='case' ? 1 : key==='caseSum' ? .9 : .14;
+  caseFlankL.transition('case').duration(D).attr('opacity',flank);
+  caseFlankR.transition('case').duration(D).attr('opacity',flank);
   caseBought.transition('case').duration(D)
     .attr('opacity', (key==='caseBought'||key==='caseSum') ? 1 : 0);
   caseMissed.transition('case').duration(D)
+    .attr('opacity', key==='caseSum' ? 1 : 0);
+  caseTally.transition('case').duration(D)
+    .delay(key==='caseSum' && !REDUCE ? 420 : 0)
     .attr('opacity', key==='caseSum' ? 1 : 0);
   const cardKey = CASE_CARD_OF[key];
   if (cardKey){

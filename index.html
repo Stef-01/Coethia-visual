@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Reachable — Visual Explainers</title>
-<meta name="description" content="Two scrollytelling visual essays: political health personas, and the argument for belief-based health communication.">
+<title>The Belief Layer — Why Public Health Keeps Aiming at the Wrong Thing</title>
+<meta name="description" content="Health campaigns buy who you are and almost never buy what you believe. Two scrollytelling essays on the missing layer: political health personas, and the case for belief-based communication.">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F8F6F1">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='44' fill='%23F37940'/%3E%3Ccircle cx='50' cy='50' r='20' fill='%23F8F6F1'/%3E%3C/svg%3E">
@@ -19,6 +19,8 @@
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
 }
 *{box-sizing:border-box}
+/* see the explainers: stop a sideways trackpad flick becoming a history move */
+html{overscroll-behavior-x:none}
 body{
   margin:0;background:var(--bg);color:var(--ink-body);
   font-family:var(--sans);font-weight:300;font-size:17px;line-height:1.8;
@@ -118,7 +120,7 @@ h1{animation-delay:.08s}
       <circle cx="-10" cy="24" r="10" fill="#E74D4E"/>
       <circle cx="4" cy="-2" r="7" fill="#7FCCC8"/>
     </svg>
-    <span>The Reachable</span>
+    <span>The Belief Layer</span>
   </span>
   <nav class="mastnav" aria-label="Explainers">
     <a href="political-health-personas.html"><span class="nl">The Personas</span> <span class="aro r">&rsaquo;</span></a>
@@ -127,8 +129,8 @@ h1{animation-delay:.08s}
 </header>
 <main>
   <span class="kicker">Visual Explainers</span>
-  <h1>Two Arguments About American Health, Told by Scrolling</h1>
-  <p class="lede">A pair of interactive visual essays in one shared design system. Every figure in both pieces is synthetic — these are arguments about <em>how to look</em>, not findings.</p>
+  <h1>Public Health Has Been Aiming at the Wrong Layer</h1>
+  <p class="lede">Every campaign buys who you are. Almost none buys what you believe — and belief is the layer that decides whether the message lands. Two interactive essays on the segmentation that health communication keeps skipping. Every figure is synthetic: these are arguments about <em>how to look</em>, not findings.</p>
 
   <div class="piece">
     <h2><a class="tlink" href="political-health-personas.html">How Does Politics Shape American Health?</a></h2>
