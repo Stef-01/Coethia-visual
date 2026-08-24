@@ -2044,8 +2044,8 @@ function drawForceDots(G){
   mono(forcePanel, dx-10, G.py+G.ph-18, forceSeen.size+' OF 5', 6.5, MUTE, 'end');
 }
 function setForce(id){
-  forceOpen = id;
-  if (id) forceSeen.add(id);
+  forceOpen = forceOpen === id ? null : id;
+  if (forceOpen) forceSeen.add(forceOpen);
   drawForces(); drawForcePanel(); applyTypeScale(); wireForces();
 }
 function wireForces(){
@@ -2055,9 +2055,9 @@ function wireForces(){
       if (ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); setForce(f.id); }
     });
   forcePanel.selectAll('g.fnext')
-    .on('click', (ev,f)=> setForce(f.id))
+    .on('click', (ev,f)=>{ forceOpen = null; setForce(f.id); })
     .on('keydown', function(ev,f){
-      if (ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); setForce(f.id); }
+      if (ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); forceOpen = null; setForce(f.id); }
     });
 }
 drawForces(); drawForcePanel(); wireForces();
@@ -2073,15 +2073,45 @@ const CYCLE = [
 (function(){
   CYCLE.forEach((c,i)=>{
     const g = gCyc.append('g').attr('class','cstep').attr('data-i',i);
-    g.append('circle').attr('class','cnum').attr('r',17)
+    const disc = g.append('g');
+    disc.append('circle').attr('class','cnum').attr('r',24)
       .attr('fill', c.late ? '#EFEAE0' : '#212E36');
-    label(g, 0, 5, String(i+1), 11, 700, c.late ? '#8A8474' : '#F8F6F1', 'middle');
-    label(g, 0, 42, c.t, 11.5, 700, c.late ? '#8A8474' : INK, 'middle');
-    c.d.forEach((ln,k)=> label(g, 0, 62+k*15, ln, 9, 400, MUTE, 'middle'));
+    const ink2 = c.late ? '#8A8474' : '#F8F6F1', acc2 = c.late ? '#B9B2A4' : '#F9C9B4';
+    if (i === 0){        // seeding: a seed pinging outward
+      disc.append('circle').attr('r',3.4).attr('fill',acc2);
+      for (let k=0;k<6;k++){
+        const a = k*Math.PI/3 - Math.PI/2;
+        disc.append('path').attr('d','M '+(Math.cos(a)*7)+' '+(Math.sin(a)*7)+' L '+(Math.cos(a)*12)+' '+(Math.sin(a)*12))
+          .attr('stroke',ink2).attr('stroke-width',1.6).attr('stroke-linecap','round');
+      }
+    } else if (i === 1){ // entrenchment: arcs closing around a dot
+      disc.append('circle').attr('r',3).attr('fill',acc2);
+      disc.append('path').attr('d','M 8.5 -6 A 10.5 10.5 0 0 1 8.5 6').attr('fill','none')
+        .attr('stroke',ink2).attr('stroke-width',1.8).attr('stroke-linecap','round');
+      disc.append('path').attr('d','M -8.5 6 A 10.5 10.5 0 0 1 -8.5 -6').attr('fill','none')
+        .attr('stroke',ink2).attr('stroke-width',1.8).attr('stroke-linecap','round');
+    } else if (i === 2){ // high-intent search: the magnifier
+      disc.append('circle').attr('cx',-2).attr('cy',-2).attr('r',6.5).attr('fill','none')
+        .attr('stroke',ink2).attr('stroke-width',2);
+      disc.append('path').attr('d','M 3 3 L 9 9').attr('stroke',acc2)
+        .attr('stroke-width',2.4).attr('stroke-linecap','round');
+    } else {             // the correction: the clock that ran out
+      disc.append('circle').attr('r',9).attr('fill','none').attr('stroke',ink2).attr('stroke-width',1.8);
+      disc.append('path').attr('d','M 0 0 L 0 -6 M 0 0 L 4.5 3').attr('stroke',ink2)
+        .attr('stroke-width',1.8).attr('stroke-linecap','round');
+    }
+    const badge = g.append('g');
+    badge.append('circle').attr('cx',18).attr('cy',-18).attr('r',7.5)
+      .attr('fill', c.late ? '#B9B2A4' : ALARM);
+    badge.append('text').attr('x',18).attr('y',-14.8).attr('text-anchor','middle')
+      .attr('font-family',MONO).call(typed,7).attr('font-weight',500)
+      .attr('fill','#FFFFFF').text(i+1);
+    label(g, 0, 48, c.t, 11.5, 700, c.late ? '#8A8474' : INK, 'middle');
+    c.d.forEach((ln,k)=> label(g, 0, 68+k*15, ln, 9, 400, MUTE, 'middle'));
     if (c.late){
       const stamp = g.append('g').attr('class','clate');
-      roundRect(stamp, -62, 96, 124, 26, 6, 'none', ALARM, 1.8);
-      label(stamp, 0, 113, 'TOO LATE', 10, 700, ALARM, 'middle')
+      roundRect(stamp, -62, 102, 124, 26, 6, 'none', ALARM, 1.8);
+      label(stamp, 0, 119, 'TOO LATE', 10, 700, ALARM, 'middle')
         .attr('font-family',MONO).attr('letter-spacing','.14em');
       stamp.attr('transform','rotate(-6)');
     }
@@ -2242,13 +2272,35 @@ const HOOKS = [
     const g = gHook.append('g').attr('class','hookcard').datum(h)
       .attr('data-i',i);
     roundRect(g, 0, 0, 380, 96, 14, '#FFFFFF', LINE, 1.3);
+    // each hook carries its emblem: the thing it pretends to be
+    const em = g.append('g').attr('transform','translate(340,34)');
+    em.append('circle').attr('r',22).attr('fill','#FBE3D2');
+    if (i === 0){        // authority theft: the badge-star
+      em.append('path').attr('d','M 0 -10 L 2.8 -3 L 10 -3 L 4.4 1.6 L 6.6 9 L 0 4.6 L -6.6 9 L -4.4 1.6 L -10 -3 L -2.8 -3 Z')
+        .attr('fill','none').attr('stroke',ALARM).attr('stroke-width',1.7).attr('stroke-linejoin','round');
+    } else if (i === 1){ // suppression: the eye
+      em.append('path').attr('d','M -11 0 Q 0 -9 11 0 Q 0 9 -11 0 Z')
+        .attr('fill','none').attr('stroke',INK).attr('stroke-width',1.7);
+      em.append('circle').attr('r',3.4).attr('fill',ALARM);
+    } else if (i === 2){ // class envy: the diamond
+      em.append('path').attr('d','M -9 -3 L -4.5 -8 L 4.5 -8 L 9 -3 L 0 9 Z')
+        .attr('fill','none').attr('stroke',INK).attr('stroke-width',1.7).attr('stroke-linejoin','round');
+      em.append('path').attr('d','M -9 -3 H 9 M -4.5 -8 L -2.5 -3 L 0 9 M 4.5 -8 L 2.5 -3')
+        .attr('stroke',ALARM).attr('stroke-width',1.1);
+    } else {             // borrowed antiquity: the scroll
+      em.append('rect').attr('x',-8).attr('y',-8).attr('width',16).attr('height',16).attr('rx',2)
+        .attr('fill','none').attr('stroke',INK).attr('stroke-width',1.7);
+      em.append('path').attr('d','M -8 -4 q -4 0 -4 4 q 0 4 4 4 M 8 -4 q 4 0 4 4 q 0 4 -4 4')
+        .attr('fill','none').attr('stroke',ALARM).attr('stroke-width',1.5);
+      em.append('path').attr('d','M -4 -2 H 4 M -4 2 H 4').attr('stroke',INK).attr('stroke-width',1.2);
+    }
     const words = h.t.split(' ');
     let lines = [''], li = 0;
     words.forEach(w=>{
       if ((lines[li]+' '+w).trim().length > 38){ li++; lines[li]=w; }
       else lines[li] = (lines[li]+' '+w).trim();
     });
-    lines.forEach((ln,k)=> label(g, 18, 30+k*17, ln, 10.5, 700, INK));
+    lines.forEach((ln,k)=> label(g, 18, 30+k*17, ln, 10.5, 700, INK).attr('data-w','300'));
     roundRect(g, 18, 62, h.m.length*5.6+22, 20, 10, '#FBE3D2');
     label(g, 18+(h.m.length*5.6+22)/2, 76, h.m, 8.3, 600, ALARM, 'middle');
   });
@@ -2339,7 +2391,7 @@ function drawCyoaCards(){
       .attr('tabindex',-1).attr('role','button')
       .attr('aria-label','Walk the funnel: '+c.short+' — '+c.mech)
       .style('cursor','pointer')
-      .attr('opacity', cyoaOpen && !on ? .45 : 1);
+      .attr('opacity', cyoaOpen && !on ? .62 : 1);
     padHit(card, x, y, w, h, 6);
     roundRect(card, x, y, w, h, 12, on ? '#212E36' : c.tint, on ? null : 'rgba(33,46,54,.14)', 1.2);
     label(card, x+14, y+(nar?23:30), c.short, nar?10.5:10, 700, on ? '#F8F6F1' : INK);
@@ -2423,8 +2475,8 @@ function drawCyoaPanel(){
   }
 }
 function setCyoa(id){
-  cyoaOpen = id;
-  if (id) cyoaSeen.add(id);
+  cyoaOpen = cyoaOpen === id ? null : id;
+  if (cyoaOpen) cyoaSeen.add(cyoaOpen);
   drawCyoaCards(); drawCyoaPanel(); applyTypeScale(); wireCyoa();
 }
 function wireCyoa(){
@@ -2434,9 +2486,9 @@ function wireCyoa(){
       if (ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); setCyoa(c.id); }
     });
   cyoaPanel.selectAll('g.cnext')
-    .on('click', (ev,c)=> setCyoa(c.id))
+    .on('click', (ev,c)=>{ cyoaOpen = null; setCyoa(c.id); })
     .on('keydown', function(ev,c){
-      if (ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); setCyoa(c.id); }
+      if (ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); cyoaOpen = null; setCyoa(c.id); }
     });
 }
 drawCyoaCards(); drawCyoaPanel(); wireCyoa();
@@ -2523,7 +2575,7 @@ function playWall(d){
   conBody.select('g.s3').transition('wall').duration(dur).delay(d==='shape'&&!REDUCE?160:0)
     .attr('opacity', d === 'shape' ? 1 : 0);
   // dim the chosen button, keep the other live
-  conBody.selectAll('g.wallbtn').attr('opacity', b => b === d ? .45 : 1);
+  conBody.selectAll('g.wallbtn').attr('opacity', b => b === d ? .7 : 1);
   const s5 = conBody.select('g.s5'), s6 = conBody.select('g.s6');
   if (wallSeen.size >= 2){
     s5.attr('opacity',0).style('pointer-events','none');
@@ -3219,14 +3271,25 @@ const sg3 = gSig.append('g').attr('opacity',0);
     roundRect(g, -195, 0, 390, 328, 16, '#FFFFFF', LINE, 1.3);
     label(g, -173, 34, c.name, 13.5, 700, INK);
     mono(g, -173, 58, 'RECENT SEARCHES', 7.4, MUTE);
-    c.q.forEach((q,i)=> label(g, -173, 82+i*22, q, 10, 400, '#3A4750').attr('class','sq'));
+    c.q.forEach((q,i)=>{
+      const ry = 68 + i*26;
+      const row = g.append('g').attr('class','sq');
+      roundRect(row, -173, ry, 346, 21, 10.5, '#F8F6F1', '#E9E5DC', 1);
+      row.append('circle').attr('cx',-160).attr('cy',ry+10.5).attr('r',4)
+        .attr('fill','none').attr('stroke',MUTE).attr('stroke-width',1.3);
+      row.append('path').attr('d','M '+(-157.4)+' '+(ry+13.6)+' l 3 3')
+        .attr('stroke',MUTE).attr('stroke-width',1.3).attr('stroke-linecap','round');
+      label(row, -148, ry+14.5, q, 9.3, 400, '#3A4750');
+    });
     g.append('path').attr('d','M -173 178 H 173').attr('stroke','#EFECE5').attr('stroke-width',1);
     mono(g, -173, 198, 'ON THE PHONE', 7.4, MUTE);
     let ax = -173;
-    c.apps.forEach(a=>{
-      const w = a.length*5.6*TK + 20;
+    c.apps.forEach((a,ai)=>{
+      const w = a.length*5.6*TK + 30;
       roundRect(g, ax, 208, w, 22, 11, c.tint);
-      label(g, ax+w/2, 208+14.5, a, 8.6, 600, INK, 'middle');
+      g.append('circle').attr('cx',ax+13).attr('cy',219).attr('r',3.6)
+        .attr('fill',['#E74D4E','#5FA8A0','#F37940'][ai%3]);
+      label(g, ax+w/2+5, 208+14.5, a, 8.6, 600, INK, 'middle');
       ax += w + 8;
     });
     label(g, -173, 258, c.eco, 9.3, 400, MUTE);
@@ -3591,9 +3654,13 @@ function render(key){
         .transition('rise').duration(360).delay((d,i)=>520+i*100).ease(d3.easeCubicOut)
         .attr('opacity',1);
     }
-    // the module opens itself: force one begins the walk
-    if (!forceOpen){
-      const t = setTimeout(()=>{ if (current==='forces' && !forceOpen) setForce('truth'); }, REDUCE ? 60 : 1450);
+    // an invitation, not an ambush: the first node pulses instead of opening
+    if (!forceOpen && !REDUCE){
+      const first = forceNodes.selectAll('g.ftile').filter((d,i)=>i===0).select('circle');
+      first.transition('pulse').duration(500).delay(1150).attr('r', 42)
+        .transition('pulse').duration(500).attr('r', 36)
+        .transition('pulse').duration(500).attr('r', 42)
+        .transition('pulse').duration(500).attr('r', 36);
     }
   }
 
