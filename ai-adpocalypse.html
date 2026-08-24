@@ -513,6 +513,7 @@ const SCENES = [
         <p>Then the negatives. A negative keyword list is a mundane efficiency tool, and it is also <strong>a filter on doubt</strong>: the advertiser chooses which questions it will not be present for. Someone searching for side effects is not a customer. They are excluded, by name.</p>` },
 
 { key:'mach9', frame:'con', h:'Fifteen Headlines, One Fig Leaf',
+  hint:'Pick the headline the machine leads with — the ad follows',
   body:`<p>The ad is written in fragments — fifteen headlines, four descriptions — and the machine assembles whichever combination performs. The advertiser never writes the whole message, only the parts. The strength meter grades diversity and relevance.</p>
         <p><strong>It does not grade truth.</strong> And there in the fine print sits the phrase doing the legal work: <em>for research use only</em>. That label has never made a product legal to put in a human body. It means the seller has read the same rules you have.</p>` },
 
@@ -540,7 +541,7 @@ const SCENES = [
   note:'All four funnels are illustrative composites of documented patterns; no real account or product is depicted.' },
 
 { key:'chamber', frame:'cham', h:'The Chamber Seals',
-  body:`<p>The chamber is not built out of belief. It is built out of dwell time. The recommender reads attention as satisfaction and serves more of the same — looksmaxxing forums, alternative ivermectin communities, eating-disorder groups that reinforce the disorder they gather around.</p>
+  body:`<p>The chamber is not built out of belief. It is built out of dwell time. The recommender reads attention as satisfaction and serves more of the same — looksmaxxing forums, alternative ivermectin communities, eating-disorder groups that reinforce the disorder they gather around. Even vaccine hesitancy now arrives dressed as an aesthetic — raw milk, essential oils, “natural immunity” — a lifestyle feed with no counter-content in sight.</p>
         <p>Inside, the content agrees with itself. Outside, the correction bounces off a wall it cannot see. And prolonged immersion does its own clinical damage: distressing content at algorithmic dose can produce psychological symptoms that masquerade as the very conditions the feed then sells cures for.</p>
         <p><strong>Act One had a negative-keyword list that excluded “side effects”. The feed has an organic twin: a chamber where the question never surfaces at all.</strong></p>`,
   src:`<b>Source:</b> <a href="https://doi.org/10.1093/jcmc/zmad048" target="_blank" rel="noopener">Lee &amp; Hancock — Social media mindsets, <em>J Comput-Mediat Commun</em> 2024</a> (how use patterns relate to psychological well-being; doi:10.1093/jcmc/zmad048).` },
@@ -1349,7 +1350,8 @@ function mAdPreview(g, x, y, w){
   label(g, x+21, y+43.5, 'M', 7.5, 700, '#FFFFFF', 'middle');
   label(g, x+34, y+38, 'Meridian Longevity', 9, 400, GURL);
   label(g, x+34, y+49, 'meridianlongevity.example', 8.2, 400, GSUB);
-  label(g, x+14, y+72, 'Clinical-Grade Recovery Protocols | Book a', 11, 400, GLINK);
+  const hd = RSA_HEADS[rsaPick];
+  label(g, x+14, y+72, hd.t + hd.tail, 11, 400, GLINK);
   label(g, x+14, y+87, 'Free Telehealth Consult Today', 11, 400, GLINK);
   label(g, x+14, y+105, 'Physician-guided recovery and longevity plans.', 8.8, 400, '#4d5156');
   label(g, x+14, y+117, 'Peptide protocols available. For research use only.', 8.8, 400, '#4d5156');
@@ -1420,8 +1422,8 @@ mach2: { crumb:'New campaign · review', step:'BLOCKED', head:'Policy review', r
        'Pharmacy and telehealth advertisers must be certified by LegitScript.']);
     // the reader makes the vendor's choice
     const ch = g.append('g').attr('class','s2');
-    [['appeal','Appeal — keep selling peptides'],
-     ['shape','Restructure as a telehealth clinic']].forEach((b,i)=>{
+    [['appeal', isNarrow() ? 'Appeal the ban' : 'Appeal — keep selling peptides'],
+     ['shape', isNarrow() ? 'Become the clinic' : 'Restructure as a telehealth clinic']].forEach((b,i)=>{
       const bx = CX0 + i*(CW*0.42+16), bw2 = CW*0.42;
       const btn = ch.append('g').attr('class','wallbtn').datum(b[0])
         .style('cursor','pointer');
@@ -1586,12 +1588,26 @@ mach8: { crumb:'New campaign · keywords', step:'STEP 5 OF 6', head:'Keywords', 
 
 mach9: { crumb:'New campaign · ads', step:'STEP 5 OF 6', head:'Create your ad', rail:4,
   draw(g){
+    // the reader picks the lead headline; the preview follows
+
     const lw = CW*0.5;
     let y = CY0 - 14;
     y = mField(g, CX0, y, lw, 'Final URL', 'meridianlongevity.example');
     y = mField(g, CX0, y-8, lw, 'Display path', '/recovery-consult');
-    mono(g, CX0, y-2, 'HEADLINES — 13 OF 15', 7.2, GSUB);
-    y = mSlots(g, y+6, CX0, lw, ['Headline 1','Headline 2','Headline 3'], 3, ['24/30','27/30','19/30']);
+    mono(g, CX0, y-2, 'HEADLINES — PICK WHAT THE MACHINE LEADS WITH', 7.2, GSUB);
+    RSA_HEADS.forEach((hd,i)=>{
+      const sy = y + 6 + i*(36+8);
+      const row = g.append('g').attr('class','rsapick').datum(i).style('cursor','pointer');
+      padHit(row, CX0, sy, lw, 36, 8);
+      roundRect(row, CX0, sy, lw, 36, 5, i===rsaPick ? '#e8f0fe' : '#FFFFFF',
+                i===rsaPick ? GBLUE : GBORD, i===rsaPick ? 1.6 : 1.05).attr('class','rsabox');
+      const lw2 = 9*5.1*TK + 8;
+      row.append('rect').attr('x',CX0+10).attr('y',sy-4).attr('width',lw2).attr('height',9).attr('fill', i===rsaPick ? '#e8f0fe' : '#FFFFFF');
+      label(row, CX0+14, sy+3, 'Headline '+(i+1), 7.6, 400, GSUB);
+      label(row, CX0+14, sy+24, hd.t, 9.3, i===rsaPick ? 600 : 400, i===rsaPick ? GBLUED : GTEXT);
+      label(row, CX0+lw-10, sy+24, hd.c, 8, 400, GSUB, 'end');
+    });
+    y = y + 6 + 3*(36+8) + 8;
     mono(g, CX0, y+2, 'DESCRIPTIONS — 4 OF 4', 7.2, GSUB);
     mSlots(g, y+10, CX0, lw, ['Description 1'], 1, ['86/90']);
     const px = CX0 + CW*0.56;
@@ -1608,7 +1624,7 @@ mach10: { crumb:'All campaigns · Meridian — Recovery', step:'LIVE', head:'One
     roundRect(q, CX0, y, CW*0.62, 32, 16, GSURF, GBORD, 1.05);
     IC.search(q, CX0+18, y+16, GSUB);
     label(q, CX0+32, y+21, '“why won’t my shoulder heal”', 10.3, 500, GTEXT);
-    mono(q, CX0+CW*0.62+14, y+21, '~200 MS', 8, GERR);
+    mono(q, CX0+CW*0.62+14, y+21, '0 MS', 8, GERR).attr('class','msc');
     ctlAuction(g, y+56);
   } },
 
@@ -1917,12 +1933,22 @@ const WSIDE = 350, PSIDE = Math.round(WSIDE*Math.sqrt(SCALE_P/SCALE_W)); // 180
     .attr('stroke',INK).attr('stroke-width',1.2);
   // context ticks: the other mega-industries wellness now exceeds
   const CTX = [['sports','$2.7T'],['tourism','$5.0T'],['green economy','$5.1T'],['IT','$5.3T']];
+  const CTXV = [2.7, 5.0, 5.1, 5.3];
   CTX.forEach((c,i)=>{
     const cx2 = 190 + i*172;
     label(gScale, cx2, baseY+34, c[0], 9.5, 400, MUTE).attr('class','ctxr');
     label(gScale, cx2, baseY+52, c[1], 11, 700, '#8A8474').attr('class','ctxr');
+    // drawn to the same scale as the squares: area per $T
+    gScale.append('rect').attr('class','ctxr')
+      .attr('x',cx2).attr('y',baseY+60).attr('width',120*CTXV[i]/SCALE_W).attr('height',7)
+      .attr('rx',3.5).attr('fill','#CFC9BC');
+    gScale.append('rect').attr('class','ctxr')
+      .attr('x',cx2).attr('y',baseY+60).attr('width',120).attr('height',7)
+      .attr('rx',3.5).attr('fill','none').attr('stroke','#DCD5C6').attr('stroke-width',1);
   });
-  label(gScale, 500, baseY+86, 'Wellness now out-earns every one of them — with no gate but marketing.', 11, 700, INK, 'middle')
+  label(gScale, 190, baseY+84, 'bars: share of the wellness economy’s size', 8, 400, '#B9B2A4')
+    .attr('class','ctxr');
+  label(gScale, 500, baseY+104, 'Wellness now out-earns every one of them — with no gate but marketing.', 11, 700, INK, 'middle')
     .attr('class','ctxr');
   // where it is headed: the dashed outline of 2029
   const GSIDE = Math.round(WSIDE*Math.sqrt(9.8/SCALE_W));   // ≈420
@@ -2215,6 +2241,28 @@ function chamLoop(on){
   });
 }
 
+/* ---- mach9's headlines: the reader picks, the ad follows ---- */
+const RSA_HEADS = [
+  { t:'Clinical-Grade Recovery Protocols', c:'24/30', tail:' | Book a' },
+  { t:'Feel 25 Again — Doctors Agree', c:'27/30', tail:' | Book a' },
+  { t:'The Recovery Secret Gyms Won’t Share', c:'19/30', tail:' | Book' }
+];
+let rsaPick = 0;
+function wireRsa(){
+  conBody.selectAll('g.rsapick')
+    .attr('tabindex',0).attr('role','button')
+    .attr('aria-pressed', d => d === rsaPick ? 'true' : 'false')
+    .attr('aria-label', d => 'Lead with headline: ' + RSA_HEADS[d].t)
+    .on('click.rsa keydown.rsa', function(ev,d){
+      if (ev.type==='keydown' && ev.key!=='Enter' && ev.key!==' ') return;
+      ev.preventDefault();
+      if (d === rsaPick) return;
+      rsaPick = d;
+      hideTip();
+      conKey = null; renderConsole('mach9');
+    });
+}
+
 /* ---- mach6's audience, assembled by the reader ---- */
 const SEG_TERMS = [
   { t:'bpc-157 dosage',      v:121000, w:'A compound name, spelled right. This is someone weeks into research, not a browser.' },
@@ -2335,6 +2383,7 @@ function renderConsole(key){
   applyTypeScale();
   wireChips(conBody);
   if (key === 'mach6'){ segOn = new Set(); drawSegChips(); }
+  if (key === 'mach9'){ wireRsa(); }
   if (key === 'mach2'){
     if (REDUCE) conBody.selectAll('g.s2').attr('opacity',1);
     conBody.selectAll('g.wallbtn')
@@ -2358,6 +2407,7 @@ function renderConsole(key){
     conBody.selectAll('rect.rankbar').attr('width', function(){ return Math.max(8, this.__w || 0); });
     conBody.selectAll('rect.effbar').attr('width', function(){ return this.__w; });
     conBody.selectAll('g.winner').attr('opacity',1);
+    conBody.selectAll('text.msc').text('214 MS');
     return;
   }
   // the screen assembles, then the chosen control commits
@@ -2413,6 +2463,12 @@ function renderConsole(key){
   });
   conBody.selectAll('g.winner')
     .transition('commit').duration(320).delay(1500).attr('opacity',1);
+  // the auction clock runs while the bars fill
+  conBody.selectAll('text.msc').each(function(){
+    const t = d3.select(this);
+    t.transition('commit').duration(1400).delay(500).ease(d3.easeLinear)
+      .tween('t', () => k => t.text(Math.round(214*k) + ' MS'));
+  });
 }
 
 
@@ -3037,7 +3093,14 @@ function wireChips(g){
   bindTip(chips, d => '<b>'+d.t+'</b><br>'+d.w, d => d.t + '. ' + d.w);
 }
 function wireLedger(){
-  bindTip(ledgBody.selectAll('g.lrow'), d => '<b>'+d.t+'</b><br>'+d.w, d => d.t + '. ' + d.w);
+  const rows = ledgBody.selectAll('g.lrow');
+  bindTip(rows, d => '<b>'+d.t+'</b><br>'+d.w, d => d.t + '. ' + d.w);
+  rows.on('mouseenter.hl focus.hl', function(){
+      d3.select(this).select('rect').attr('stroke','#B9B2A4').attr('stroke-width',1.5);
+    })
+    .on('mouseleave.hl blur.hl', function(){
+      d3.select(this).select('rect').attr('stroke','#EFECE5').attr('stroke-width',1);
+    });
 }
 bindTip(gWheel.selectAll('g.stn'), d => '<b>'+d.t+'</b><br>'+d.d, d => d.t + '. ' + d.d);
 
