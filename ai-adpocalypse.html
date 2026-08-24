@@ -361,7 +361,7 @@ h1{
 
 <section class="scroller" id="scroller">
   <div class="graphic"><svg id="viz" preserveAspectRatio="xMidYMid meet" role="group"
-    aria-label="Animated chart. A late-night health search is answered by bought results; an advertising console is then walked screen by screen — objective, policy wall, bidding, location, audience shelf, custom segments built from past searches, demographics, keywords, ad builder and auction. The scene then moves to a phone feed where synthetic creators are specified and manufactured on device farms, and a testing flywheel amplifies winners. A ledger compares the machine with public health across six dimensions. The final movement re-runs the same console for public health: grant inventory, search interception, finding unreached populations, a credible-messenger loop, a capability ladder and a register of what it would take."></svg></div>
+    aria-label="Animated chart. A late-night health search is answered by bought results; an advertising console is then walked screen by screen — objective, policy wall, bidding, location, audience shelf, custom segments built from past searches, demographics, keywords, ad builder and auction. The scene then moves to a phone feed where synthetic creators are specified and manufactured on device farms, and a testing flywheel amplifies winners. A ledger compares the machine with public health across six dimensions. The final movement re-runs the same console for public health: grant inventory, search interception, finding unreached populations, two behavioural signatures a demographic label cannot tell apart, one evidence base routed four ways by barrier, the psychological-targeting field evidence, a credible-messenger loop, a capability ladder and a register of what it would take."></svg></div>
   <div class="scroll-scenes" id="scenes"></div>
 </section>
 
@@ -440,13 +440,24 @@ const SCENES = [
 
 { key:'results', frame:'dark', h:'The Auction Answers First',
   body:`<p>The first answers are bought. In 2026 what is often being sold into this exact moment is a peptide — compounds like BPC-157 and TB-500, which an FDA advisory committee voted <strong>8 to 6</strong> to recommend for compounding in July 2026, overruling the agency’s own scientists, who had found the safety and efficacy evidence wanting.</p>
-        <p>A recommendation is not an approval. The agency had not acted. The market did not wait.</p>`,
+        <p>Beside the peptides sit the supplement sellers — compounds with no validation requirement at all, auctioned into the same moment of fear. A recommendation is not an approval. The agency had not acted. The market did not wait.</p>`,
   src:`<b>Sources:</b> FDA Pharmacy Compounding Advisory Committee, 23–24 July 2026 (six of seven peptides recommended for the 503A Bulks List); AJMC, CNN and Medscape coverage of the vote and of agency staff opposition.` },
 
 { key:'thesis', frame:'dark', h:'The AI Adpocalypse',
   body:`<p>Precision persuasion is now cheap, fast, and pointed at people at their most frightened. Health promotion is slower, poorer, and aimed at nobody in particular.</p>
         <p>What follows is the machine, end to end. First the advertising console, screen by screen, as an advertising manager actually meets it. Then the synthetic-creator layer that launders the same pitch into something that looks like a friend’s advice.</p>
         <p><strong>Then we turn it around.</strong></p>` },
+
+{ key:'forces', frame:'forc', h:'We Are Losing the Algorithmic War',
+  body:`<p>The 20th-century model of public health assumed a press release was communication. In 2026, information consumption is governed by recommendation engines, and they optimise for exactly one thing: whether you keep watching.</p>
+        <p>Five forces follow from that single metric — and every one of them favours the seller over the clinician.</p>`,
+  hint:'Click a force to open its mechanism',
+  note:'Structural claims, argued scene by scene through the rest of the piece; framing follows practitioner briefings on algorithmic health misinformation.' },
+
+{ key:'cycle', frame:'cyc', h:'Anatomy of the Cycle',
+  body:`<p>Misinformation stopped being organic confusion. It is an optimised commercial pipeline with four steps.</p>
+        <p><strong>Seeding:</strong> an influencer claims a common symptom — fatigue — is a hidden danger the establishment ignores. <strong>Entrenchment:</strong> the algorithm reads dwell time as satisfaction and feeds more, walling the chamber. <strong>High-intent search:</strong> the viewer leaves the feed and types the compound into Google — where Act Two’s machine is already waiting. <strong>The correction:</strong> the agency publishes a fact-check at step four, where nobody compromised at step one will ever see it.</p>
+        <p><strong>The intervention arrives three steps too late. Every time.</strong></p>` },
 
 /* ---------- ACT I — THE MACHINE ---------- */
 
@@ -502,6 +513,23 @@ const SCENES = [
         <p>There are well over a hundred thousand Instagram posts and hundreds of millions of TikTok views on these compounds, and the line between drug, supplement and wellness content has been deliberately blurred. Almost none of it is labelled as marketing.</p>
         <p><strong>Because increasingly it is not marketing. It is manufacturing.</strong></p>` },
 
+{ key:'hooks', frame:'hook', h:'The Hook Library',
+  body:`<p>The reels run on a small library of hooks, reused for decades because they work: <em>authority theft</em> — “Secret Stanford doctors use this one supplement.” <em>The suppression conspiracy</em> — “Big Pharma is hiding this.” <em>Class envy</em> — “The wealthy keep this one remedy to themselves.” <em>Borrowed antiquity</em> — “Ancient healers used this root for 3,000 years.”</p>
+        <p>Each does the same three jobs in under a second: it interrupts the scroll, borrows credibility the seller never earned, and reframes the absence of evidence as proof of a cover-up.</p>`,
+  hint:'Hover a hook for why it works' },
+
+{ key:'cyoa', frame:'cyoa', h:'Choose Your Feed',
+  body:`<p>Pick the reel you would actually stop on. Most people are honest about exactly one of these.</p>
+        <p>Then walk the funnel that follows it, beat by beat — the hook, the retention mechanics, the manufactured proof, the countdown, and what is actually in the bottle when it arrives.</p>
+        <p><strong>The funnel is identical every time. Only the costume changes.</strong></p>`,
+  hint:'Click a reel to walk its funnel',
+  note:'All four funnels are illustrative composites of documented patterns; no real account or product is depicted.' },
+
+{ key:'chamber', frame:'cham', h:'The Chamber Seals',
+  body:`<p>The chamber is not built out of belief. It is built out of dwell time. The recommender reads attention as satisfaction and serves more of the same — looksmaxxing forums, alternative ivermectin communities, eating-disorder groups that reinforce the disorder they gather around.</p>
+        <p>Inside, the content agrees with itself. Outside, the correction bounces off a wall it cannot see. And prolonged immersion does its own clinical damage: distressing content at algorithmic dose can produce psychological symptoms that masquerade as the very conditions the feed then sells cures for.</p>
+        <p><strong>Act One had a negative-keyword list that excluded “side effects”. The feed has an organic twin: a chamber where the question never surfaces at all.</strong></p>` },
+
 { key:'feed2', frame:'feed', h:'Build-a-Creator',
   body:`<p>You do not hire a creator. You specify one. The tooling markets exactly this — hyper-specific synthetic creators for any niche, a <em>62-year-old mom in Phoenix</em>, a <em>Gen-Z skater in Atlanta</em> — configured like campaign settings, because that is what they are.</p>
         <p>Parallel platforms turn a script and a chosen synthetic performer into a testimonial video in about two minutes, from libraries of three hundred-plus digital actors, from around a hundred and ten dollars a month.</p>
@@ -550,9 +578,39 @@ const SCENES = [
         <p><strong>Meeting people at the search works — when somebody bothers to buy the placement.</strong></p>`,
   src:`<b>Sources:</b> Belgian market analysis of gray-market peptide content and contamination; randomised controlled trial of suicide-prevention search advertising; 988 Lifeline outcome study, July 2022 – December 2024.` },
 
+{ key:'preroll', frame:'con', h:'Buy the Slot in Front of the Lie',
+  body:`<p>You do not need to ban the channel. Placement targeting lets a health department compile the specific alternative-health channels seeding hesitancy and unregulated compounds — and then buy the advertising inventory that runs directly in front of their videos.</p>
+        <p>Peer-reviewed data plays as the pre-roll on the pseudo-science video itself: a forced off-ramp at the exact moment of exposure, on the exact audience, without touching the video.</p>
+        <p>One caution the evidence insists on: the creative must be built for the barrier — the routes from the scene before — because a generic establishment spot in that slot does not persuade. It entrenches.</p>`,
+  src:`<b>Sources:</b> Google Ads placement targeting (specific channels and videos as ad inventory); reactance findings in health-communication research.` },
+
+{ key:'subsidy', frame:'con', h:'The Auction Subsidises Truth',
+  body:`<p>Here is the mechanism nobody expects: <strong>the auction is tilted toward honesty.</strong> Ad Rank multiplies bid by quality — and quality scores relevance, expected click-through, and landing-page trustworthiness.</p>
+        <p>A gray-market seller with an untrustworthy page carries a quality score near 2 and must bid around $25 a click to reach a competitive rank. A .gov page with exact-match clinical data scores near 10 and reaches the same rank at $5. <strong>Relevance operates as a five-to-one financial subsidy for the credible actor.</strong></p>
+        <p>And the downstream returns compound: high-intent search interception converts at several times the rate of contextual placement, which itself beats broad display by an order of magnitude. Public health has been buying the most expensive, least effective inventory — while the cheapest, most effective seat was reserved for it by the auction’s own arithmetic.</p>`,
+  note:'The quality-score arithmetic illustrates the documented Ad Rank mechanism; the action-rate comparison reflects practitioner benchmarks, not trial results — both are stamped, not laundered.' },
+
 { key:'good3', frame:'con', h:'Find the Unreached',
   body:`<p>Turned around, the targeting grid is an epidemiological instrument. The same dimensions that let a seller find the top ten per cent of household income let a health department find the bottom fifty in a county with one clinic and no Spanish-language outreach.</p>
         <p>Public health already holds the denominator data the advertisers are guessing at. And the previous piece’s argument still runs underneath this one: <strong>the segment tells you where to buy the impression; belief tells you what to put in it.</strong></p>` },
+
+{ key:'sig1', frame:'sig', h:'What a Signature Actually Looks Like',
+  body:`<p>One population’s digital signature: repeated searches about longevity, metabolic health, biomarkers, supplements and healthspan; fitness and tracking apps; optimization-oriented sites; a particular YouTube and podcast ecosystem. Another population shares the low institutional trust but none of the resources: few clinician contacts, heavy reliance on local information networks, and relentlessly practical searches — cost, availability, what is near me.</p>
+        <p>Conventional demographic segmentation places these two groups far apart. A single label like <em>“distrustful”</em> collapses them into one.</p>
+        <p><strong>Both are wrong about the only thing that matters: the barrier each group actually faces.</strong></p>`,
+  note:'Signature examples are illustrative composites; the segmentation argument follows the companion piece.' },
+
+{ key:'sig2', frame:'sig', h:'Adapt the Message to the Barrier',
+  body:`<p>The evidence never changes. The route by which it becomes usable does.</p>
+        <p>An <strong>autonomy-oriented</strong> audience gets the clinician-reviewed presentation: absolute benefits, absolute harms, uncertainty, and the choice left with them. A <strong>clinician-trusting</strong> audience gets the same evidence delivered by a physician. An audience <strong>overwhelmed</strong> by contradictory claims gets explicit adjudication — what is known, what remains uncertain, and why apparently conflicting statements differ. A <strong>low-access</strong> audience gets the recommendation coupled to a local service, its cost, its eligibility rules, and a direct route to care.</p>
+        <p><strong>Four messages. One truth.</strong> And the converse is the caution: a generic establishment spot delivered into a wellness-identity audience triggers reactance — it entrenches the belief, because it looks exactly like the thing that audience was conditioned to fear.</p>`,
+  hint:'Hover a route to read how it lands' },
+
+{ key:'sig3', frame:'sig', h:'This Is Not a Hypothesis',
+  body:`<p>Psychologically differentiated communication has already been tested at commercial scale. In three field experiments reaching more than <strong>3.5 million people</strong>, Matz and colleagues found that advertisements matched to psychological characteristics produced up to <strong>40% more clicks</strong> and <strong>50% more purchases</strong> than mismatched or unpersonalized alternatives.</p>
+        <p>The commercial question was purchases. The public-health question is more consequential: whether the same capacity to locate behaviourally coherent audiences can improve comprehension, appropriate care-seeking, correction of false beliefs, and evidence-consistent decisions.</p>
+        <p><strong>The machinery is proven. Only the objective is untested.</strong></p>`,
+  src:`<b>Source:</b> Matz, Kosinski, Nave &amp; Stillwell, <em>PNAS</em> 2017 — psychological targeting as an effective approach to digital mass persuasion; three field experiments, N &gt; 3.5 million.` },
 
 { key:'good4', frame:'wheel', h:'A Credible-Messenger Flywheel',
   body:`<p>The same loop, with honest metrics. And here the piece has to be careful, because the evidence is genuinely mixed.</p>
@@ -674,6 +732,12 @@ const FRAMES = {
   wheel:'150 96 700 540',
   ledg: '80 60 840 590',
   tier: '60 60 880 600',
+  sig:  '60 30 880 620',
+  forc: '60 24 880 630',
+  cyc:  '50 40 900 600',
+  hook: '60 30 880 620',
+  cyoa: '50 20 900 650',
+  cham: '110 30 780 620',
   meth: '120 90 760 520'
 };
 const FRAMES_MOBILE = {
@@ -684,6 +748,12 @@ const FRAMES_MOBILE = {
   wheel:'175 110 650 560',
   ledg: '90 96 820 700',
   tier: '150 70 700 620',
+  sig:  '235 10 530 830',
+  forc: '230 10 540 800',
+  cyc:  '235 10 530 820',
+  hook: '240 20 520 780',
+  cyoa: '230 5 540 840',
+  cham: '210 20 580 700',
   meth: '170 100 660 540'
 };
 function isNarrow(){ return innerWidth <= 960; }
@@ -701,12 +771,18 @@ const gWheel = svg.append('g').attr('opacity',0);   // the flywheel(s)
 const gDash  = svg.append('g').attr('opacity',0);   // what the loop measures
 const gLedg  = svg.append('g').attr('opacity',0);   // the ledgers
 const gTier  = svg.append('g').attr('opacity',0);   // the capability ladder
+const gSig   = svg.append('g').attr('opacity',0);   // signatures, routes, the Matz evidence
+const gForce = svg.append('g').attr('opacity',0);   // the five forces
+const gCyc   = svg.append('g').attr('opacity',0);   // the misinformation cycle
+const gHook  = svg.append('g').attr('opacity',0);   // the hook library
+const gCyoa  = svg.append('g').attr('opacity',0);   // choose-your-feed funnels
+const gCham  = svg.append('g').attr('opacity',0);   // the echo chamber
 const gMeth  = svg.append('g').attr('opacity',0);   // the register
 const gTitle = svg.append('g').attr('opacity',0);
 const gHit   = svg.append('g');
 const gStamp = svg.append('g').attr('opacity',0).attr('pointer-events','none');
 
-[gDark,gCon,gFeed,gRack,gWheel,gDash,gLedg,gTier,gMeth,gTitle,gStamp]
+[gDark,gCon,gFeed,gRack,gWheel,gDash,gLedg,gTier,gMeth,gSig,gForce,gCyc,gHook,gCyoa,gCham,gTitle,gStamp]
   .forEach(g => g.attr('aria-hidden','true'));
 
 const stampText = gStamp.append('text')
@@ -857,7 +933,7 @@ const SERP_Y = PH.y+150;
 const AD_ROWS = [
   { t:'Clinical-Grade Recovery Peptides', d:'meridian-longevity · Free consult' },
   { t:'BPC-157 — Research Grade, 99% Pure', d:'apex-research-labs · Ships today' },
-  { t:'Heal Faster: Peptide Protocols', d:'vitalis-rx · Telehealth visit $29' },
+  { t:'Doctors Won’t Say It — Natural GLP-1', d:'herbal-metabolic · 60% off today' },
   { t:'Shoulder Not Healing? Start Here', d:'restore-clinic · Book online' }
 ];
 const adRow = serpG.selectAll('g.ad').data(AD_ROWS).join('g').attr('class','ad')
@@ -897,230 +973,360 @@ label(fixG, SCR.x+26, SERP_Y+56, 'been found with 10–90% less than labelled.',
    Nothing here goes beyond what the public campaign wizard shows.
    ===================================================================== */
 
-/* On a phone the console is not cropped — it becomes a narrower, taller
-   window, and every control below sizes itself from CW. */
-let CON, CX0, CY0, CW;
+/* =====================================================================
+   THE CONSOLE — a faithful recreation of the real campaign wizard.
+   Material grammar throughout: white surfaces, #dadce0 hairlines, the blue,
+   outlined fields, a left stepper rail, rounded-full primary buttons.
+   No logo is reproduced; the stamp and the register say the rest.
+   ===================================================================== */
+
+const GBLUE='#1a73e8', GBLUED='#174ea6', GTEXT='#202124', GSUB='#5f6368',
+      GBORD='#dadce0', GSURF='#f8f9fa', GERR='#d93025', GERRBG='#fce8e6',
+      GGRN='#188038', GLINK='#1a0dab', GURL='#202124', GCHIPBG='#e8f0fe';
+
+let CON, CX0, CY0, CW, RAIL;
 function conMetrics(){
-  CON = isNarrow() ? { x:190, y:110, w:620, h:600 }
-                   : { x:90,  y:120, w:820, h:500 };
-  CX0 = CON.x + 34;
-  CY0 = CON.y + 106;
-  CW  = CON.w - 68;
+  if (isNarrow()){
+    CON = { x:186, y:104, w:628, h:608 };
+    RAIL = 0;
+  } else {
+    CON = { x:64, y:98, w:872, h:534 };
+    RAIL = 168;
+  }
+  CX0 = CON.x + RAIL + 28;
+  CY0 = CON.y + 132;
+  CW  = CON.w - RAIL - 56;
 }
 conMetrics();
 
+const WIZ_STEPS = ['Objective','Campaign type','Bidding','Settings','Keywords & ads','Review'];
+
 const conFrame = gCon.append('g');
 const conBody  = gCon.append('g');     // redrawn per screen
-let conShell, conBar, conUrlPill, conUrl, conAcct, conHead, conStep;
+let conShell, conRailG, conHead, conStep, conAcct, conCrumb;
 function drawConFrame(){
   conFrame.selectAll('*').remove();
-  conShell = roundRect(conFrame, CON.x, CON.y, CON.w, CON.h, 16, '#FFFFFF', LINE, 1.4);
-  conBar = conFrame.append('g');
-  conBar.append('path').attr('d','M '+CON.x+' '+(CON.y+38)+' H '+(CON.x+CON.w))
-    .attr('stroke',LINE).attr('stroke-width',1.2);
-  [0,1,2].forEach(i=>{
-    conBar.append('circle').attr('cx',CON.x+24+i*15).attr('cy',CON.y+19).attr('r',4.5)
-      .attr('fill','#E7E2D8');
-  });
-  const pillW = Math.min(300, CW*0.52);
-  conUrlPill = roundRect(conBar, CON.x+80, CON.y+8, pillW, 22, 11, '#F3F0E9');
-  conUrl = mono(conBar, CON.x+94, CON.y+23, '', 8, MUTE);
-  conAcct = mono(conBar, CON.x+CON.w-24, CON.y+23, '', 8, MUTE, 'end');
-  conHead = label(conFrame, CX0, CON.y+70, '', 14, 700, INK);
-  conStep = mono(conFrame, CON.x+CON.w-34, CON.y+70, '', 8, ALARM, 'end');
+  // the sheet
+  conShell = roundRect(conFrame, CON.x, CON.y, CON.w, CON.h, 10, '#FFFFFF', GBORD, 1.2);
+  // app bar
+  conFrame.append('path').attr('d','M '+CON.x+' '+(CON.y+44)+' H '+(CON.x+CON.w))
+    .attr('stroke',GBORD).attr('stroke-width',1);
+  // close ✕ + breadcrumb
+  conFrame.append('path')
+    .attr('d','M '+(CON.x+22)+' '+(CON.y+16)+' l 12 12 M '+(CON.x+34)+' '+(CON.y+16)+' l -12 12')
+    .attr('stroke',GSUB).attr('stroke-width',1.8).attr('stroke-linecap','round');
+  conCrumb = label(conFrame, CON.x+52, CON.y+28, 'New campaign', 11.5, 500, GTEXT);
+  // right cluster: help · bell · avatar
+  const rx = CON.x + CON.w;
+  conFrame.append('circle').attr('cx',rx-118).attr('cy',CON.y+22).attr('r',8.5)
+    .attr('fill','none').attr('stroke',GSUB).attr('stroke-width',1.4);
+  label(conFrame, rx-118, CON.y+26, '?', 9.5, 600, GSUB, 'middle');
+  conFrame.append('path')
+    .attr('d','M '+(rx-84)+' '+(CON.y+27)+' h 12 l -1.6 -3 v -5 a 4.4 4.4 0 0 0 -8.8 0 v 5 Z')
+    .attr('fill','none').attr('stroke',GSUB).attr('stroke-width',1.3).attr('stroke-linejoin','round');
+  const avatarG = conFrame.append('g');
+  avatarG.append('circle').attr('class','avatar').attr('cx',rx-40).attr('cy',CON.y+22).attr('r',11);
+  conAcct = label(avatarG, rx-40, CON.y+26.5, '', 10, 600, '#FFFFFF', 'middle');
+  // title row
+  conHead = label(conFrame, CX0 - (RAIL ? 0 : 2), CON.y+78, '', 15.5, 500, GTEXT);
+  conStep = mono(conFrame, rx-28, CON.y+78, '', 7.5, GERR, 'end');
+  // stepper rail (desktop only)
+  conRailG = conFrame.append('g');
+  if (RAIL){
+    conFrame.append('path')
+      .attr('d','M '+(CON.x+RAIL)+' '+(CON.y+44)+' V '+(CON.y+CON.h))
+      .attr('stroke',GBORD).attr('stroke-width',1);
+  }
 }
 drawConFrame();
 
-/* ---- control primitives: each draws at y and returns the next y ---- */
-
-function ctlCards(g, y, items, sel, tint){
-  const n = items.length, gap = 12;
-  const w = Math.min(180, (CW - gap*(n-1)) / n), h = 62;
-  items.forEach((it,i)=>{
-    const x = CX0 + i*(w+gap);
-    const on = i === sel;
-    const card = g.append('g').attr('class', on ? 'sel' : 'opt');
-    const r = roundRect(card, x, y, w, h, 12, on ? (tint||'#FBE3D2') : '#F7F5F0',
-                        on ? (tint?TEAL_D:ALARM) : '#EAE6DD', on ? 1.8 : 1.2);
-    if (on) r.attr('data-sel','1');
-    card.append('circle').attr('cx',x+18).attr('cy',y+20).attr('r',7)
-      .attr('fill','none').attr('stroke', on ? (tint?TEAL_D:ALARM) : '#C9C3B6').attr('stroke-width',1.6);
-    if (on) card.append('circle').attr('cx',x+18).attr('cy',y+20).attr('r',3.6)
-      .attr('fill', tint?TEAL_D:ALARM).attr('class','dot');
-    label(card, x+32, y+24, it.t || it, 10.5, on?700:400, on?INK:'#55606A');
-    if (it.d) label(card, x+18, y+44, it.d, 9, 400, MUTE);
+function drawRail(active, live){
+  conRailG.selectAll('*').remove();
+  if (!RAIL) return;
+  const x = CON.x + 26, y0 = CON.y + 92, dy = 62;
+  WIZ_STEPS.forEach((st,i)=>{
+    const y = y0 + i*dy;
+    const done = live || i < active;
+    const now = !live && i === active;
+    if (i < WIZ_STEPS.length-1){
+      conRailG.append('path').attr('d','M '+(x+11)+' '+(y+13)+' V '+(y+dy-13))
+        .attr('stroke', done ? GBLUE : GBORD).attr('stroke-width',1.6);
+    }
+    const c = conRailG.append('circle').attr('cx',x+11).attr('cy',y).attr('r',11)
+      .attr('fill', done || now ? GBLUE : '#FFFFFF')
+      .attr('stroke', done || now ? GBLUE : GBORD).attr('stroke-width',1.6);
+    if (done){
+      conRailG.append('path')
+        .attr('d','M '+(x+6)+' '+y+' l 3.6 3.8 l 6.4 -7')
+        .attr('stroke','#FFFFFF').attr('stroke-width',2).attr('fill','none')
+        .attr('stroke-linecap','round').attr('stroke-linejoin','round');
+    } else {
+      label(conRailG, x+11, y+4, String(i+1), 9.5, 600, now ? '#FFFFFF' : GSUB, 'middle');
+    }
+    label(conRailG, x+34, y+4, st, 10.5, now ? 600 : 400, now ? GTEXT : GSUB);
   });
-  return y + h + 20;
 }
 
-const FULL = f => isNarrow() ? 1 : f;   // narrow screens have no margin to give
-function ctlRadio(g, y, items, sel, tint){
-  const h = 30;
-  items.forEach((it,i)=>{
-    const on = i === sel;
-    const row = g.append('g');
-    if (on) roundRect(row, CX0-8, y+i*h-9, CW*FULL(0.62), h-4, 8, tint?'#E7F2F1':'#FBE3D2');
-    row.append('circle').attr('cx',CX0+8).attr('cy',y+i*h).attr('r',6.5)
-      .attr('fill','none').attr('stroke', on ? (tint?TEAL_D:ALARM) : '#C9C3B6').attr('stroke-width',1.5);
-    if (on) row.append('circle').attr('cx',CX0+8).attr('cy',y+i*h).attr('r',3.2).attr('fill',tint?TEAL_D:ALARM);
-    label(row, CX0+24, y+i*h+4, it.t||it, 10.5, on?700:400, on?INK:'#55606A');
-    if (it.d) label(row, CX0+24+ (it.t||it).length*6.2 + 14, y+i*h+4, it.d, 9.5, 400, MUTE);
-  });
-  return y + items.length*h + 16;
-}
+/* ---- Material primitives ------------------------------------------- */
 
-function ctlChips(g, y, items, opts){
+function mCard(g, x, y, w, h, elev){
+  const r = roundRect(g, x, y, w, h, 8, '#FFFFFF', GBORD, 1.1);
+  if (elev) r.attr('filter','drop-shadow(0 4px 14px rgba(32,33,36,.18))');
+  return r;
+}
+function mRadio(g, x, y, on){
+  g.append('circle').attr('cx',x).attr('cy',y).attr('r',8)
+    .attr('fill','#FFFFFF').attr('stroke', on ? GBLUE : GSUB).attr('stroke-width',1.8);
+  if (on) g.append('circle').attr('class','dot').attr('cx',x).attr('cy',y).attr('r',4.4).attr('fill',GBLUE);
+}
+function mCheck(g, x, y, state){ // 1 on · 0 off · 2 disabled
+  roundRect(g, x, y, 15, 15, 2.5,
+    state===1 ? GBLUE : '#FFFFFF',
+    state===1 ? GBLUE : (state===2 ? GBORD : GSUB), 1.6);
+  if (state===1) g.append('path')
+    .attr('d','M '+(x+3.4)+' '+(y+7.6)+' l 3.2 3.4 l 5.4 -6.6')
+    .attr('stroke','#FFFFFF').attr('stroke-width',1.9).attr('fill','none')
+    .attr('stroke-linecap','round').attr('stroke-linejoin','round');
+}
+function mBtn(g, x, y, txt, primary){
+  const w = txt.length*6.4*TK + 34;
+  roundRect(g, x, y, w, 30, 15, primary ? GBLUE : '#FFFFFF', primary ? null : GBORD, 1.1);
+  label(g, x+w/2, y+19.5, txt, 10.5, 600, primary ? '#FFFFFF' : GBLUE, 'middle');
+  return w;
+}
+function mField(g, x, y, w, lab, val, opts){
   opts = opts || {};
-  const pad = 10*TK, gap = 9, h = 20 + 8*TK;
-  let x = CX0, row = 0;
-  const out = [];
-  items.forEach((it,i)=>{
-    const t = it.t || it;
-    const w = Math.max(58, t.length*5.6*TK + pad*2);
-    if (x + w > CX0 + CW - 4){ x = CX0; row++; }
-    const cy = y + row*(h+gap);
-    const cg = g.append('g').attr('class','chip').datum(it);
-    roundRect(cg, x, cy, w, h, h/2, opts.tint || '#F7EFE7',
-              opts.stroke || ALARM, 1.3).attr('stroke-dasharray', opts.dashed ? '5 4' : null);
-    label(cg, x+w/2, cy+h/2+3.4*TK, t, 9.5, 600, opts.fg || ALARM, 'middle');
-    out.push({ g:cg, x:x, y:cy, w:w, h:h, d:it });
-    x += w + gap;
-  });
-  g.property('__chips', out);
-  return y + (row+1)*(h+gap) + 12;
-}
-
-function ctlList(g, y, items, tint){
-  const h = 34;
-  items.forEach((it,i)=>{
-    const row = g.append('g');
-    const on = it.on;
-    roundRect(row, CX0, y+i*h, CW*FULL(0.72), h-6, 8, on ? (tint?'#E7F2F1':'#FBF2EA') : '#FAF8F4',
-              on ? (tint?TEAL:'#EFD5C2') : '#EFECE5', 1.1);
-    const bx = CX0+12, by = y+i*h+7;
-    roundRect(row, bx, by, 14, 14, 3.5, on ? (tint?TEAL_D:ALARM) : 'none', on ? null : '#C9C3B6', 1.4);
-    if (on) row.append('path').attr('d','M '+(bx+3.5)+' '+(by+7)+' l 3 3.4 l 5 -6.4')
-      .attr('stroke','#FFFFFF').attr('stroke-width',1.8).attr('fill','none')
-      .attr('stroke-linecap','round').attr('stroke-linejoin','round');
-    label(row, bx+26, y+i*h+18, it.t, 10.5, on?600:400, on?INK:'#55606A');
-    if (it.n) label(row, CX0+CW*FULL(0.72)-14, y+i*h+18, it.n, 9, 400, MUTE, 'end');
-  });
-  return y + items.length*h + 14;
-}
-
-function ctlNotice(g, y, title, lines, kind){
-  const h = 34 + lines.length*16;
-  const alarm = kind !== 'ok';
-  const box = g.append('g').attr('class','ntc');
-  roundRect(box, CX0, y, CW*FULL(0.84), h, 12, alarm ? '#FBEDE7' : '#E7F2F1',
-            alarm ? ALARM : TEAL_D, 1.5).attr('stroke-dasharray', alarm ? '6 4' : null);
-  box.append('circle').attr('cx',CX0+22).attr('cy',y+22).attr('r',9)
-    .attr('fill', alarm ? ALARM : TEAL_D);
-  label(box, CX0+22, y+26, alarm ? '!' : '✓', 11, 700, '#FFFFFF', 'middle');
-  label(box, CX0+42, y+26, title, 11, 700, alarm ? ALARM : TEAL_D);
-  lines.forEach((ln,i)=> label(box, CX0+42, y+46+i*16, ln, 9.8, 400, '#4A5560'));
-  return y + h + 16;
-}
-
-function ctlField(g, y, lab, val, tint){
-  mono(g, CX0, y, lab, 8, MUTE);
-  roundRect(g, CX0, y+8, CW*FULL(0.72), 34, 8, '#FAF8F4', '#E3DFD6', 1.2);
-  label(g, CX0+14, y+30, val, 10.5, 600, tint?TEAL_D:INK);
+  roundRect(g, x, y, w, 42, 5, '#FFFFFF', opts.active ? GBLUE : GBORD, opts.active ? 1.8 : 1.1);
+  // floating label notches the outline
+  const lw = lab.length*5.1*TK + 8;
+  g.append('rect').attr('x',x+12).attr('y',y-5).attr('width',lw).attr('height',10).attr('fill','#FFFFFF');
+  label(g, x+16, y+3, lab, 8, 400, opts.active ? GBLUE : GSUB);
+  label(g, x+16, y+27, val, 10.5, 400, opts.err ? GERR : GTEXT);
   return y + 58;
 }
-
-function ctlGrid(g, y, cols, rows, cells, tint){
-  const lw = 56 + 26*TK;
-  const cw = (CW-lw-6)/cols.length, ch = 20 + 6*TK;
-  cols.forEach((c,i)=> label(g, CX0+lw+i*cw+cw/2, y-6, c, 8.5, 600, MUTE, 'middle'));
-  rows.forEach((r,j)=>{
-    label(g, CX0+lw-8, y+14+j*ch, r, 9.5, 400, '#55606A', 'end');
-    cols.forEach((c,i)=>{
-      const st = cells(i,j);   // 0 off · 1 on · 2 excluded
-      const cell = g.append('g').attr('class','gcell');
-      roundRect(cell, CX0+lw+i*cw+2, y+j*ch, cw-4, ch-5, 5,
-        st===1 ? (tint?'#BFE3E0':'#F7D9C7') : (st===2 ? '#F2EFE9' : '#FAF8F4'),
-        st===1 ? (tint?TEAL_D:ALARM) : '#EAE6DD', st===1?1.4:1);
-      if (st===2){
-        cell.append('path').attr('d','M '+(CX0+lw+i*cw+cw/2-5)+' '+(y+j*ch+(ch-5)/2-5)+
-          ' l 10 10 M '+(CX0+lw+i*cw+cw/2+5)+' '+(y+j*ch+(ch-5)/2-5)+' l -10 10')
-          .attr('stroke','#B9B2A4').attr('stroke-width',1.4).attr('stroke-linecap','round');
-      }
-    });
+function mBanner(g, x, y, w, kind, title, lines){
+  const h = 30 + lines.length*15 + 8;
+  const box = g.append('g').attr('class','ntc');
+  const err = kind === 'err';
+  roundRect(box, x, y, w, h, 8, err ? GERRBG : '#e6f4ea', err ? GERR : GGRN, 1.1);
+  box.append('circle').attr('cx',x+21).attr('cy',y+21).attr('r',8.5).attr('fill', err ? GERR : GGRN);
+  label(box, x+21, y+25, err ? '!' : '✓', 10, 700, '#FFFFFF', 'middle');
+  label(box, x+40, y+18, title, 10.5, 600, err ? GERR : GGRN);
+  lines.forEach((ln,i)=> label(box, x+40, y+35+i*15, ln, 9.3, 400, '#3c4043'));
+  return y + h + 14;
+}
+function mTabs(g, x, y, tabs, active){
+  tabs.forEach((t,i)=>{
+    const tx = x + i*92;
+    label(g, tx, y, t, 10.5, i===active?600:400, i===active?GBLUE:GSUB);
+    if (i===active) g.append('rect').attr('x',tx-2).attr('y',y+7).attr('width',t.length*6.4+8)
+      .attr('height',3).attr('rx',1.5).attr('fill',GBLUE);
   });
-  return y + rows.length*ch + 18;
+  g.append('path').attr('d','M '+x+' '+(y+9)+' H '+(x+CW)).attr('stroke',GBORD).attr('stroke-width',1);
+  return y + 26;
 }
 
-function ctlSlots(g, y, n, cols, filled, tint){
-  const w = (CW*FULL(0.78))/cols - 8, h = 20;
-  for (let i=0;i<n;i++){
-    const r = Math.floor(i/cols), c = i%cols;
-    const on = i < filled;
-    const sg = g.append('g').attr('class','slot');
-    roundRect(sg, CX0+c*(w+8), y+r*(h+7), w, h, 5,
-      on ? (tint?'#E7F2F1':'#F7EFE7') : '#FAF8F4', on ? (tint?TEAL:'#EFD5C2') : '#EAE6DD', 1.1);
-    if (on) sg.append('rect').attr('x',CX0+c*(w+8)+8).attr('y',y+r*(h+7)+8.5)
-      .attr('width',w-16-(i%3)*9).attr('height',3).attr('rx',1.5)
-      .attr('fill', tint?TEAL_D:'#C98F70');
-  }
-  return y + Math.ceil(n/cols)*(h+7) + 14;
+/* the term chips — kept as g.chip with datum for the tooltip system */
+function mChips(g, x, y, w, items, opts){
+  opts = opts || {};
+  const pad = 10*TK, gap = 8, h = 18 + 8*TK;
+  let cx = x, row = 0;
+  items.forEach(it=>{
+    const t = it.t || it;
+    const cw = Math.max(50, t.length*5.4*TK + pad*2 + (opts.x ? 14 : 0));
+    if (cx + cw > x + w){ cx = x; row++; }
+    const cy = y + row*(h+gap);
+    const cg = g.append('g').attr('class','chip').datum(it);
+    roundRect(cg, cx, cy, cw, h, h/2, opts.dead ? GSURF : GCHIPBG,
+              opts.dead ? GBORD : (opts.err ? GERR : '#aecbfa'), 1.1)
+      .attr('stroke-dasharray', opts.err ? '4 3' : null);
+    label(cg, cx + pad, cy + h/2 + 3.4*TK, t, 9.3, 500,
+          opts.dead ? GSUB : (opts.err ? GERR : GBLUED));
+    if (opts.x){
+      const xx = cx + cw - 13;
+      cg.append('path').attr('d','M '+(xx-3.2)+' '+(cy+h/2-3.2)+' l 6.4 6.4 M '+(xx+3.2)+' '+(cy+h/2-3.2)+' l -6.4 6.4')
+        .attr('stroke', opts.dead ? GSUB : GBLUED).attr('stroke-width',1.3).attr('stroke-linecap','round');
+    }
+    cx += cw + gap;
+  });
+  return y + (row+1)*(h+gap) + 10;
 }
 
-function ctlMeter(g, y, val, tint){
-  const cx = CX0+CW*(isNarrow()?0.88:0.86), cy = y+16, r = 26;
-  const arc = d3.arc().innerRadius(r-6).outerRadius(r).startAngle(-Math.PI*0.72);
-  g.append('path').attr('transform','translate('+cx+','+cy+')')
-    .attr('d', arc({ endAngle: Math.PI*0.72 })).attr('fill','#EFECE5');
-  const live = g.append('path').attr('class','meter').attr('transform','translate('+cx+','+cy+')')
-    .attr('fill', tint?TEAL_D:'#5FA88A')
-    .attr('d', arc({ endAngle: -Math.PI*0.72 }));
-  live.property('__arc', arc).property('__val', val);
-  label(g, cx, cy+4, 'Excellent', 8.5, 700, tint?TEAL_D:'#3F7D66', 'middle');
-  mono(g, cx, cy+26, 'AD STRENGTH', 7, MUTE, 'middle');
-  return y;
+/* objective / type cards */
+function mCards(g, y, items, sel, cols){
+  cols = cols || items.length;
+  const gap = 12, w = (CW - gap*(cols-1)) / cols, h = 74;
+  items.forEach((it,i)=>{
+    const x = CX0 + (i%cols)*(w+gap), cy = y + Math.floor(i/cols)*(h+14);
+    const on = i === sel;
+    const card = g.append('g').attr('class', on ? 'sel' : 'opt');
+    roundRect(card, x, cy, w, h, 8, on ? '#e8f0fe' : '#FFFFFF', on ? GBLUE : GBORD, on ? 1.8 : 1.1);
+    card.append('circle').attr('cx',x+22).attr('cy',cy+24).attr('r',11)
+      .attr('fill', on ? GBLUE : GSURF);
+    if (it.ic) it.ic(card, x+22, cy+24, on ? '#FFFFFF' : GSUB);
+    label(card, x+40, cy+28, it.t, 10.5, on?600:500, GTEXT);
+    if (it.d) label(card, x+14, cy+52, it.d, 8.6, 400, GSUB);
+    if (on){
+      const chk = card.append('g').attr('class','dot');
+      chk.append('circle').attr('cx',x+w-16).attr('cy',cy+16).attr('r',8).attr('fill',GBLUE);
+      chk.append('path').attr('d','M '+(x+w-20)+' '+(cy+16)+' l 2.8 3 l 5 -5.6')
+        .attr('stroke','#FFFFFF').attr('stroke-width',1.8).attr('fill','none')
+        .attr('stroke-linecap','round').attr('stroke-linejoin','round');
+    }
+  });
+  return y + Math.ceil(items.length/cols)*(h+14) + 12;
 }
 
-function ctlCounters(g, y, items, tint){
-  const w = (CW*FULL(0.92))/items.length;
+/* tiny icons for the objective cards */
+const IC = {
+  tag:   (g,x,y,c)=>{ g.append('path').attr('d','M '+(x-5)+' '+(y-5)+' h 6 l 5 5 l -6 6 l -5 -5 Z')
+           .attr('fill','none').attr('stroke',c).attr('stroke-width',1.5).attr('stroke-linejoin','round');
+           g.append('circle').attr('cx',x-2).attr('cy',y-2).attr('r',1.2).attr('fill',c); },
+  person:(g,x,y,c)=>{ g.append('circle').attr('cx',x).attr('cy',y-3).attr('r',3.2)
+           .attr('fill','none').attr('stroke',c).attr('stroke-width',1.5);
+           g.append('path').attr('d','M '+(x-5.5)+' '+(y+6)+' q 5.5 -6 11 0')
+           .attr('fill','none').attr('stroke',c).attr('stroke-width',1.5).attr('stroke-linecap','round'); },
+  cursor:(g,x,y,c)=>{ g.append('path').attr('d','M '+(x-4)+' '+(y-5)+' l 9 4 l -4 1.4 l -1.4 4 Z')
+           .attr('fill','none').attr('stroke',c).attr('stroke-width',1.4).attr('stroke-linejoin','round'); },
+  horn:  (g,x,y,c)=>{ g.append('path').attr('d','M '+(x-5)+' '+(y-2)+' h 3 l 6 -4 v 12 l -6 -4 h -3 Z')
+           .attr('fill','none').attr('stroke',c).attr('stroke-width',1.4).attr('stroke-linejoin','round'); },
+  search:(g,x,y,c)=>{ g.append('circle').attr('cx',x-1).attr('cy',y-1).attr('r',4)
+           .attr('fill','none').attr('stroke',c).attr('stroke-width',1.5);
+           g.append('path').attr('d','M '+(x+2)+' '+(y+2)+' l 4 4').attr('stroke',c)
+           .attr('stroke-width',1.5).attr('stroke-linecap','round'); },
+  grid:  (g,x,y,c)=>{ [-4,1].forEach(dx=>[-4,1].forEach(dy=>
+           g.append('rect').attr('x',x+dx).attr('y',y+dy).attr('width',3.6).attr('height',3.6)
+            .attr('fill','none').attr('stroke',c).attr('stroke-width',1.2))); },
+  play:  (g,x,y,c)=>{ g.append('path').attr('d','M '+(x-3)+' '+(y-4.5)+' l 7.5 4.5 l -7.5 4.5 Z')
+           .attr('fill','none').attr('stroke',c).attr('stroke-width',1.4).attr('stroke-linejoin','round'); }
+};
+
+/* rows with checkbox + chevron — the audience browse tree */
+function mTree(g, y, rows){
+  const h = 36;
+  rows.forEach((r,i)=>{
+    const ry = y + i*h, ind = (r.ind||0)*22;
+    const row = g.append('g');
+    if (r.on) roundRect(row, CX0-6, ry-6, CW*0.6, h-6, 4, '#e8f0fe');
+    mCheck(row, CX0+ind, ry, r.on ? 1 : (r.dis ? 2 : 0));
+    label(row, CX0+ind+26, ry+12, r.t, 10.3, r.on?600:400, r.dis ? '#9aa0a6' : GTEXT);
+    if (r.n) label(row, CX0+CW*0.6-12, ry+12, r.n, 8.8, 400, GSUB, 'end');
+    if (r.chev) row.append('path')
+      .attr('d','M '+(CX0+ind+CW*0.6-34)+' '+(ry+4)+' l 5 5 l -5 5')
+      .attr('fill','none').attr('stroke',GSUB).attr('stroke-width',1.5)
+      .attr('stroke-linecap','round').attr('stroke-linejoin','round');
+  });
+  return y + rows.length*h + 10;
+}
+
+function mCounters(g, y, items, teal){
+  const w = CW / items.length;
   items.forEach((it,i)=>{
     const x = CX0 + i*w;
     const cell = g.append('g');
-    mono(cell, x, y, it.l, 7.5, MUTE);
-    const t = label(cell, x, y+26, '0', 19, 700, it.hi ? (tint?TEAL_D:ALARM) : INK);
+    label(cell, x, y, it.l, 8.6, 400, GSUB);
+    const t = label(cell, x, y+27, '', 18, 500, it.hi ? (teal?TEAL_D:GBLUE) : GTEXT);
     if (!REDUCE && it.v != null){
-      t.transition('count').duration(1400).delay(300+i*120).ease(VALUE_EASE)
+      t.transition('count').duration(1300).delay(300+i*120).ease(VALUE_EASE)
         .tween('t', function(){
           const iv = d3.interpolateNumber(0, it.v);
-          return k => t.text(it.pre ? it.pre + Math.round(iv(k)).toLocaleString('en-US') : Math.round(iv(k)).toLocaleString('en-US'));
+          return k => t.text((it.pre||'') + Math.round(iv(k)).toLocaleString('en-US') + (it.suf||''));
         });
-    } else if (it.v != null){
-      t.text((it.pre||'') + it.v.toLocaleString('en-US'));
-    } else { t.text(it.s); }
+    } else t.text(it.v != null ? (it.pre||'') + it.v.toLocaleString('en-US') + (it.suf||'') : it.s);
   });
-  return y + 52;
+  return y + 46;
 }
 
-function ctlMap(g, y, tint){
-  const cy = y + 96;
-  const METROS = [[CX0+130,cy-30,52],[CX0+300,cy+16,40],[CX0+440,cy-42,34],[CX0+560,cy+30,30]];
+function mMap(g, y, teal){
+  const cy = y + 88;
+  const METROS = [[CX0+110,cy-26,48],[CX0+250,cy+18,38],[CX0+380,cy-36,32],[CX0+490,cy+26,28]];
   g.append('path')
-    .attr('d','M '+(CX0+40)+' '+(cy+60)+' q 120 -70 250 -30 q 130 40 300 -34 q 80 -34 120 6')
-    .attr('fill','none').attr('stroke','#E3DFD6').attr('stroke-width',1.4);
-  METROS.forEach((m,i)=>{
+    .attr('d','M '+(CX0+20)+' '+(cy+52)+' q 110 -64 230 -26 q 120 36 270 -30 q 70 -30 110 4')
+    .attr('fill','none').attr('stroke',GBORD).attr('stroke-width',1.3);
+  METROS.forEach(m=>{
     const ring = g.append('g').attr('class','pin');
     ring.append('circle').attr('class','pinring').attr('data-r',m[2])
       .attr('cx',m[0]).attr('cy',m[1]).attr('r',m[2])
-      .attr('fill', tint?'rgba(127,204,200,.16)':'rgba(243,121,64,.13)')
-      .attr('stroke', tint?TEAL_D:ACCENT).attr('stroke-width',1.4).attr('stroke-dasharray','5 4');
+      .attr('fill', teal?'rgba(127,204,200,.15)':'rgba(26,115,232,.10)')
+      .attr('stroke', teal?TEAL_D:GBLUE).attr('stroke-width',1.3).attr('stroke-dasharray','5 4');
     ring.append('circle').attr('class','pindot')
-      .attr('cx',m[0]).attr('cy',m[1]).attr('r',4.5).attr('fill', tint?TEAL_D:ALARM);
+      .attr('cx',m[0]).attr('cy',m[1]).attr('r',4.2).attr('fill', teal?TEAL_D:GBLUE);
   });
-  label(g, CX0, y+8, tint ? 'Counties with one clinic or fewer' : 'Metro radius targets', 10, 600, INK);
-  return y + 190;
+  return y + 176;
 }
 
+/* the demographics table, drawn the way the real screen draws it */
+function mDemoTable(g, y, cols, rows, cells, teal){
+  const lw = 60 + 20*TK;
+  const cw = (CW - lw - 4)/cols.length, ch = 19 + 6*TK;
+  cols.forEach((c,i)=> label(g, CX0+lw+i*cw+cw/2, y-5, c, 8.3, 500, GSUB, 'middle'));
+  rows.forEach((r,j)=>{
+    label(g, CX0+lw-10, y+13+j*ch, r, 9.3, 400, GTEXT, 'end');
+    cols.forEach((c,i)=>{
+      const st = cells(i,j);
+      const cell = g.append('g').attr('class','gcell');
+      roundRect(cell, CX0+lw+i*cw+2, y+j*ch, cw-4, ch-5, 3,
+        st===1 ? (teal?'#dff0ee':'#e8f0fe') : '#FFFFFF',
+        st===1 ? (teal?TEAL_D:GBLUE) : GBORD, st===1 ? 1.3 : 1);
+      mCheck(cell, CX0+lw+i*cw+cw/2-7, y+j*ch+(ch-5)/2-7.5, st===1 ? 1 : (st===2 ? 2 : 0));
+    });
+  });
+  return y + rows.length*ch + 14;
+}
 
-/* ---- the auction, drawn at the speed it happens ---- */
+function mSlots(g, y, x, w, labels, filled, counts){
+  const h = 34;
+  labels.forEach((lb,i)=>{
+    const sy = y + i*(h+8);
+    const on = i < filled;
+    const sg = g.append('g').attr('class','slot');
+    roundRect(sg, x, sy, w, h, 5, '#FFFFFF', GBORD, 1.05);
+    const lw2 = lb.length*5.1*TK + 8;
+    sg.append('rect').attr('x',x+10).attr('y',sy-4).attr('width',lw2).attr('height',9).attr('fill','#FFFFFF');
+    label(sg, x+14, sy+3, lb, 7.6, 400, GSUB);
+    if (on){
+      sg.append('rect').attr('x',x+12).attr('y',sy+18).attr('width',(w-70)*(0.55+((i*37)%40)/100))
+        .attr('height',4).attr('rx',2).attr('fill','#bdc1c6');
+      label(sg, x+w-10, sy+23, counts[i], 8, 400, GSUB, 'end');
+    }
+  });
+  return y + labels.length*(h+8) + 8;
+}
+
+/* Ad Strength — the real gauge: an arc of four grades and a needle */
+function mStrength(g, x, y, frac){
+  const r = 34;
+  const seg = d3.arc().innerRadius(r-7).outerRadius(r);
+  const A0 = -Math.PI*0.5, A1 = Math.PI*0.5;
+  const grades = ['#d93025','#f9ab00','#8ab4f8','#188038'];
+  grades.forEach((c,i)=>{
+    g.append('path').attr('transform','translate('+x+','+y+')')
+      .attr('d', seg({ startAngle:A0+(A1-A0)*i/4 + .02, endAngle:A0+(A1-A0)*(i+1)/4 - .02 }))
+      .attr('fill',c).attr('opacity',.85);
+  });
+  const needle = g.append('g').attr('class','meter').attr('transform','translate('+x+','+y+')');
+  needle.append('path').attr('d','M -2 3 L 0 '+(-(r-11))+' L 2 3 Z').attr('fill',GTEXT);
+  needle.append('circle').attr('r',3.4).attr('fill',GTEXT);
+  needle.property('__deg', (frac-0.5)*180).attr('data-deg', (frac-0.5)*180);
+  needle.attr('transform','translate('+x+','+y+') rotate('+((frac-0.5)*180)+')');
+  label(g, x, y+20, 'Excellent', 10, 600, GGRN, 'middle');
+  mono(g, x, y+34, 'AD STRENGTH', 6.8, GSUB, 'middle');
+}
+
+/* the live ad preview — what the machine will actually render */
+function mAdPreview(g, x, y, w){
+  mCard(g, x, y, w, 128);
+  label(g, x+14, y+22, 'Sponsored', 8.8, 700, GTEXT);
+  g.append('circle').attr('cx',x+21).attr('cy',y+40).attr('r',7).attr('fill','#0b8043');
+  label(g, x+21, y+43.5, 'M', 7.5, 700, '#FFFFFF', 'middle');
+  label(g, x+34, y+38, 'Meridian Longevity', 9, 400, GURL);
+  label(g, x+34, y+49, 'meridianlongevity.example', 8.2, 400, GSUB);
+  label(g, x+14, y+72, 'Clinical-Grade Recovery Protocols | Book a', 11, 400, GLINK);
+  label(g, x+14, y+87, 'Free Telehealth Consult Today', 11, 400, GLINK);
+  label(g, x+14, y+105, 'Physician-guided recovery and longevity plans.', 8.8, 400, '#4d5156');
+  label(g, x+14, y+117, 'Peptide protocols available. For research use only.', 8.8, 400, '#4d5156');
+}
+
 function ctlAuction(g, y){
   const lanes = [
     { n:'Meridian Longevity', bid:.72, q:.86, win:true },
@@ -1129,246 +1335,704 @@ function ctlAuction(g, y){
     { n:'Apex Research',      bid:.66, q:.33 }
   ];
   const nameW = 96 + 34*TK;
-  const bw = CW - nameW - 74, h = 26, gap = 12;
-  const thr = 0.55;
+  const bw = CW - nameW - 74, h = 26, gap = 12, thr = 0.55;
   lanes.forEach((L,i)=>{
     const ly = y + i*(h+gap);
-    label(g, CX0, ly+18, L.n, 10, L.win?700:400, L.win?INK:'#66727C');
-    const track = roundRect(g, CX0+nameW, ly+3, bw, h-6, 10, '#F3F0E9');
+    label(g, CX0, ly+18, L.n, 10, L.win?600:400, L.win?GTEXT:GSUB);
+    roundRect(g, CX0+nameW, ly+3, bw, h-6, 10, GSURF);
     const rank = L.bid * L.q + 0.12;
-    const bar = roundRect(g, CX0+nameW, ly+3, 4, h-6, 10, L.win ? ALARM : '#D8D2C6').attr('class','rankbar');
+    const bar = roundRect(g, CX0+nameW, ly+3, 4, h-6, 10, L.win ? GBLUE : '#bdc1c6').attr('class','rankbar');
     bar.property('__w', bw*rank);
     if (L.win){
       const tag = g.append('g').attr('class','winner').attr('opacity',0);
-      roundRect(tag, CX0+nameW+bw+10, ly+3, 60, h-6, 10, '#FBE3D2');
-      label(tag, CX0+nameW+bw+40, ly+17, 'served', 9, 700, ALARM, 'middle');
+      roundRect(tag, CX0+nameW+bw+10, ly+3, 60, h-6, 10, '#e6f4ea');
+      label(tag, CX0+nameW+bw+40, ly+17, 'served', 9, 600, GGRN, 'middle');
     }
   });
   const tx = CX0+nameW+bw*thr;
-  g.append('path').attr('class','thr').attr('d','M '+tx+' '+(y-6)+' V '+(y+lanes.length*(h+gap)))
-    .attr('stroke',INK).attr('stroke-width',1.3).attr('stroke-dasharray','4 4').attr('opacity',.5);
-  mono(g, tx, y-12, 'AD RANK THRESHOLD', 7, MUTE, 'middle');
-  label(g, CX0, y+lanes.length*(h+gap)+26,
-    'Recalculated for every auction, from bid × live quality signals × context.', 9.5, 400, MUTE);
-  return y + lanes.length*(h+gap) + 40;
+  g.append('path').attr('d','M '+tx+' '+(y-6)+' V '+(y+lanes.length*(h+gap)))
+    .attr('stroke',GTEXT).attr('stroke-width',1.2).attr('stroke-dasharray','4 4').attr('opacity',.45);
+  mono(g, tx, y-12, 'AD RANK THRESHOLD', 6.8, GSUB, 'middle');
+  label(g, CX0, y+lanes.length*(h+gap)+24,
+    'Recalculated for every auction, from bid × live quality signals × context.', 9.3, 400, GSUB);
+  return y + lanes.length*(h+gap) + 38;
 }
 
 /* =====================================================================
-   7. THE TWELVE SCREENS
-   Every field name below follows the platform's public documentation.
+   THE SCREENS — field names and structure follow the real wizard.
    ===================================================================== */
 
 const SCREENS = {
 
-mach1: { url:'ads console · new campaign', step:'STEP 1 OF 7', head:'Choose your objective',
+mach1: { crumb:'New campaign', step:'STEP 1 OF 6', head:'Choose your objective', rail:0,
   draw(g){
     let y = CY0;
-    y = ctlCards(g, y, [
-      { t:'Sales',   d:'Drive purchases' },
-      { t:'Leads',   d:'Capture contacts' },
-      { t:'Traffic', d:'Visits to a site' },
-      { t:'Awareness',d:'Reach and frequency' }], 0);
-    y = ctlNotice(g, y+6, 'What the console never asks',
-      ['Whether the product works. Whether the claim is true.',
-       'Whether the person who converts is helped or harmed.'], 'warn');
+    y = mCards(g, y, [
+      { t:'Sales', d:'Drive sales online or in store', ic:IC.tag },
+      { t:'Leads', d:'Get leads and conversions', ic:IC.person },
+      { t:'Website traffic', d:'Get the right people to visit', ic:IC.cursor },
+      { t:'Awareness', d:'Reach a broad audience', ic:IC.horn }], 0, isNarrow()?2:4);
+    y = mBanner(g, CX0, y+4, CW*0.9, 'err', 'What the console never asks',
+      ['Whether the product works. Whether the claim is true. What',
+       'happens to the person who converts.']);
+    mBtn(g, CX0, y+4, 'Next', true);
   } },
 
-mach2: { url:'ads console · policy', step:'BLOCKED', head:'Campaign setup — policy review',
+mach2: { crumb:'New campaign · review', step:'BLOCKED', head:'Policy review', rail:5,
   draw(g){
-    // three beats: the attempt, the wall, the shape the wall permits
     const s1 = g.append('g').attr('class','s1');
     const s2 = g.append('g').attr('class','s2');
     const s3 = g.append('g').attr('class','s3');
-    let y = CY0 - 4;
-    y = ctlField(s1, y, 'CAMPAIGN NAME', 'BPC-157 — Recovery Peptides');
-    y = ctlChips(s1, y, ['bpc-157', 'tb-500 injection', 'buy research peptides'],
-      { tint:'#F6E9E4', stroke:ALARM, fg:ALARM, dashed:true });
-    y = ctlNotice(s2, y, 'Not eligible to run',
-      ['Research chemicals and unapproved supplements are not',
-       'permitted. Telehealth advertisers must hold certification.'], 'warn');
-    y = ctlField(s3, y+4, 'CAMPAIGN NAME (RESUBMITTED)', 'Meridian Longevity — Recovery Consults', true);
-    ctlNotice(s3, y, 'Eligible', ['Telehealth clinic, certified. Ads may serve.'], 'ok');
-  } },
-
-mach3: { url:'ads console · bidding', step:'STEP 2 OF 7', head:'Bidding',
-  draw(g){
-    let y = CY0;
-    y = ctlRadio(g, y, [
-      { t:'Maximise conversions', d:'with an optional target cost per action' },
-      { t:'Maximise clicks' },
-      { t:'Target impression share' },
-      { t:'Manual CPC' }], 0);
-    y = ctlField(g, y, 'CONVERSION ACTION', 'Consultation booked');
-    ctlCounters(g, y+10, [
-      { l:'TARGET CPA', v:74, pre:'$', hi:true },
-      { l:'CONVERSIONS / DAY', v:38 },
-      { l:'SPEND / DAY', v:2812, pre:'$' }]);
-  } },
-
-mach4: { url:'ads console · locations', step:'STEP 3 OF 7', head:'Locations and languages',
-  draw(g){
-    let y = CY0 - 8;
-    y = ctlMap(g, y);
-    ctlList(g, y-24, [
-      { t:'Presence: people in or regularly in your targeted locations', on:true },
-      { t:'English', on:true, n:'primary' }]);
-  } },
-
-mach5: { url:'ads console · audiences', step:'STEP 4 OF 7', head:'Audience segments — browse',
-  draw(g){
-    let y = CY0;
-    y = ctlList(g, y, [
-      { t:'Affinity — Health & Fitness Buffs', n:'ready-made' },
-      { t:'In-market — Sports & Fitness Supplements', on:true, n:'ready-made' },
-      { t:'Life events — Recently started a fitness routine', n:'ready-made' },
-      { t:'Detailed demographics — Education, homeownership…', n:'ready-made' },
-      { t:'Your data — site visitors, customer lists', n:'first-party' }]);
-    ctlNotice(g, y+2, 'A shelf of people, browsable by category',
-      ['Assembled from behaviour across the platform’s properties —',
-       'inferred, never asked.'], 'warn');
-  } },
-
-mach6: { url:'ads console · custom segment', step:'STEP 4 OF 7', head:'Build a custom segment',
-  draw(g){
     let y = CY0 - 6;
-    y = ctlNotice(g, y, 'Restricted: health conditions',
-      ['Audiences built on a sensitive health condition — or on',
-       'activity implying one — may not be used here.'], 'warn');
-    y = ctlList(g, y-2, [
-      { t:'People with these interests or purchase intentions' },
-      { t:'People who searched for any of these terms on Google', on:true },
-      { t:'People who browse types of websites' },
-      { t:'People who use types of apps' }]);
-    y = ctlChips(g, y-4, [
-      { t:'bpc-157 dosage',      w:'A compound name, spelled right. This is someone weeks into research, not a browser.' },
-      { t:'tb-500 healing',      w:'An outcome attached to a compound: they have already decided what they want it to do.' },
-      { t:'wolverine stack',     w:'Community vocabulary. They are reading forums, which means they trust peers over clinicians.' },
-      { t:'shoulder won’t heal', w:'The injury underneath all of it — volunteered, in plain language, at 1 a.m.' },
-      { t:'peptide clinic near me', w:'Purchase intent with a geography attached. The most valuable four words on this screen.' }],
-      { tint:'#F7EFE7', stroke:ALARM, fg:ALARM });
-    label(g, CX0, y+2, '…and people who searched similar terms.', 10, 700, ALARM);
-    ctlCounters(g, y+22, [
-      { l:'ESTIMATED AUDIENCE', v:412000, hi:true },
-      { l:'CONDITION NAMED', s:'never' }]);
+    y = mField(s1, CX0, y, CW*0.8, 'Campaign name', 'BPC-157 — Recovery Peptides');
+    y = mChips(s1, CX0, y-8, CW*0.9, ['bpc-157','tb-500 injection','buy research peptides'],
+      { err:true, x:true });
+    y = mBanner(s2, CX0, y+2, CW*0.9, 'err', 'Not eligible to run',
+      ['Research chemicals and unapproved supplements are not permitted.',
+       'Pharmacy and telehealth advertisers must be certified by LegitScript.']);
+    y = mField(s3, CX0, y+8, CW*0.8, 'Campaign name', 'Meridian Longevity — Recovery Consults', { active:true });
+    mBanner(s3, CX0, y-6, CW*0.9, 'ok', 'Eligible',
+      ['Telehealth clinic, certified. Ads may serve.']);
   } },
 
-mach7: { url:'ads console · demographics', step:'STEP 5 OF 7', head:'Demographics',
+mach3: { crumb:'New campaign · bidding', step:'STEP 2 OF 6', head:'Bidding', rail:2,
   draw(g){
     let y = CY0 - 4;
-    y = ctlGrid(g, y,
+    mCard(g, CX0, y, CW*0.9, 96);
+    label(g, CX0+18, y+26, 'What do you want to focus on?', 10.5, 500, GTEXT);
+    roundRect(g, CX0+18, y+38, 220, 34, 5, '#FFFFFF', GBORD, 1.1);
+    label(g, CX0+32, y+60, 'Conversions', 10.5, 400, GTEXT);
+    g.append('path').attr('d','M '+(CX0+218)+' '+(y+52)+' l 5 6 l 5 -6')
+      .attr('fill','none').attr('stroke',GSUB).attr('stroke-width',1.5);
+    const ck = g.append('g');
+    mCheck(ck, CX0+262, y+45, 1);
+    label(ck, CX0+286, y+57, 'Set a target cost per action ($74)', 9.8, 400, GTEXT);
+    y += 112;
+    y = mField(g, CX0, y, CW*0.6, 'Conversion action', 'Consultation booked', { active:true });
+    mCounters(g, y+8, [
+      { l:'Target CPA', v:74, pre:'$', hi:true },
+      { l:'Est. conversions / day', v:38 },
+      { l:'Est. spend / day', v:2812, pre:'$' }]);
+  } },
+
+mach4: { crumb:'New campaign · settings', step:'STEP 3 OF 6', head:'Locations', rail:3,
+  draw(g){
+    let y = CY0 - 10;
+    const rows = [
+      { t:'All countries and territories' },
+      { t:'United States' },
+      { t:'Enter another location', on:true, n:'radius: metro areas' }];
+    rows.forEach((r,i)=>{
+      const row = g.append('g');
+      mRadio(row, CX0+8, y+i*30, !!r.on);
+      label(row, CX0+26, y+i*30+4, r.t, 10.3, r.on?600:400, GTEXT);
+      if (r.n) label(row, CX0+240, y+i*30+4, r.n, 8.8, 400, GSUB);
+    });
+    y = mMap(g, y+84);
+    label(g, CX0, y-70, 'Language: English', 10, 400, GTEXT);
+    label(g, CX0, y-52, 'Presence: people in or regularly in your targeted locations', 9.3, 400, GSUB);
+  } },
+
+mach5: { crumb:'New campaign · settings', step:'STEP 3 OF 6', head:'Audience segments', rail:3,
+  draw(g){
+    let y = CY0 - 12;
+    y = mTabs(g, CX0, y, ['Search','Browse'], 1);
+    y = mTree(g, y+6, [
+      { t:'Affinity', chev:true, n:'who they are' },
+      { t:'In-market and life events', chev:true, n:'what they’re shopping for' },
+      { t:'Sports & Fitness Supplements', ind:1, on:true, n:'in-market' },
+      { t:'Detailed demographics', chev:true },
+      { t:'Your data — site visitors, customer lists', chev:true, n:'first-party' }]);
+    const px = CX0 + CW*0.64, pw = CW*0.36 - 8;
+    mCard(g, px, CY0+14, pw, 132);
+    label(g, px+14, CY0+36, 'Selected segments', 9.8, 600, GTEXT);
+    label(g, px+14, CY0+58, 'Sports & Fitness', 9.3, 400, GTEXT);
+    label(g, px+14, CY0+71, 'Supplements', 9.3, 400, GTEXT);
+    mono(g, px+14, CY0+92, 'OBSERVATION → TARGETING', 6.8, GBLUE);
+    label(g, px+14, CY0+114, 'Narrows who can see', 8.6, 400, GSUB);
+    label(g, px+14, CY0+126, 'these ads.', 8.6, 400, GSUB);
+    mBanner(g, CX0, y+4, CW*0.6, 'err', 'A shelf of people, browsable',
+      ['Assembled from behaviour across the platform —',
+       'inferred, never asked.']);
+  } },
+
+mach6: { crumb:'New campaign · custom segment', step:'STEP 3 OF 6', head:'Audience segments', rail:3, modal:true,
+  draw(g){
+    // the builder opens as a modal over the wizard
+    g.append('rect').attr('x',CON.x+1).attr('y',CON.y+45).attr('width',CON.w-2).attr('height',CON.h-46)
+      .attr('fill','rgba(32,33,36,.32)');
+    const mw = CW + 20, mx = CX0 - 10, my = CY0 - 24;
+    const modal = g.append('g');
+    mCard(modal, mx, my, mw, CON.h - (my-CON.y) - 22, true);
+    label(modal, mx+22, my+30, 'New custom segment', 12.5, 500, GTEXT);
+    modal.append('path')
+      .attr('d','M '+(mx+mw-30)+' '+(my+18)+' l 11 11 M '+(mx+mw-19)+' '+(my+18)+' l -11 11')
+      .attr('stroke',GSUB).attr('stroke-width',1.6).attr('stroke-linecap','round');
+    let y = my + 52;
+    y = mField(modal, mx+22, y, mw*0.52, 'Segment name', 'recovery-intent · 1am', { active:true });
+    const r1 = modal.append('g');
+    mRadio(r1, mx+30, y, false);
+    label(r1, mx+48, y+4, isNarrow() ? 'Interests or purchase intentions'
+      : 'People with any of these interests or purchase intentions', 9.8, 400, GTEXT);
+    const r2 = modal.append('g');
+    mRadio(r2, mx+30, y+30, true);
+    label(r2, mx+48, y+34, isNarrow() ? 'Searched these terms on Google'
+      : 'People who searched for any of these terms on Google', 9.8, 600, GTEXT);
+    y = mChips(modal, mx+48, y+48, mw*0.55,
+      [{ t:'bpc-157 dosage',      w:'A compound name, spelled right. This is someone weeks into research, not a browser.' },
+       { t:'tb-500 healing',      w:'An outcome attached to a compound: they have already decided what they want it to do.' },
+       { t:'wolverine stack',     w:'Community vocabulary. They are reading forums, which means they trust peers over clinicians.' },
+       { t:'shoulder won’t heal', w:'The injury underneath all of it — volunteered, in plain language, at 1 a.m.' },
+       { t:'peptide clinic near me', w:'Purchase intent with a geography attached. The most valuable four words on this screen.' }],
+      { x:true });
+    label(modal, mx+48, y+6, 'Ads will reach people who searched these terms, and similar terms.', 8.8, 600, GSUB);
+    // audience size panel
+    const px = mx + mw*0.62, pw = mw*0.38 - 22;
+    mCard(modal, px, my+52, pw, 150);
+    label(modal, px+14, my+74, 'Audience size', 9.8, 600, GTEXT);
+    const az = label(modal, px+14, my+102, '', 17, 500, GBLUE);
+    az.attr('class','azn');
+    az.property('__v', 412000);
+    mono(modal, px+14, my+118, 'WEEKLY IMPRESSIONS, EST.', 6.6, GSUB);
+    [['Search', .62],['YouTube', .9],['Display', .74]].forEach((sfc,i)=>{
+      const by = my+132 + i*16;
+      label(modal, px+14, by+8, sfc[0], 8.2, 400, GSUB);
+      modal.append('rect').attr('x',px+66).attr('y',by+2).attr('width',(pw-84)).attr('height',5)
+        .attr('rx',2.5).attr('fill',GSURF);
+      modal.append('rect').attr('x',px+66).attr('y',by+2).attr('width',(pw-84)*sfc[1]).attr('height',5)
+        .attr('rx',2.5).attr('fill','#aecbfa');
+    });
+    // the restriction, beside what it fails to restrict
+    mBanner(modal, mx+22, y+20, mw*0.55, 'err', 'Restricted: health conditions',
+      ['Audiences built on a sensitive health condition — or on',
+       'activity implying one — may not be used. Search terms may.']);
+    const btn = modal.append('g').attr('class','dot');
+    mBtn(btn, mx+mw-108, CON.y+CON.h-64, 'Create', true);
+  } },
+
+mach7: { crumb:'New campaign · settings', step:'STEP 3 OF 6', head:'Demographics', rail:3,
+  draw(g){
+    let y = CY0 - 4;
+    y = mDemoTable(g, y,
       ['18–24','25–34','35–44','45–54','55–64','65+','Unknown'],
       ['Male','Female','Unknown'],
       (i,j)=> (i>=1 && i<=4 && j<=1) ? 1 : (i===0 ? 2 : 0));
-    y = ctlNotice(g, y-4, 'Not available in Search',
-      ['Household income (7 tiers, top 10% down) and parental',
-       'status are Display, Video and Demand Gen dimensions.'], 'warn');
-    ctlChips(g, y-6, ['+ new Demand Gen campaign', 'Household income: Top 10%', '11–20%'],
-      { tint:'#EFEAE0', stroke:'#B9B2A4', fg:'#55606A' });
+    y = mBanner(g, CX0, y-2, CW*0.9, 'err', 'Not available in Search',
+      ['Household income (7 tiers, top 10% down) and parental status are',
+       'Display, Video and Demand Gen dimensions.']);
+    mChips(g, CX0, y-4, CW*0.9,
+      ['+ New Demand Gen campaign','Household income: Top 10%','11–20%','Parental status: parent'],
+      { dead:true });
   } },
 
-mach8: { url:'ads console · keywords', step:'STEP 6 OF 7', head:'Keywords',
+mach8: { crumb:'New campaign · keywords', step:'STEP 4 OF 6', head:'Keywords', rail:4,
   draw(g){
-    let y = CY0 - 4;
-    y = ctlChips(g, y, ['recovery therapy clinic', '“longevity medicine near me”', '[sports injury treatment]', 'peptide therapy consult'],
-      { tint:'#F7EFE7', stroke:ALARM, fg:ALARM });
-    label(g, CX0, y+2, 'Clean. The banned compound appears nowhere.', 10, 600, INK);
-    y += 24;
-    mono(g, CX0, y, 'NEGATIVE KEYWORDS — WHERE THIS AD WILL NOT APPEAR', 8, MUTE);
-    y = ctlChips(g, y+14, ['fda warning', 'side effects', 'scam', 'lawsuit', 'reddit', 'is it safe'],
-      { tint:'#F2EFE9', stroke:'#B9B2A4', fg:'#66727C', dashed:true });
-    label(g, CX0, y+2, 'A filter on doubt: the advertiser chooses which questions it is absent for.', 10, 400, MUTE);
+    let y = CY0 - 8;
+    mCard(g, CX0, y, CW*0.9, 92);
+    label(g, CX0+16, y+20, 'Enter products or services to advertise', 9.3, 400, GSUB);
+    ['recovery therapy clinic', '“longevity medicine near me”', '[sports injury treatment]', 'peptide therapy consult']
+      .forEach((k,i)=> label(g, CX0+16, y+40+i*13, k, 9.5, 500, GTEXT));
+    label(g, CX0+CW*0.9-14, y+20, 'broad · “phrase” · [exact]', 8.3, 400, GSUB, 'end');
+    y += 106;
+    label(g, CX0, y+4, 'The banned compound appears nowhere.', 9.8, 600, GTEXT);
+    y += 16;
+    mono(g, CX0, y+8, 'NEGATIVE KEYWORDS', 7.2, GSUB);
+    y = mChips(g, CX0, y+18, CW*0.9,
+      ['fda warning','side effects','scam','lawsuit','reddit','is it safe'], { dead:true, x:true });
+    label(g, CX0, y+2, 'A filter on doubt: the questions this ad will never be present for.', 9.3, 400, GSUB);
   } },
 
-mach9: { url:'ads console · ad', step:'STEP 7 OF 7', head:'Responsive search ad',
+mach9: { crumb:'New campaign · ads', step:'STEP 4 OF 6', head:'Create your ad', rail:4,
   draw(g){
-    let y = CY0 - 6;
-    mono(g, CX0, y, 'HEADLINES — 15 SLOTS, ASSEMBLED BY THE MACHINE', 8, MUTE);
-    y = ctlSlots(g, y+12, 15, 5, 13);
-    mono(g, CX0, y, 'DESCRIPTIONS', 8, MUTE);
-    y = ctlSlots(g, y+12, 4, 2, 4);
-    ctlMeter(g, CY0+30, .88);
-    y = ctlNotice(g, y+4, 'For research use only.',
-      ['The phrase doing the legal work. It has never made a product',
-       'legal to put in a human body.'], 'warn');
+    const lw = CW*0.5;
+    let y = CY0 - 14;
+    y = mField(g, CX0, y, lw, 'Final URL', 'meridianlongevity.example');
+    y = mField(g, CX0, y-8, lw, 'Display path', '/recovery-consult');
+    mono(g, CX0, y-2, 'HEADLINES — 13 OF 15', 7.2, GSUB);
+    y = mSlots(g, y+6, CX0, lw, ['Headline 1','Headline 2','Headline 3'], 3, ['24/30','27/30','19/30']);
+    mono(g, CX0, y+2, 'DESCRIPTIONS — 4 OF 4', 7.2, GSUB);
+    mSlots(g, y+10, CX0, lw, ['Description 1'], 1, ['86/90']);
+    const px = CX0 + CW*0.56;
+    mAdPreview(g, px, CY0-10, CW*0.44);
+    mStrength(g, px + CW*0.22, CY0+168, 0.9);
+    mBanner(g, px, CY0+206, CW*0.44, 'err', 'For research use only.',
+      ['The disclaimer that converts.']);
   } },
 
-mach10: { url:'ads console · auction', step:'LIVE', head:'One query, one auction',
+mach10: { crumb:'All campaigns · Meridian — Recovery', step:'LIVE', head:'One query, one auction', rail:6, live:true,
   draw(g){
-    let y = CY0 - 6;
+    let y = CY0 - 10;
     const q = g.append('g');
-    roundRect(q, CX0, y, CW*FULL(0.62), 30, 15, '#FAF8F4', '#E3DFD6', 1.2);
-    label(q, CX0+16, y+20, '“why won’t my shoulder heal”', 10.5, 600, INK);
-    mono(q, CX0+CW*FULL(0.62)-(isNarrow()?70:-16), y+20, '~200 ms', 9, ALARM);
-    ctlAuction(g, y+58);
+    roundRect(q, CX0, y, CW*0.62, 32, 16, GSURF, GBORD, 1.05);
+    IC.search(q, CX0+18, y+16, GSUB);
+    label(q, CX0+32, y+21, '“why won’t my shoulder heal”', 10.3, 500, GTEXT);
+    mono(q, CX0+CW*0.62+14, y+21, '~200 MS', 8, GERR);
+    ctlAuction(g, y+56);
   } },
 
-/* ---- the flip: the same console, the other buyer ---- */
+/* ---- the flip: the identical console, another account ---- */
 
-flip: { url:'ads console · new campaign', step:'SAME CONSOLE', head:'County Health Department', tint:true,
-  draw(g){
-    let y = CY0 + 10;
-    y = ctlCards(g, y, [
-      { t:'Sales',   d:'Drive purchases' },
-      { t:'Leads',   d:'Capture contacts' },
-      { t:'Traffic', d:'Visits to a resource' },
-      { t:'Awareness',d:'Reach the unreached' }], 3, true);
-    ctlNotice(g, y+10, 'Everything you just watched is available here',
-      ['Same screens. Same targeting primitives. Different buyer,',
-       'and a different definition of a conversion.'], 'ok');
-  } },
-
-good1: { url:'ads console · grants', step:'GRANT ACCOUNT', head:'Ad Grants', tint:true,
+flip: { crumb:'New campaign', step:'SAME CONSOLE', head:'Choose your objective', rail:0, tint:true,
   draw(g){
     let y = CY0;
-    y = ctlCounters(g, y+10, [
-      { l:'MONTHLY INVENTORY', v:10000, pre:'$', hi:true },
-      { l:'ACCOUNT CTR FLOOR', s:'5%' },
-      { l:'COST', s:'$0' }], true);
-    y = ctlList(g, y+8, [
-      { t:'Smart Bidding required — the $2 manual CPC ceiling no longer applies', on:true },
-      { t:'Specific geo-targeting — a policy requirement, not an option', on:true },
-      { t:'Nonprofit verification via Goodstack', on:true },
-      { t:'Performance Max now permitted', on:true }], true);
-    ctlNotice(g, y, 'The inventory is sitting there',
-      ['Most organisations that qualify either have no account,',
-       'or nobody in the building who can run one.'], 'ok');
+    y = mCards(g, y, [
+      { t:'Sales', d:'Drive sales online or in store', ic:IC.tag },
+      { t:'Leads', d:'Get leads and other conversions', ic:IC.person },
+      { t:'Website traffic', d:'Get the right people to visit', ic:IC.cursor },
+      { t:'Awareness', d:'Reach the unreached', ic:IC.horn }], 3, isNarrow()?2:4);
+    mBanner(g, CX0, y+4, CW*0.9, 'ok', 'Everything you just watched is available here',
+      ['Same screens. Same targeting primitives. A different buyer, and a',
+       'different definition of a conversion.']);
   } },
 
-good2: { url:'ads console · custom segment', step:'INTERCEPT', head:'The same audience, met differently', tint:true,
+good1: { crumb:'Ad Grants account', step:'GRANT', head:'Ad Grants', rail:2, tint:true,
+  draw(g){
+    let y = CY0 - 2;
+    y = mCounters(g, y+8, [
+      { l:'Monthly inventory', v:10000, pre:'$', hi:true },
+      { l:'Account CTR floor', s:'5%' },
+      { l:'Cost to the org', s:'$0' }], true);
+    y += 6;
+    [['Smart Bidding required — the $2 manual CPC ceiling no longer applies',1],
+     ['Specific geo-targeting — a policy requirement, not an option',1],
+     ['Nonprofit verification via Goodstack',1],
+     ['Performance Max campaigns now permitted',1]].forEach((r,i)=>{
+      const row = g.append('g');
+      mCheck(row, CX0, y+i*30-11, 1);
+      label(row, CX0+26, y+i*30+2, r[0], 9.8, 400, GTEXT);
+    });
+    mBanner(g, CX0, y+118, CW*0.9, 'ok', 'The inventory is sitting there',
+      ['Most organisations that qualify have no account, or nobody in the',
+       'building who can run one.']);
+  } },
+
+good2: { crumb:'New campaign · custom segment', step:'INTERCEPT', head:'The same audience, met differently', rail:3, tint:true,
+  draw(g){
+    let y = CY0 - 8;
+    y = mChips(g, CX0, y, CW*0.9,
+      ['bpc-157 dosage','tb-500 healing','wolverine stack','shoulder won’t heal'], {});
+    const card = g.append('g');
+    mCard(card, CX0, y+2, CW*0.9, 128);
+    mono(card, CX0+16, y+24, 'WHAT THE EVIDENCE ACTUALLY SAYS', 7, TEAL_D);
+    ['BPC-157 is not approved. A July 2026 advisory committee recommended it',
+     'for compounding, 8–6, over the agency’s own scientists.',
+     'Gray-market vials have been found with 10–90% less active ingredient',
+     'than labelled, with contamination and heavy metals.',
+     '“For research use only” is not a legal category for human use.'
+    ].forEach((ln,i)=> label(card, CX0+16, y+44+i*16, ln, 9.5, 400, '#3c4043'));
+    mCounters(g, y+152, [
+      { l:'RCT evidence', s:'search → hotline' },
+      { l:'988, first 30 months', v:4400, hi:true },
+      { l:'Fewer deaths than projected', s:'ages 15–23' }], true);
+  } },
+
+preroll: { crumb:'New campaign · placements', step:'INFILTRATE', head:'Placements — YouTube channels', rail:3, tint:true,
+  draw(g){
+    let y = CY0 - 8;
+    const lw = CW*0.5;
+    mono(g, CX0, y, 'TARGETED CHANNELS — AD INVENTORY PURCHASED', 7, GSUB);
+    [['Essential Truth Wellness','412k subs'],['Raw Vitality Family','1.1m subs'],
+     ['The Hidden Cure Podcast','268k subs'],['Ancient Roots Healing','770k subs']]
+      .forEach((ch,i)=>{
+        const ry = y + 14 + i*34;
+        const row = g.append('g');
+        roundRect(row, CX0, ry, lw, 28, 5, '#FFFFFF', GBORD, 1.05);
+        mCheck(row, CX0+10, ry+6, 1);
+        label(row, CX0+34, ry+18, ch[0], 9.8, 500, GTEXT);
+        label(row, CX0+lw-12, ry+18, ch[1], 8.3, 400, GSUB, 'end');
+      });
+    label(g, CX0, y+14+4*34+22, 'The channel is untouched. The slot in front of it is bought.', 9.3, 400, GSUB);
+    // the player: clinical pre-roll on the pseudo-science video
+    const px = CX0 + CW*0.55, pw = CW*0.45;
+    const player = g.append('g');
+    roundRect(player, px, CY0-8, pw, 150, 10, '#202124');
+    roundRect(player, px+12, CY0+2, 96, 22, 4, '#FFFFFF');
+    label(player, px+20, CY0+17, 'Ad · 0:15', 8.6, 600, GTEXT);
+    label(player, px+pw/2, CY0+62, 'CLINICAL DATA SPOT', 10, 700, '#FFFFFF', 'middle');
+    label(player, px+pw/2, CY0+80, 'peer-reviewed · unskippable', 8.3, 400, '#bdc1c6', 'middle');
+    roundRect(player, px+pw-104, CY0+112, 92, 22, 4, '#3c4043');
+    label(player, px+pw-58, CY0+127, 'Skip in 15s', 8.3, 400, '#9aa0a6', 'middle');
+    label(g, px, CY0+164, '“The Truth About Essential Oils and Immunity”', 9.3, 500, GTEXT);
+    label(g, px, CY0+180, 'Alternative Wellness Channel · 1.2M views', 8.3, 400, GSUB);
+    mBanner(g, CX0, CY0+206, CW*0.9, 'ok', 'A forced off-ramp at the moment of exposure',
+      ['The correction reaches the compromised audience at step one —',
+       'not step four.']);
+  } },
+
+subsidy: { crumb:'Auction insights', step:'THE MATH', head:'Ad Rank — the honesty subsidy', rail:2, tint:true,
   draw(g){
     let y = CY0 - 6;
-    y = ctlChips(g, y, ['bpc-157 dosage', 'tb-500 healing', 'wolverine stack', 'shoulder won’t heal'],
-      { tint:'#E7F2F1', stroke:TEAL_D, fg:TEAL_D });
-    const card = g.append('g');
-    roundRect(card, CX0, y+4, CW*FULL(0.86), 132, 14, '#FFFFFF', TEAL_D, 1.6);
-    mono(card, CX0+18, y+28, 'WHAT THE EVIDENCE ACTUALLY SAYS', 8, TEAL_D);
-    [ 'BPC-157 is not approved. A July 2026 advisory committee',
-      'recommended it for compounding, 8–6, over agency scientists.',
-      'Gray-market vials have been found with 10–90% less active',
-      'ingredient than labelled, with contamination and heavy metals.',
-      '“For research use only” is not a legal category for human use.'
-    ].forEach((ln,i)=> label(card, CX0+18, y+52+i*17, ln, 10, i<2?400:400, '#3A4750'));
-    y += 150;
-    ctlCounters(g, y, [
-      { l:'RCT EVIDENCE', s:'search → hotline' },
-      { l:'988, FIRST 30 MONTHS', v:4400, hi:true },
-      { l:'FEWER DEATHS THAN PROJECTED', s:'ages 15–23' }], true);
+    const cw2 = CW*0.44;
+    [[CX0, 'The gray-market seller', '2', '$25.00', GERR, 'untrustworthy landing page'],
+     [CX0+CW*0.5, 'The .gov clinical page', '10', '$5.00', GGRN, 'exact-match, credible, useful']]
+      .forEach((c,ci)=>{
+        const card = g.append('g');
+        mCard(card, c[0], y, cw2, 128);
+        label(card, c[0]+16, y+24, c[1], 10.5, 600, GTEXT);
+        label(card, c[0]+16, y+42, c[5], 8.6, 400, GSUB);
+        mono(card, c[0]+16, y+66, 'QUALITY SCORE', 6.8, GSUB);
+        label(card, c[0]+16, y+92, c[2] + ' / 10', 16, 700, c[4]);
+        mono(card, c[0]+cw2-16, y+66, 'BID FOR RANK 50', 6.8, GSUB, 'end');
+        label(card, c[0]+cw2-16, y+92, c[3], 16, 700, c[4], 'end').attr('class','bidnum');
+        label(card, c[0]+16, y+114, 'Ad Rank = bid × quality = 50', 8.6, 400, GSUB);
+      });
+    y += 146;
+    label(g, CX0+CW/2, y, 'Same rank. Five times the price for the liar.', 11.5, 700, GTEXT, 'middle');
+    y += 26;
+    mono(g, CX0, y, 'ACTION RATE BY TACTIC — PRACTITIONER BENCHMARKS', 7, GSUB);
+    const bw = CW*0.62;
+    [['Broad display / PR', .02, '#bdc1c6', '~0.2%'],
+     ['Contextual pre-roll', .29, '#8ab4f8', '~3.5%'],
+     ['Search interception', 1.0, TEAL_D, '12%+']]
+      .forEach((b,i)=>{
+        const by = y + 16 + i*32;
+        label(g, CX0, by+13, b[0], 9.3, 400, GTEXT);
+        roundRect(g, CX0+150, by, bw-150, 18, 9, GSURF);
+        roundRect(g, CX0+150, by, 6, 18, 9, b[2]).attr('class','effbar')
+          .property('__w', Math.max(10,(bw-150)*b[1]));
+        label(g, CX0+bw+14, by+13, b[3], 10, 700, b[2]==='#bdc1c6'?GSUB:b[2]).attr('class','efftag');
+      });
   } },
 
-good3: { url:'ads console · demographics', step:'FIND THE GAP', head:'The grid, used the other way', tint:true,
+good3: { crumb:'New campaign · settings', step:'FIND THE GAP', head:'Demographics, inverted', rail:3, tint:true,
   draw(g){
-    let y = CY0 - 4;
-    y = ctlGrid(g, y,
-      ['Top 10%','11–20%','21–30%','31–40%','41–50%','Lower 50%','Unknown'],
+    let y = CY0 - 6;
+    y = mDemoTable(g, y,
+      ['Top 10%','11–20%','21–30%','31–40%','41–50%','Low 50%','Unknown'],
       ['Metro','Suburban','Rural'],
       (i,j)=> (i>=4 && j>=1) ? 1 : 0, true);
-    y = ctlMap(g, y-16, true);
-    label(g, CX0, y-16, 'The same dimensions. Pointed at who is missing, not who can pay.', 10, 600, INK);
+    y = mMap(g, y-6, true);
+    label(g, CX0, y-14, 'The same dimensions. Pointed at who is missing, not who can pay.', 9.8, 600, GTEXT);
   } }
 
 };
 
-/* ---- the renderer: one frame, re-dressed ---- */
+/* =====================================================================
+   THE FORCES, THE CYCLE, THE HOOKS, THE FUNNELS, THE CHAMBER
+   ===================================================================== */
+
+/* ---- the five forces: a board that opens on click ---- */
+const FORCES = [
+  { id:'truth', t:'Engagement ≠ truth',
+    d:['Algorithms optimise strictly for engagement and session length —','never accuracy. Emotionally charged misinformation outperforms','clinical fact structurally, not occasionally: the metric that decides','what you see cannot perceive the difference.'] },
+  { id:'novel', t:'Novelty rewards pseudo-science',
+    d:['Feeds reward shock, outrage and novelty. Pseudo-science is','inherently novel — a new secret cure every week. Clinical data is','inherently not: a replicated finding is old news by definition. The','house style of science is repetition; the feed’s is surprise.'] },
+  { id:'revenue', t:'Desperation is recurring revenue',
+    d:['There is vast unethical revenue in cures for permanent chronic','disease — and for conditions medicine cannot yet treat well. A','customer who cannot be cured cannot be satisfied, and cannot stop','buying. The product fails; the subscription renews.'] },
+  { id:'chamber', t:'Chambers seal themselves',
+    d:['Health is politicised and recommenders are powerful: the similarly','convinced find each other — looksmaxxing forums, alternative','ivermectin groups, self-reinforcing eating-disorder communities —','and the algorithm walls off the counter-content.'] },
+  { id:'masq', t:'The clinical masquerade',
+    d:['Distressing content at algorithmic dose can produce psychological','symptoms that masquerade as the very conditions the feed then','sells cures for. The machine can manufacture the demand','it monetises.'] }
+];
+const forceTiles = gForce.append('g');
+const forcePanel = gForce.append('g');
+let forceOpen = null;
+function drawForces(){
+  forceTiles.selectAll('*').remove();
+  const nar = isNarrow();
+  const cols = nar ? 1 : 5;
+  const tw = nar ? 460 : 164, th = nar ? 44 : 96, gap = 12;
+  const x0 = nar ? 270 : 500 - (5*tw + 4*gap)/2;
+  FORCES.forEach((f,i)=>{
+    const x = nar ? x0 : x0 + i*(tw+gap);
+    const y = nar ? 54 + i*(th+10) : 64;
+    const on = forceOpen === f.id;
+    const tile = forceTiles.append('g').attr('class','ftile').datum(f)
+      .attr('tabindex',-1).attr('role','button')
+      .attr('aria-label', f.t + '. ' + f.d.join(' '))
+      .style('cursor','pointer');
+    roundRect(tile, x, y, tw, th, 12, on ? '#212E36' : '#FFFFFF', on ? null : LINE, 1.3);
+    mono(tile, x+14, y+22, '0'+(i+1), 7.5, on ? '#F9C9B4' : ALARM);
+    const words = nar ? [f.t] : f.t.split(' ').reduce((acc,w)=>{
+      const last = acc[acc.length-1];
+      if (last && (last+' '+w).length <= 14) acc[acc.length-1] = last+' '+w;
+      else acc.push(w);
+      return acc;
+    },[]);
+    words.forEach((ln,k)=> label(tile, x+14, y+(nar?30:44)+k*15, ln, nar?11:10, 700, on ? '#F8F6F1' : INK));
+  });
+}
+function drawForcePanel(){
+  forcePanel.selectAll('*').remove();
+  const nar = isNarrow();
+  const f = FORCES.find(x=>x.id===forceOpen);
+  const px = nar ? 270 : 220, pw = nar ? 460 : 560,
+        py = nar ? 340 : 210, ph = nar ? 210 : 150;
+  if (!f){
+    label(forcePanel, nar?500:500, py+ph/2, 'Open a force to read its mechanism.', 11, 400, MUTE, 'middle')
+      .attr('opacity',.8);
+    return;
+  }
+  roundRect(forcePanel, px, py, pw, ph, 14, '#FFFFFF', ALARM, 1.5);
+  mono(forcePanel, px+20, py+28, 'FORCE 0'+(FORCES.indexOf(f)+1), 7.5, ALARM);
+  label(forcePanel, px+20, py+52, f.t, 13, 700, INK);
+  f.d.forEach((ln,i)=> label(forcePanel, px+20, py+76+i*18, ln, 10, 400, '#3A4750'));
+  if (!REDUCE){
+    forcePanel.attr('opacity',0).attr('transform','translate(0,8)')
+      .transition('fp').duration(320).ease(d3.easeCubicOut)
+      .attr('opacity',1).attr('transform','translate(0,0)');
+  }
+}
+function setForce(id){
+  forceOpen = forceOpen === id ? null : id;
+  drawForces(); drawForcePanel(); applyTypeScale(); wireForces();
+}
+function wireForces(){
+  forceTiles.selectAll('g.ftile')
+    .on('click', (ev,f)=> setForce(f.id))
+    .on('keydown', function(ev,f){
+      if (ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); setForce(f.id); }
+    });
+}
+drawForces(); drawForcePanel(); wireForces();
+label(gForce, 500, isNarrow()?30:40, 'One metric — watch time. Five consequences.', 12, 700, INK, 'middle');
+
+/* ---- the misinformation cycle ---- */
+const CYCLE = [
+  { t:'Seeding', d:['“Your fatigue is parasites.','The establishment ignores it.”'] },
+  { t:'Entrenchment', d:['Dwell time read as truth;','the chamber walls itself.'] },
+  { t:'High-intent search', d:['The viewer types the compound','into Google. Act Two waits.'] },
+  { t:'The correction', d:['The fact-check publishes here —','three steps after the capture.'], late:true }
+];
+(function(){
+  CYCLE.forEach((c,i)=>{
+    const g = gCyc.append('g').attr('class','cstep').attr('data-i',i);
+    g.append('circle').attr('class','cnum').attr('r',17)
+      .attr('fill', c.late ? '#EFEAE0' : '#212E36');
+    label(g, 0, 5, String(i+1), 11, 700, c.late ? '#8A8474' : '#F8F6F1', 'middle');
+    label(g, 0, 42, c.t, 11.5, 700, c.late ? '#8A8474' : INK, 'middle');
+    c.d.forEach((ln,k)=> label(g, 0, 62+k*15, ln, 9, 400, MUTE, 'middle'));
+    if (c.late){
+      const stamp = g.append('g').attr('class','clate');
+      roundRect(stamp, -62, 96, 124, 26, 6, 'none', ALARM, 1.8);
+      label(stamp, 0, 113, 'TOO LATE', 10, 700, ALARM, 'middle')
+        .attr('font-family',MONO).attr('letter-spacing','.14em');
+      stamp.attr('transform','rotate(-6)');
+    }
+  });
+  for (let i=0;i<3;i++){
+    gCyc.append('path').attr('class','carrow').attr('data-i',i)
+      .attr('fill','none').attr('stroke',INK).attr('stroke-width',1.5)
+      .attr('stroke-dasharray','6 5');
+  }
+})();
+function layoutCycle(){
+  const nar = isNarrow();
+  gCyc.selectAll('g.cstep').each(function(){
+    const i = +this.getAttribute('data-i');
+    const x = nar ? 500 : 170 + i*220;
+    const y = nar ? 120 + i*190 : 300;
+    d3.select(this).attr('transform','translate('+x+','+y+')');
+  });
+  gCyc.selectAll('path.carrow').each(function(){
+    const i = +this.getAttribute('data-i');
+    d3.select(this).attr('d', nar
+      ? 'M 500 '+(120+i*190+128)+' V '+(120+(i+1)*190-24)
+      : 'M '+(170+i*220+80)+' 300 H '+(170+(i+1)*220-80));
+  });
+}
+layoutCycle();
+
+/* ---- the hook library ---- */
+const HOOKS = [
+  { t:'“Secret Stanford doctors use this ONE supplement”', m:'Authority theft',
+    w:'Credibility is borrowed, never earned: the white coat, the campus, the “leak”. The institution being invoked would disown every word — which is why it is named and never quoted.' },
+  { t:'“Big Pharma is HIDING this”', m:'Suppression conspiracy',
+    w:'Distrust, pre-harvested by the ecosystem, does the work. Unfalsifiable by design: the absence of evidence is presented as the proof of the cover-up.' },
+  { t:'“The wealthy keep this ONE remedy to themselves”', m:'Class envy + scarcity',
+    w:'Aspiration as anaesthetic. Price anchoring does the close: their version costs $10,000, yours is $49, today only.' },
+  { t:'“Ancient healers used this root for 3,000 years”', m:'Borrowed antiquity',
+    w:'Old is made to feel safe, and safe is made to feel proven — the naturalistic fallacy on a loop. The evidence base never existed; the nostalgia for it sells anyway.' }
+];
+(function(){
+  const px = 190;
+  roundRect(gHook, px, 70, 250, 500, 30, '#FFFFFF', LINE, 1.6);
+  roundRect(gHook, px+12, 88, 226, 464, 20, '#F3F0E9');
+  label(gHook, px+125, 200, '▶', 26, 400, '#B9B2A4', 'middle');
+  label(gHook, px+125, 320, 'the reel', 10, 400, MUTE, 'middle');
+  mono(gHook, px+125, 540, '0.8 SECONDS TO HOOK', 6.8, ALARM, 'middle');
+  HOOKS.forEach((h,i)=>{
+    const g = gHook.append('g').attr('class','hookcard').datum(h)
+      .attr('data-i',i);
+    roundRect(g, 0, 0, 380, 96, 14, '#FFFFFF', LINE, 1.3);
+    const words = h.t.split(' ');
+    let lines = [''], li = 0;
+    words.forEach(w=>{
+      if ((lines[li]+' '+w).trim().length > 38){ li++; lines[li]=w; }
+      else lines[li] = (lines[li]+' '+w).trim();
+    });
+    lines.forEach((ln,k)=> label(g, 18, 30+k*17, ln, 10.5, 700, INK));
+    roundRect(g, 18, 62, h.m.length*5.6+22, 20, 10, '#FBE3D2');
+    label(g, 18+(h.m.length*5.6+22)/2, 76, h.m, 8.3, 600, ALARM, 'middle');
+  });
+})();
+function layoutHooks(){
+  const nar = isNarrow();
+  gHook.selectAll('g.hookcard').each(function(){
+    const i = +this.getAttribute('data-i');
+    d3.select(this).attr('transform', nar
+      ? 'translate(255,'+(80+i*112)+')'
+      : 'translate(480,'+(84+i*118)+')');
+  });
+  gHook.selectAll('rect,text').filter(function(){ return !this.closest('g.hookcard'); });
+  // the reel phone hides on narrow — the cards are the content
+  gHook.selectAll(':scope > rect, :scope > text').attr('display', nar ? 'none' : null);
+}
+layoutHooks();
+bindTip(gHook.selectAll('g.hookcard'), d => '<b>'+d.m+'</b><br>'+d.w, d => d.m + '. ' + d.w);
+
+/* ---- choose your feed: four funnels, one skeleton ---- */
+const CYOA = [
+  { id:'stanford', short:'Secret Stanford doctors…', mech:'Authority theft', tint:'#DCEBF5',
+    beats:[
+      ['HOOK · 0.8s','White coat, campus b-roll, a “leaked” framing. Credibility borrowed, never earned.'],
+      ['RETENTION','Open loop: “they tried to silence him.” The reveal stays one beat away, forever.'],
+      ['PROOF','AI-actor testimonials and screenshot “studies” — Act Two’s factory, on the clock.'],
+      ['COUNTDOWN','“Watch before it’s taken down.” Urgency implies suppression; suppression implies value.'],
+      ['THE BOTTLE','Generic berberine at a twelve-times markup. The secret was the markup.']] },
+  { id:'pharma', short:'Big Pharma is hiding…', mech:'Suppression conspiracy', tint:'#FBE3D2',
+    beats:[
+      ['HOOK','A cure exists and someone buried it. Pre-harvested distrust does the heavy lifting.'],
+      ['RETENTION','Unfalsifiable by design: absence of evidence is presented as proof of the cover-up.'],
+      ['PROOF','A real drug-pricing scandal, cropped until it seems to prove something else entirely.'],
+      ['COUNTDOWN','“Join the ones who woke up.” Belonging is the product; biology is the pretext.'],
+      ['THE BOTTLE','A proprietary blend with no dosages listed. The label hides more than pharma ever did.']] },
+  { id:'wealthy', short:'The wealthy keep this…', mech:'Class envy', tint:'#EFEAE0',
+    beats:[
+      ['HOOK','Jets, villas, a name-dropped billionaire’s “protocol”. Aspiration as anaesthetic.'],
+      ['RETENTION','Price anchoring: “their version costs $10,000. Yours is $49. Today.”'],
+      ['PROOF','A concierge-medicine screenshot that proves only that rich people buy things.'],
+      ['COUNTDOWN','Scarcity: “500 bottles reserved for non-members.” The velvet rope is the product.'],
+      ['THE BOTTLE','An NAD “precursor” with no human bioavailability data at the sold dose.']] },
+  { id:'ancient', short:'Ancient healers used…', mech:'Borrowed antiquity', tint:'#E7F2F1',
+    beats:[
+      ['HOOK','Parchment filter, appropriated tradition. Old feels safe; safe is sold as proven.'],
+      ['RETENTION','“Modern science finally catches up” — the study never arrives; the sequel always does.'],
+      ['PROOF','The naturalistic fallacy on a loop: natural, therefore harmless, therefore effective.'],
+      ['COUNTDOWN','“Reclaim what medicine forgot.” Nostalgia for an evidence base that never existed.'],
+      ['THE BOTTLE','An imported extract from the least-tested supply chain on the market — the category where contamination audits keep finding what the label never mentions.']] }
+];
+const cyoaCards = gCyoa.append('g');
+const cyoaPanel = gCyoa.append('g');
+let cyoaOpen = null;
+function drawCyoaCards(){
+  cyoaCards.selectAll('*').remove();
+  const nar = isNarrow();
+  CYOA.forEach((c,i)=>{
+    const x = nar ? 265 : 80 + i*216;
+    const y = nar ? 30 + i*64 : 60;
+    const w = nar ? 470 : 200, h = nar ? 54 : 92;
+    const on = cyoaOpen === c.id;
+    const card = cyoaCards.append('g').attr('class','ccard').datum(c)
+      .attr('tabindex',-1).attr('role','button')
+      .attr('aria-label','Walk the funnel: '+c.short+' — '+c.mech)
+      .style('cursor','pointer');
+    roundRect(card, x, y, w, h, 12, on ? '#212E36' : c.tint, on ? null : 'rgba(33,46,54,.14)', 1.2);
+    label(card, x+14, y+(nar?23:30), c.short, nar?10.5:10, 700, on ? '#F8F6F1' : INK);
+    label(card, x+14, y+(nar?41:52), c.mech, 8.6, 600, on ? '#F9C9B4' : '#8A6A55');
+    if (!nar) label(card, x+14, y+76, on ? 'walking the funnel ↓' : 'tap to walk the funnel', 8, 400, on ? '#D9D2C6' : MUTE);
+  });
+}
+function drawCyoaPanel(){
+  cyoaPanel.selectAll('*').remove();
+  const nar = isNarrow();
+  const c = CYOA.find(x=>x.id===cyoaOpen);
+  const px = nar ? 245 : 120, pw = nar ? 510 : 760,
+        py = nar ? 306 : 190;
+  if (!c){
+    label(cyoaPanel, 500, py+120, 'Choose a reel above. The funnel is the same; the costume changes.', 11, 400, MUTE, 'middle');
+    return;
+  }
+  const bh = nar ? 84 : 82;
+  c.beats.forEach((b,i)=>{
+    const by = py + i*(bh+8);
+    const row = cyoaPanel.append('g').attr('class','cbeat');
+    roundRect(row, px, by, pw, bh, 12, i===4 ? '#FBEDE7' : '#FFFFFF',
+              i===4 ? ALARM : LINE, i===4 ? 1.5 : 1.2);
+    mono(row, px+16, by+22, b[0], 7.3, i===4 ? ALARM : '#8A6A55');
+    const words = b[1].split(' ');
+    let lines = [''], li = 0;
+    const maxc = nar ? 58 : 92;
+    words.forEach(w=>{
+      if ((lines[li]+' '+w).trim().length > maxc){ li++; lines[li]=w; }
+      else lines[li] = (lines[li]+' '+w).trim();
+    });
+    lines.forEach((ln,k)=> label(row, px+16, by+42+k*15, ln, 9.8, 400, '#3A4750'));
+  });
+  if (!REDUCE){
+    cyoaPanel.selectAll('g.cbeat').attr('opacity',0).attr('transform','translate(0,10)')
+      .transition('cbeat').duration(360).delay((d,i)=>i*130).ease(d3.easeCubicOut)
+      .attr('opacity',1).attr('transform','translate(0,0)');
+  }
+}
+function setCyoa(id){
+  cyoaOpen = cyoaOpen === id ? null : id;
+  drawCyoaCards(); drawCyoaPanel(); applyTypeScale(); wireCyoa();
+}
+function wireCyoa(){
+  cyoaCards.selectAll('g.ccard')
+    .on('click', (ev,c)=> setCyoa(c.id))
+    .on('keydown', function(ev,c){
+      if (ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); setCyoa(c.id); }
+    });
+}
+drawCyoaCards(); drawCyoaPanel(); wireCyoa();
+
+/* ---- the chamber: dwell time builds the wall ---- */
+(function(){
+  const BUB = [
+    { x:330, y:250, r:96, t:'looksmaxxing' },
+    { x:640, y:210, r:82, t:'alt-ivermectin' },
+    { x:500, y:450, r:104, t:'ED communities' }
+  ];
+  BUB.forEach(b=>{
+    const g = gCham.append('g');
+    g.append('circle').attr('cx',b.x).attr('cy',b.y).attr('r',b.r)
+      .attr('fill','rgba(231,77,78,.07)').attr('stroke',ALARM)
+      .attr('stroke-width',1.5).attr('stroke-dasharray','2 5')
+      .attr('stroke-linecap','round').attr('class','bubwall');
+    for (let i=0;i<14;i++){
+      const a = rnd()*Math.PI*2, rr = Math.sqrt(rnd())*(b.r-16);
+      g.append('circle').attr('cx',b.x+Math.cos(a)*rr).attr('cy',b.y+Math.sin(a)*rr)
+        .attr('r',4.5).attr('fill',['#E74D4E','#C25236','#B8492E'][i%3]).attr('opacity',.85);
+    }
+    label(g, b.x, b.y+b.r+20, b.t, 10, 600, ALARM, 'middle');
+  });
+  for (let i=0;i<5;i++){
+    const cc = gCham.append('g').attr('class','counter').attr('data-i',i);
+    roundRect(cc, -34, -12, 68, 24, 12, '#E7F2F1', TEAL_D, 1.3);
+    label(cc, 0, 4, 'evidence', 8, 600, TEAL_D, 'middle');
+  }
+  label(gCham, 500, 70, 'Inside: agreement. Outside: a wall the correction cannot see.', 11.5, 700, INK, 'middle');
+})();
+let chamOn = false;
+function chamLoop(on){
+  if (REDUCE) return;
+  if (!on){ chamOn = false; gCham.selectAll('g.counter').interrupt('bounce'); return; }
+  if (chamOn) return;
+  chamOn = true;
+  const TARGETS = [[330,250,96],[640,210,82],[500,450,104],[330,250,96],[640,210,82]];
+  gCham.selectAll('g.counter').each(function(d,i){
+    const g = d3.select(this);
+    const [tx,ty,tr] = TARGETS[i];
+    (function fly(){
+      if (!chamOn) return;
+      const a = rnd()*Math.PI*2;
+      const sx = tx+Math.cos(a)*(tr+180), sy = ty+Math.sin(a)*(tr+180);
+      const hx = tx+Math.cos(a)*(tr+16), hy = ty+Math.sin(a)*(tr+16);
+      g.attr('transform','translate('+sx+','+sy+')').attr('opacity',0);
+      g.transition('bounce').duration(400).delay(i*260).attr('opacity',1)
+        .transition('bounce').duration(1100).ease(d3.easeCubicIn)
+        .attr('transform','translate('+hx+','+hy+')')
+        .transition('bounce').duration(700).ease(d3.easeCubicOut)
+        .attr('transform','translate('+(tx+Math.cos(a)*(tr+70))+','+(ty+Math.sin(a)*(tr+70))+')')
+        .attr('opacity',0)
+        .on('end', fly);
+    })();
+  });
+}
+
+/* ---- sonar: good3 is a search, so it searches ---- */
 let sonarOn = false;
 function sonar(on){
   if (REDUCE){ return; }
@@ -1393,45 +2057,45 @@ function sonar(on){
   });
 }
 
+/* ---- the renderer ---- */
 let conKey = null;
 function renderConsole(key){
   const sc = SCREENS[key];
   if (!sc || conKey === key) return;
   conKey = key;
+  if (!conShell) drawConFrame();
   conBody.selectAll('*').remove();
-  conUrl.text(sc.url);
-  conStep.text(sc.step).attr('fill', sc.tint ? TEAL_D : ALARM);
+  conCrumb.text(sc.crumb);
+  conStep.text(sc.step).attr('fill', sc.tint ? TEAL_D : (sc.live ? GGRN : GERR));
   conHead.text(sc.head);
-  conShell.transition('tint').duration(FADE)
-    .attr('stroke', sc.tint ? TEAL : LINE);
-  conAcct.text(isNarrow() ? (sc.tint ? 'HEALTH DEPT' : 'MERIDIAN')
-                          : (sc.tint ? 'COUNTY HEALTH DEPARTMENT' : 'MERIDIAN LONGEVITY'));
+  conFrame.select('circle.avatar').attr('fill', sc.tint ? TEAL_D : '#7b1fa2');
+  conAcct.text(sc.tint ? 'C' : 'M');
+  drawRail(sc.rail || 0, !!sc.live);
   sc.draw(conBody);
   applyTypeScale();
   wireChips(conBody);
 
   if (REDUCE){
-    conBody.selectAll('path.rankbar,rect.rankbar').attr('width', function(){ return this.__w || +this.getAttribute('width'); });
+    conBody.selectAll('rect.rankbar').attr('width', function(){ return Math.max(8, this.__w || 0); });
+    conBody.selectAll('rect.effbar').attr('width', function(){ return this.__w; });
     conBody.selectAll('g.winner').attr('opacity',1);
-    conBody.selectAll('path.meter').attr('d', function(){
-      return this.__arc({ endAngle: -Math.PI*0.72 + Math.PI*1.44*this.__val });
-    });
+    conBody.selectAll('text.azn').each(function(){ this.textContent = (+d3.select(this).property('__v')).toLocaleString('en-US'); });
     return;
   }
-  // entrance: the screen assembles, then the chosen control commits
+  // the screen assembles, then the chosen control commits
   conBody.attr('opacity',0).attr('transform','translate(0,10)')
     .transition('screen').duration(420).ease(d3.easeCubicOut)
     .attr('opacity',1).attr('transform','translate(0,0)');
-  conBody.selectAll('g.sel rect').attr('stroke-width',1.2)
+  conBody.selectAll('g.sel rect').attr('stroke-width',1.1)
     .transition('commit').duration(420).delay(520).attr('stroke-width',1.8);
-  conBody.selectAll('g.sel circle.dot').attr('r',0)
-    .transition('commit').duration(380).delay(560).ease(d3.easeBackOut.overshoot(2)).attr('r',3.6);
+  conBody.selectAll('g.sel .dot, g.sel g.dot').attr('opacity',0)
+    .transition('commit').duration(340).delay(560).attr('opacity',1);
   conBody.selectAll('g.chip').attr('opacity',0)
     .transition('commit').duration(300).delay((d,i)=>420+i*110).attr('opacity',1);
   conBody.selectAll('g.slot').attr('opacity',0)
-    .transition('commit').duration(200).delay((d,i)=>380+i*38).attr('opacity',1);
-  // a sequenced screen tells its story in beats; everywhere else the
-  // commentary (notices) arrives after the controls it comments on
+    .transition('commit').duration(220).delay((d,i)=>380+i*70).attr('opacity',1);
+  // sequenced screens tell their story in beats; elsewhere the commentary
+  // (banners) arrives after the controls it comments on
   if (!conBody.select('g.s1').empty()){
     conBody.select('g.s1').attr('opacity',0)
       .transition('commit').duration(420).delay(200).attr('opacity',1);
@@ -1445,24 +2109,36 @@ function renderConsole(key){
       .transition('commit').duration(380).delay((d,i)=>820+i*170).attr('opacity',1);
   }
   conBody.selectAll('g.gcell').attr('opacity',0)
-    .transition('commit').duration(220).delay((d,i)=>380+i*26).attr('opacity',1);
+    .transition('commit').duration(220).delay((d,i)=>380+i*24).attr('opacity',1);
   conBody.selectAll('circle.pinring').attr('r',0)
     .transition('commit').duration(520).delay((d,i)=>480+i*130).ease(d3.easeCubicOut)
     .attr('r', function(){ return +this.getAttribute('data-r'); });
   conBody.selectAll('circle.pindot').attr('r',0)
     .transition('commit').duration(280).delay((d,i)=>660+i*130).ease(d3.easeCubicOut)
-    .attr('r',4.5);
-  // the strength meter arcs up
-  conBody.selectAll('path.meter').each(function(){
-    const node = this, arc = node.__arc, val = node.__val;
-    d3.select(node).transition('commit').duration(1100).delay(700).ease(VALUE_EASE)
-      .attrTween('d', () => t => arc({ endAngle: -Math.PI*0.72 + Math.PI*1.44*val*t }));
+    .attr('r',4.2);
+  // the audience-size estimate counts up — the machine pricing the crowd
+  conBody.selectAll('text.azn').each(function(){
+    const t = d3.select(this), v = +t.property('__v');
+    t.transition('commit').duration(1200).delay(900).ease(VALUE_EASE)
+      .tween('t', () => k => t.text(Math.round(v*k).toLocaleString('en-US')));
   });
-  // ad rank bars fill, then the winner is stamped
+  // the strength needle swings up through the grades
+  conBody.selectAll('g.meter').each(function(){
+    const n = d3.select(this), deg = +this.getAttribute('data-deg');
+    const tf = this.getAttribute('transform').split(' rotate')[0];
+    n.attr('transform', tf + ' rotate(-90)')
+      .transition('commit').duration(1100).delay(700).ease(VALUE_EASE)
+      .attrTween('transform', () => k => tf + ' rotate(' + (-90 + (deg+90)*k) + ')');
+  });
   conBody.selectAll('rect.rankbar').each(function(d,i){
     const w = this.__w;
     d3.select(this).transition('commit').duration(700).delay(500+i*110).ease(VALUE_EASE)
       .attr('width', Math.max(8,w));
+  });
+  conBody.selectAll('rect.effbar').each(function(d,i){
+    const w = this.__w;
+    d3.select(this).transition('commit').duration(800).delay(700+i*200).ease(VALUE_EASE)
+      .attr('width', w);
   });
   conBody.selectAll('g.winner')
     .transition('commit').duration(320).delay(1500).attr('opacity',1);
@@ -1867,6 +2543,148 @@ function renderLedger(key){
   label(gTier, 500, BASEY+52, 'It starts as a report. It ends as a flywheel your team owns.', 12.5, 700, INK, 'middle');
 })();
 
+/* =====================================================================
+   ACT III DEEP DIVE — signatures, routes, and the field evidence
+   ===================================================================== */
+
+const sg1 = gSig.append('g').attr('opacity',0);
+const sg2 = gSig.append('g').attr('opacity',0);
+const sg3 = gSig.append('g').attr('opacity',0);
+
+/* ---- sig1: two signatures the labels cannot tell apart ---- */
+(function(){
+  const CARDS = [
+    { x:288, tint:'#DCEBF5', name:'The optimizer',
+      q:['“apob vs ldl which matters”','“continuous glucose monitor no diabetes”','“nmn dosage longevity”','“best labs for biomarker panel”'],
+      apps:['tracker ring','macros app','fitness log'],
+      eco:'Ecosystem: optimization podcasts, longevity YouTube',
+      bar:'Barrier: distrusts institutions — trusts data' },
+    { x:712, tint:'#FBE3D2', name:'The stretched',
+      q:['“free clinic near me”','“cheapest insulin without insurance”','“er wait times tonight”','“bus route to county hospital”'],
+      apps:['local groups','marketplace','maps'],
+      eco:'Ecosystem: family, church, neighbourhood group chats',
+      bar:'Barrier: access, cost, time' }
+  ];
+  CARDS.forEach((c,ci)=>{
+    const g = sg1.append('g').attr('class','sig1card').attr('data-x',c.x)
+      .attr('transform','translate('+c.x+',108)');
+    roundRect(g, -195, 0, 390, 328, 16, '#FFFFFF', LINE, 1.3);
+    label(g, -173, 34, c.name, 13.5, 700, INK);
+    mono(g, -173, 58, 'RECENT SEARCHES', 7.4, MUTE);
+    c.q.forEach((q,i)=> label(g, -173, 82+i*22, q, 10, 400, '#3A4750').attr('class','sq'));
+    g.append('path').attr('d','M -173 178 H 173').attr('stroke','#EFECE5').attr('stroke-width',1);
+    mono(g, -173, 198, 'ON THE PHONE', 7.4, MUTE);
+    let ax = -173;
+    c.apps.forEach(a=>{
+      const w = a.length*5.6*TK + 20;
+      roundRect(g, ax, 208, w, 22, 11, c.tint);
+      label(g, ax+w/2, 208+14.5, a, 8.6, 600, INK, 'middle');
+      ax += w + 8;
+    });
+    label(g, -173, 258, c.eco, 9.3, 400, MUTE);
+    roundRect(g, -173, 276, 346, 34, 8, c.tint);
+    label(g, 0, 297, c.bar, 10.3, 700, INK, 'middle');
+  });
+  // the collapse: one grey label, struck through
+  const strip = sg1.append('g').attr('class','sig1strip');
+  label(strip, 500, 492, 'Demographics put them far apart. One label collapses them:', 11, 400, MUTE, 'middle');
+  roundRect(strip, 428, 506, 144, 30, 15, '#EFEAE0', '#B9B2A4', 1.2);
+  label(strip, 500, 526, '“distrustful”', 11.5, 600, '#55606A', 'middle');
+  strip.append('path').attr('class','strike')
+    .attr('d','M 420 521 L 580 521')
+    .attr('stroke',ALARM).attr('stroke-width',2.4).attr('stroke-linecap','round').attr('opacity',0);
+  label(strip, 500, 560, 'Neither the grid nor the label sees the barrier.', 11, 700, INK, 'middle')
+    .attr('class','sig1close');
+})();
+function layoutSig1(){
+  const nar = isNarrow();
+  sg1.selectAll('g.sig1card').each(function(d,i){
+    const x = nar ? 500 : +this.getAttribute('data-x');
+    const y = nar ? 40 + i*352 : 108;
+    this.setAttribute('data-ty', x+','+y);
+    d3.select(this).attr('transform','translate('+x+','+y+')');
+  });
+  sg1.select('g.sig1strip').attr('transform', nar ? 'translate(0,268)' : 'translate(0,0)');
+}
+
+/* ---- sig2: one evidence base, four routes ---- */
+const SIG2 = [
+  { x:262, y:308, t:'Autonomy-oriented', tint:'#DCEBF5',
+    l1:'Clinician-reviewed. Absolute benefits,', l2:'harms, uncertainty — choice kept.',
+    w:'Responds to a clinician-reviewed presentation that emphasises absolute benefits, absolute harms, uncertainty, and available choices. Persuasion reads as control; complete information reads as respect.' },
+  { x:738, y:308, t:'Clinician-trusting', tint:'#E7F2F1',
+    l1:'The same evidence, delivered', l2:'by a physician, in person or on camera.',
+    w:'The identical evidence lands differently when a doctor says it. The messenger is the variable, not the message.' },
+  { x:262, y:492, t:'Overwhelmed', tint:'#FBE3D2',
+    l1:'Adjudication: what is known, what is', l2:'uncertain, why the claims differ.',
+    w:'Drowning in contradictory claims, this audience needs explicit adjudication — what is known, what remains uncertain, and why apparently conflicting statements disagree. The scene they need is this series’ noise act, resolved.' },
+  { x:738, y:492, t:'Low-access', tint:'#EFEAE0',
+    l1:'The recommendation, plus the clinic,', l2:'the cost, the eligibility, the route.',
+    w:'Benefits most when the recommendation is coupled to a local service: cost, eligibility, and a direct route to care. The barrier is logistics, not belief — no amount of framing substitutes for a bus route.' }
+];
+(function(){
+  const pill = sg2.append('g').attr('class','sig2pill');
+  roundRect(pill, 355, 118, 290, 64, 32, '#FFFFFF', INK, 1.6);
+  label(pill, 500, 145, 'ONE EVIDENCE BASE', 12, 700, INK, 'middle');
+  label(pill, 500, 165, 'benefits · harms · uncertainty', 9.3, 400, MUTE, 'middle');
+  SIG2.forEach(c=>{
+    const lower = c.y > 400;
+    sg2.append('path').attr('class','lead')
+      .attr('d', lower
+        ? 'M 500 184 Q 500 '+((184+c.y)/2+56)+' '+c.x+' '+(c.y-64)
+        : 'M 500 184 Q '+(500+(c.x-500)*.45)+' '+((184+c.y)/2)+' '+c.x+' '+(c.y-64))
+      .attr('fill','none').attr('stroke','#B9B2A4').attr('stroke-width',1.4).attr('stroke-dasharray','5 4');
+    const g = sg2.append('g').attr('class','sig2card').datum({ t:c.t, w:c.w })
+      .attr('data-x',c.x).attr('data-y',c.y)
+      .attr('transform','translate('+c.x+','+c.y+')');
+    roundRect(g, -170, -62, 340, 124, 14, c.tint);
+    label(g, 0, -32, c.t, 12.5, 700, INK, 'middle');
+    label(g, 0, -8, c.l1, 9.8, 400, '#3A4750', 'middle');
+    label(g, 0, 10, c.l2, 9.8, 400, '#3A4750', 'middle');
+    label(g, 0, 40, 'same evidence · different route', 8, 600, MUTE, 'middle');
+  });
+})();
+function layoutSig2(){
+  const nar = isNarrow();
+  sg2.selectAll('g.sig2card').each(function(d,i){
+    const x = nar ? 500 : +this.getAttribute('data-x');
+    const y = nar ? 300 + i*146 : +this.getAttribute('data-y');
+    this.setAttribute('data-ty', x+','+y);
+    d3.select(this).attr('transform','translate('+x+','+y+')');
+  });
+  sg2.selectAll('path.lead').attr('display', nar ? 'none' : null);
+}
+bindTip(sg2.selectAll('g.sig2card'), d => '<b>'+d.t+'</b><br>'+d.w, d => d.t + '. ' + d.w);
+
+/* ---- sig3: the Matz field experiments ---- */
+(function(){
+  const cx = 500;
+  const n = sg3.append('text').attr('class','sig3n').attr('x',cx).attr('y',170)
+    .attr('text-anchor','middle').attr('font-family',SANS).call(typed,34)
+    .attr('font-weight',700).attr('fill',INK).text('3,500,000');
+  n.property('__v', 3500000);
+  label(sg3, cx, 196, 'people · three field experiments · psychologically matched ads', 10.5, 400, MUTE, 'middle');
+  const BARS = [
+    { y:268, l:'Clicks',    lift:'+40%', frac:.40 },
+    { y:368, l:'Purchases', lift:'+50%', frac:.50 }
+  ];
+  const bx = 240, bw = 430;
+  BARS.forEach(b=>{
+    label(sg3, bx, b.y-14, b.l, 11.5, 700, INK);
+    mono(sg3, bx, b.y+14, 'MISMATCHED', 6.8, MUTE);
+    roundRect(sg3, bx+108, b.y+2, bw*.62, 16, 8, '#DCD5C6');
+    mono(sg3, bx, b.y+46, 'MATCHED', 6.8, TEAL_D);
+    roundRect(sg3, bx+108, b.y+34, 4, 16, 8, TEAL_D).attr('class','sig3bar')
+      .property('__w', bw*.62*(1+b.frac));
+    const tag = label(sg3, bx+108+bw*.62*(1+b.frac)+14, b.y+47, b.lift, 13, 700, TEAL_D)
+      .attr('class','sig3tag');
+  });
+  label(sg3, cx, 470, 'The commercial question was purchases.', 11.5, 400, '#3A4750', 'middle');
+  label(sg3, cx, 492, 'The public-health question — comprehension, care-seeking, corrected beliefs — is untested at this scale.', 10.5, 400, MUTE, 'middle');
+  label(sg3, cx, 530, 'The machinery is proven. Only the objective is untested.', 12.5, 700, ALARM, 'middle')
+    .attr('class','sig3close');
+})();
+
 (function(){
   const x = 190, y = 150, w = 620;
   roundRect(gMeth, x, y, w, 400, 16, '#FFFFFF', LINE, 1.4);
@@ -1945,13 +2763,16 @@ const TITLES = {
   feed1:'The feed', feed2:'Manufacturing a creator', feed3:'Manufacturing a creator',
   feed4:'The loop', feed5:'What the loop measures', feed6:'The ledger',
   flip:'The same console', good1:'The same console', good2:'The same console', good3:'The same console',
+  sig1:'Two signatures', sig2:'Four routes, one truth', sig3:'The field evidence',
+  forces:'The five forces', cycle:'The pipeline', hooks:'The hook library',
+  cyoa:'Choose your feed', chamber:'The chamber',
   good4:'The loop, honestly', good5:'The capability ladder', good6:'The ledger',
   reprise:'Two loops', methods:'The register'
 };
 
 const DARK_KEYS = ['open','results','thesis','close'];
 const CON_KEYS  = ['mach1','mach2','mach3','mach4','mach5','mach6','mach7','mach8','mach9','mach10',
-                   'flip','good1','good2','good3'];
+                   'flip','good1','good2','preroll','subsidy','good3'];
 
 let current = null;
 const scroller = document.getElementById('scroller');
@@ -1977,7 +2798,9 @@ function render(key){
 
   // the console and the ledger draw their own heads; a second one on top of
   // them was just noise
-  const ownHead = CON_KEYS.includes(key) || key==='feed6' || key==='good6' || key==='methods';
+  const ownHead = CON_KEYS.includes(key) || key==='feed6' || key==='good6' || key==='methods'
+    || key==='sig1' || key==='sig2' || key==='sig3'
+    || key==='forces' || key==='hooks' || key==='cyoa' || key==='chamber';
   setTitle(dark || ownHead ? '' : (TITLES[key] || ''));
   show(gTitle, (dark || ownHead) ? 0 : 1);
   show(gStamp, 1);
@@ -2094,6 +2917,96 @@ function render(key){
     gTier.selectAll('path.ascent').attr('opacity',0)
       .transition('rise').duration(520).delay(760).attr('opacity',.8);
   }
+  show(gForce, key === 'forces' ? 1 : 0);
+  if (key === 'forces'){ drawForces(); drawForcePanel(); applyTypeScale(); wireForces(); }
+  setTabbing(gForce.selectAll('g.ftile'), key === 'forces');
+  if (key === 'forces' && prev !== 'forces' && !REDUCE){
+    forceTiles.selectAll('g.ftile').attr('opacity',0)
+      .transition('rise').duration(380).delay((d,i)=>140+i*110).ease(d3.easeCubicOut)
+      .attr('opacity',1);
+  }
+
+  show(gCyc, key === 'cycle' ? 1 : 0);
+  if (key === 'cycle'){ layoutCycle(); }
+  if (key === 'cycle' && prev !== 'cycle' && !REDUCE){
+    gCyc.selectAll('g.cstep').attr('opacity',0)
+      .transition('rise').duration(420).delay((d,i)=>200+i*420).ease(d3.easeCubicOut)
+      .attr('opacity',1);
+    gCyc.selectAll('path.carrow').style('opacity',0);
+    gCyc.selectAll('path.carrow').each(function(d,i){
+      drawOn(d3.select(this), 320, ()=>480+(+this.getAttribute('data-i'))*420);
+    });
+    gCyc.selectAll('g.clate').attr('opacity',0)
+      .transition('rise').duration(360).delay(1750).ease(d3.easeBackOut.overshoot(1.6))
+      .attr('opacity',1);
+  }
+
+  show(gHook, key === 'hooks' ? 1 : 0);
+  if (key === 'hooks'){ layoutHooks(); }
+  setTabbing(gHook.selectAll('g.hookcard'), key === 'hooks');
+  if (key === 'hooks' && prev !== 'hooks' && !REDUCE){
+    gHook.selectAll('g.hookcard').attr('opacity',0)
+      .transition('rise').duration(400).delay((d,i)=>200+i*140).ease(d3.easeCubicOut)
+      .attr('opacity',1);
+  }
+
+  show(gCyoa, key === 'cyoa' ? 1 : 0);
+  if (key === 'cyoa'){ drawCyoaCards(); drawCyoaPanel(); applyTypeScale(); wireCyoa(); }
+  setTabbing(gCyoa.selectAll('g.ccard'), key === 'cyoa');
+
+  show(gCham, key === 'chamber' ? 1 : 0);
+  chamLoop(key === 'chamber');
+  if (key === 'chamber' && prev !== 'chamber' && !REDUCE){
+    gCham.selectAll('circle.bubwall').each(function(){
+      drawOn(d3.select(this), 1100, (d,i)=>200);
+    });
+  }
+
+  const sigKeys = ['sig1','sig2','sig3'];
+  show(gSig, sigKeys.includes(key) ? 1 : 0);
+  show(sg1, key === 'sig1' ? 1 : 0);
+  show(sg2, key === 'sig2' ? 1 : 0);
+  show(sg3, key === 'sig3' ? 1 : 0);
+  if (key === 'sig1'){ layoutSig1(); }
+  if (key === 'sig2'){ layoutSig2(); }
+  setTabbing(sg2.selectAll('g.sig2card'), key === 'sig2');
+  if (key === 'sig1' && prev !== 'sig1' && !REDUCE){
+    sg1.selectAll('g.sig1card').interrupt('rise').attr('opacity',0)
+      .attr('transform',function(){ const p=this.getAttribute('data-ty').split(','); return 'translate('+p[0]+','+(+p[1]+22)+')'; })
+      .transition('rise').duration(560).delay((d,i)=>140+i*180).ease(d3.easeCubicOut)
+      .attr('opacity',1)
+      .attr('transform',function(){ const p=this.getAttribute('data-ty').split(','); return 'translate('+p[0]+','+p[1]+')'; });
+    sg1.selectAll('text.sq').attr('opacity',0)
+      .transition('rise').duration(280).delay((d,i)=>600+i*110).attr('opacity',1);
+    sg1.select('g.sig1strip').attr('opacity',0)
+      .transition('rise').duration(420).delay(1150).attr('opacity',1);
+    drawOn(sg1.selectAll('path.strike'), 340, ()=>1650);
+    sg1.select('text.sig1close').attr('opacity',0)
+      .transition('rise').duration(420).delay(1950).attr('opacity',1);
+  }
+  if (key === 'sig2' && prev !== 'sig2' && !REDUCE){
+    sg2.select('g.sig2pill').attr('opacity',0)
+      .transition('rise').duration(420).delay(120).attr('opacity',1);
+    drawOn(sg2.selectAll('path.lead'), 480, (d,i)=>420+i*110);
+    sg2.selectAll('g.sig2card').interrupt('rise').attr('opacity',0)
+      .attr('transform',function(){ const p=this.getAttribute('data-ty').split(','); return 'translate('+p[0]+','+(+p[1]+20)+')'; })
+      .transition('rise').duration(520).delay((d,i)=>560+i*140).ease(d3.easeCubicOut)
+      .attr('opacity',1)
+      .attr('transform',function(){ const p=this.getAttribute('data-ty').split(','); return 'translate('+p[0]+','+p[1]+')'; });
+  }
+  if (key === 'sig3' && prev !== 'sig3' && !REDUCE){
+    const n = sg3.select('text.sig3n'), v = +n.property('__v');
+    n.transition('rise').duration(1400).delay(150).ease(VALUE_EASE)
+      .tween('t', () => k => n.text(Math.round(v*k).toLocaleString('en-US')));
+    sg3.selectAll('rect.sig3bar').attr('width',4)
+      .transition('rise').duration(900).delay((d,i)=>600+i*220).ease(VALUE_EASE)
+      .attr('width', function(){ return this.__w; });
+    sg3.selectAll('text.sig3tag').attr('opacity',0)
+      .transition('rise').duration(300).delay((d,i)=>1450+i*220).attr('opacity',1);
+    sg3.select('text.sig3close').attr('opacity',0)
+      .transition('rise').duration(480).delay(2100).attr('opacity',1);
+  }
+
   show(gMeth, key === 'methods' ? 1 : 0);
   if (key === 'methods' && prev !== 'methods' && !REDUCE){
     gMeth.selectAll('g.mrow').attr('opacity',0)

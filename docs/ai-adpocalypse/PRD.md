@@ -98,6 +98,14 @@ A reader finishes able to:
 
 ## 5. Storyboard — 29 scenes, SME content per scene
 
+> **Built form (2026-08-24): 39 scenes.** Founder-directed expansions during the
+> build added `sig1–sig3` (behavioural signatures, barrier routing, the Matz
+> field evidence), `forces`/`cycle` (the algorithmic-war opening, from the
+> policy-deck brief), `hooks`/`cyoa`/`chamber` (the hook library, the
+> choose-your-feed funnel walk, the echo chamber), and `preroll`/`subsidy`
+> (contextual infiltration and the quality-score subsidy). The scene cap moved
+> with the direction; the guardrails in §3 hold unchanged.
+
 Scene grammar identical to piece 2: sticky SVG stage + step rail, IO-driven
 active-set controller, per-scene camera frame, `TITLES` map, `render(key)` with
 `prev` tracking. Each scene below carries: **stage** (what is drawn/animated),

@@ -73,6 +73,20 @@ Verified: 2026-08-24 (round 1). Re-verify: M7 (Mar 2027), M10 (Jun 2027).
 | F7 | Counter-marketing works at population scale: the truth® campaign is credited with ~450,000 fewer youth/young-adult smoking initiations 2000–2004 and ~2.5 million prevented 2015–2018; a national campaign accounted for ~22% of a two-year decline in youth smoking; cost-effectiveness estimated at ~$1,076 per QALY with ~$3.07B societal savings | [AJPM](https://www.ajpmonline.org/article/s0749-3797(09)00074-9/fulltext), [AJPH dose-response](https://ajph.aphapublications.org/doi/full/10.2105/AJPH.2004.049692), [FinishIt cost-effectiveness](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6888078/), [Truth Initiative](https://truthinitiative.org/research-resources/tobacco-prevention-efforts/truth-campaign-linked-decreased-smoking-and-increased) | `good5`, `good6` |
 | F8 | Policy precedent: the EU Digital Services Act bans profiling-based advertising using special-category data including health, and bans profiling-based ads to minors — with no consent override | [EC DSA Q&A](https://digital-strategy.ec.europa.eu/en/faqs/digital-services-act-questions-and-answers), [DSA Observatory](https://dsa-observatory.eu/2025/08/01/what-does-the-dsa-mean-for-online-advertising-and-adtech/) | `good6` |
 
+| F9 | Psychological targeting works at scale: three field experiments, N > 3.5 million, psychologically matched ads produced up to 40% more clicks and 50% more purchases than mismatched/unpersonalized (Matz et al.) | [Matz, Kosinski, Nave & Stillwell, PNAS 2017](https://www.pnas.org/doi/10.1073/pnas.1710966114) *(primary source — confirm exact figures against paper at M1)* | `sig3` |
+| F10 | Placement targeting allows purchasing ad inventory in front of specific YouTube channels and videos | [Google Ads placement targeting help](https://support.google.com/google-ads/answer/2470108) | `preroll` |
+| F11 | Ad Rank multiplies bid by quality components (expected CTR, relevance, landing-page experience); higher quality reaches equal rank at lower cost — the "honesty subsidy" arithmetic (QS 2 @ ~$25 vs QS 10 @ ~$5) is an illustration of the documented mechanism, stamped as such in-piece | [Google Ads Help — Ad Rank](https://support.google.com/google-ads/answer/1752122), auction breakdowns cited at C6 | `subsidy` |
+| F12 | Action-rate comparison (broad display ≪ contextual pre-roll ~3.5% ≪ high-intent search interception 12%+) is a practitioner benchmark, presented as such, not a trial result | practitioner briefing material (policy deck, 2026) — labelled in-piece | `subsidy` |
+
+## G. The feed's structural forces (Act 0/II — argued claims)
+
+The five forces (`forces`), the misinformation cycle (`cycle`), the hook
+library (`hooks`), the funnels (`cyoa`) and the chamber (`chamber`) are
+**structural arguments and illustrative composites**, framed from practitioner
+briefings and the documented patterns above (B5, D1–D5). They are stamped
+in-piece as argument, not statistics. The clinical-masquerade claim is stated
+as a mechanism risk, not an epidemiological finding.
+
 ---
 
 ## Open items before ship
