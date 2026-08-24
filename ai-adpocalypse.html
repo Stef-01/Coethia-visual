@@ -809,7 +809,12 @@ const QUERY = 'why won’t my shoulder heal';
 let typeTimer = null;
 function typeQuery(on){
   clearInterval(typeTimer);
-  if (!on){ qText.text(''); qCaret.attr('opacity',0); return; }
+  if (!on){
+    // the question stays asked — the results scenes are answering it
+    qText.text(QUERY);
+    qCaret.interrupt('blink').attr('opacity',0);
+    return;
+  }
   if (REDUCE){ qText.text(QUERY); qCaret.attr('opacity',0); return; }
   let i = 0;
   qText.text('');
@@ -874,7 +879,7 @@ const organicG = serpG.append('g');
   organicG.append('rect').attr('x',SCR.x+26).attr('y',y+24).attr('width',SCR.w-70).attr('height',3)
     .attr('rx',1.5).attr('fill','#333F47');
 });
-label(serpG, 500, SERP_Y-14, 'the first four answers were bought', 9.5, 400, '#8FA0A9', 'middle');
+const serpLabel = label(serpG, 500, SERP_Y-14, 'the first four answers were bought', 9.5, 400, '#8FA0A9', 'middle');
 
 // the close: the same page, one placement different
 const fixG = gDark.append('g').attr('opacity',0);
@@ -1006,7 +1011,7 @@ function ctlList(g, y, items, tint){
 function ctlNotice(g, y, title, lines, kind){
   const h = 34 + lines.length*16;
   const alarm = kind !== 'ok';
-  const box = g.append('g');
+  const box = g.append('g').attr('class','ntc');
   roundRect(box, CX0, y, CW*FULL(0.84), h, 12, alarm ? '#FBEDE7' : '#E7F2F1',
             alarm ? ALARM : TEAL_D, 1.5).attr('stroke-dasharray', alarm ? '6 4' : null);
   box.append('circle').attr('cx',CX0+22).attr('cy',y+22).attr('r',9)
@@ -1032,7 +1037,7 @@ function ctlGrid(g, y, cols, rows, cells, tint){
     label(g, CX0+lw-8, y+14+j*ch, r, 9.5, 400, '#55606A', 'end');
     cols.forEach((c,i)=>{
       const st = cells(i,j);   // 0 off · 1 on · 2 excluded
-      const cell = g.append('g');
+      const cell = g.append('g').attr('class','gcell');
       roundRect(cell, CX0+lw+i*cw+2, y+j*ch, cw-4, ch-5, 5,
         st===1 ? (tint?'#BFE3E0':'#F7D9C7') : (st===2 ? '#F2EFE9' : '#FAF8F4'),
         st===1 ? (tint?TEAL_D:ALARM) : '#EAE6DD', st===1?1.4:1);
@@ -1102,11 +1107,13 @@ function ctlMap(g, y, tint){
     .attr('d','M '+(CX0+40)+' '+(cy+60)+' q 120 -70 250 -30 q 130 40 300 -34 q 80 -34 120 6')
     .attr('fill','none').attr('stroke','#E3DFD6').attr('stroke-width',1.4);
   METROS.forEach((m,i)=>{
-    const ring = g.append('g');
-    ring.append('circle').attr('cx',m[0]).attr('cy',m[1]).attr('r',m[2])
+    const ring = g.append('g').attr('class','pin');
+    ring.append('circle').attr('class','pinring').attr('data-r',m[2])
+      .attr('cx',m[0]).attr('cy',m[1]).attr('r',m[2])
       .attr('fill', tint?'rgba(127,204,200,.16)':'rgba(243,121,64,.13)')
       .attr('stroke', tint?TEAL_D:ACCENT).attr('stroke-width',1.4).attr('stroke-dasharray','5 4');
-    ring.append('circle').attr('cx',m[0]).attr('cy',m[1]).attr('r',4.5).attr('fill', tint?TEAL_D:ALARM);
+    ring.append('circle').attr('class','pindot')
+      .attr('cx',m[0]).attr('cy',m[1]).attr('r',4.5).attr('fill', tint?TEAL_D:ALARM);
   });
   label(g, CX0, y+8, tint ? 'Counties with one clinic or fewer' : 'Metro radius targets', 10, 600, INK);
   return y + 190;
@@ -1168,15 +1175,19 @@ mach1: { url:'ads console · new campaign', step:'STEP 1 OF 7', head:'Choose you
 
 mach2: { url:'ads console · policy', step:'BLOCKED', head:'Campaign setup — policy review',
   draw(g){
+    // three beats: the attempt, the wall, the shape the wall permits
+    const s1 = g.append('g').attr('class','s1');
+    const s2 = g.append('g').attr('class','s2');
+    const s3 = g.append('g').attr('class','s3');
     let y = CY0 - 4;
-    y = ctlField(g, y, 'CAMPAIGN NAME', 'BPC-157 — Recovery Peptides');
-    y = ctlChips(g, y, ['bpc-157', 'tb-500 injection', 'buy research peptides'],
+    y = ctlField(s1, y, 'CAMPAIGN NAME', 'BPC-157 — Recovery Peptides');
+    y = ctlChips(s1, y, ['bpc-157', 'tb-500 injection', 'buy research peptides'],
       { tint:'#F6E9E4', stroke:ALARM, fg:ALARM, dashed:true });
-    y = ctlNotice(g, y, 'Not eligible to run',
+    y = ctlNotice(s2, y, 'Not eligible to run',
       ['Research chemicals and unapproved supplements are not',
        'permitted. Telehealth advertisers must hold certification.'], 'warn');
-    y = ctlField(g, y+4, 'CAMPAIGN NAME (RESUBMITTED)', 'Meridian Longevity — Recovery Consults', true);
-    ctlNotice(g, y, 'Eligible', ['Telehealth clinic, certified. Ads may serve.'], 'ok');
+    y = ctlField(s3, y+4, 'CAMPAIGN NAME (RESUBMITTED)', 'Meridian Longevity — Recovery Consults', true);
+    ctlNotice(s3, y, 'Eligible', ['Telehealth clinic, certified. Ads may serve.'], 'ok');
   } },
 
 mach3: { url:'ads console · bidding', step:'STEP 2 OF 7', head:'Bidding',
@@ -1358,6 +1369,30 @@ good3: { url:'ads console · demographics', step:'FIND THE GAP', head:'The grid,
 };
 
 /* ---- the renderer: one frame, re-dressed ---- */
+let sonarOn = false;
+function sonar(on){
+  if (REDUCE){ return; }
+  sonarOn = on;
+  if (!on) return;
+  conBody.selectAll('g.pin').each(function(d,i){
+    const node = this;
+    const base = d3.select(node).select('circle.pinring');
+    const R = +base.attr('data-r');
+    function ping(){
+      if (!sonarOn || !node.isConnected) return;
+      const ringy = d3.select(node).append('circle')
+        .attr('cx', +base.attr('cx')).attr('cy', +base.attr('cy'))
+        .attr('r', R*.5).attr('fill','none')
+        .attr('stroke', TEAL_D).attr('stroke-width',1.4).attr('opacity',.5);
+      ringy.transition('sonar').duration(1700).ease(d3.easeCubicOut)
+        .attr('r', R*1.55).attr('opacity',0)
+        .on('end interrupt', function(){ ringy.remove(); });
+      setTimeout(ping, 2400 + i*250);
+    }
+    setTimeout(ping, 1500 + i*400);
+  });
+}
+
 let conKey = null;
 function renderConsole(key){
   const sc = SCREENS[key];
@@ -1395,6 +1430,28 @@ function renderConsole(key){
     .transition('commit').duration(300).delay((d,i)=>420+i*110).attr('opacity',1);
   conBody.selectAll('g.slot').attr('opacity',0)
     .transition('commit').duration(200).delay((d,i)=>380+i*38).attr('opacity',1);
+  // a sequenced screen tells its story in beats; everywhere else the
+  // commentary (notices) arrives after the controls it comments on
+  if (!conBody.select('g.s1').empty()){
+    conBody.select('g.s1').attr('opacity',0)
+      .transition('commit').duration(420).delay(200).attr('opacity',1);
+    conBody.select('g.s2').attr('opacity',0).attr('transform','translate(0,-8)')
+      .transition('commit').duration(420).delay(1050).ease(d3.easeCubicOut)
+      .attr('opacity',1).attr('transform','translate(0,0)');
+    conBody.select('g.s3').attr('opacity',0)
+      .transition('commit').duration(460).delay(2000).attr('opacity',1);
+  } else {
+    conBody.selectAll('g.ntc').attr('opacity',0)
+      .transition('commit').duration(380).delay((d,i)=>820+i*170).attr('opacity',1);
+  }
+  conBody.selectAll('g.gcell').attr('opacity',0)
+    .transition('commit').duration(220).delay((d,i)=>380+i*26).attr('opacity',1);
+  conBody.selectAll('circle.pinring').attr('r',0)
+    .transition('commit').duration(520).delay((d,i)=>480+i*130).ease(d3.easeCubicOut)
+    .attr('r', function(){ return +this.getAttribute('data-r'); });
+  conBody.selectAll('circle.pindot').attr('r',0)
+    .transition('commit').duration(280).delay((d,i)=>660+i*130).ease(d3.easeCubicOut)
+    .attr('r',4.5);
   // the strength meter arcs up
   conBody.selectAll('path.meter').each(function(){
     const node = this, arc = node.__arc, val = node.__val;
@@ -1441,19 +1498,40 @@ const postG = gFeed.append('g');
   play.append('path').attr('d','M '+(x+w/2-6)+' '+(y+114)+' l 14 9 l -14 9 Z').attr('fill',INK);
   label(postG, x+20, y+220, '“Six weeks on the protocol and my shoulder', 10, 600, INK);
   label(postG, x+20, y+236, 'finally stopped waking me up.”', 10, 600, INK);
-  // engagement
+  // engagement — live, because the metrics never sleep
   const eng = postG.append('g');
-  ['♥ 24.1k','↻ 3.2k','💬 861'].forEach((t,i)=> label(eng, x+20+i*84, y+266, t, 9, 400, MUTE));
+  ['♥','↻','💬'].forEach((ic,i)=>
+    label(eng, x+20+i*84, y+266, ic+' —', 9, 400, MUTE).attr('class','engc'));
   roundRect(postG, x+20, y+278, 96, 16, 8, '#F7EFE7');
   label(postG, x+30, y+290, 'not an ad', 8, 600, ALARM);
 })();
 
 // the reveal: she does not exist
 const notRealG = gFeed.append('g').attr('opacity',0);
-roundRect(notRealG, PH.x-14, PH.y+300, PH.w+28, 66, 12, '#FBEDE7', ALARM, 1.6)
+roundRect(notRealG, PH.x-14, PH.y+386, PH.w+28, 66, 12, '#FBEDE7', ALARM, 1.6)
   .attr('stroke-dasharray','7 5');
-label(notRealG, 500, PH.y+326, 'This person does not exist.', 12.5, 700, ALARM, 'middle');
-label(notRealG, 500, PH.y+346, 'She was specified, generated and deployed.', 10, 400, '#5A4640', 'middle');
+label(notRealG, 500, PH.y+412, 'This person does not exist.', 12.5, 700, ALARM, 'middle');
+label(notRealG, 500, PH.y+432, 'She was specified, generated and deployed.', 10, 400, '#5A4640', 'middle');
+
+/* the counters accrue while you watch — the machine's idea of a heartbeat */
+const ENG_BASE = [24100, 3200, 861];
+const fmtEng = v => v >= 1000 ? ((v/1000).toFixed(1).replace(/\.0$/,'') + 'k') : String(v);
+let engTimer = null;
+function engLive(on){
+  clearInterval(engTimer);
+  const nodes = gFeed.selectAll('text.engc').nodes();
+  const icons = ['♥','↻','💬'];
+  const vals = ENG_BASE.slice();
+  const paint = () => nodes.forEach((n,i)=> n.textContent = icons[i]+' '+fmtEng(vals[i]));
+  paint();
+  if (!on || REDUCE) return;
+  engTimer = setInterval(()=>{
+    vals[0] += 3 + Math.round(rnd()*9);
+    if (rnd() < .45) vals[1] += 1 + Math.round(rnd()*2);
+    if (rnd() < .3)  vals[2] += 1;
+    paint();
+  }, 700);
+}
 
 /* ---- build-a-creator: the persona panel, drawn like a campaign screen ---- */
 const personaG = gFeed.append('g').attr('opacity',0);
@@ -1485,8 +1563,9 @@ const personaG = gFeed.append('g').attr('opacity',0);
   const roster = personaG.append('g');
   for (let i=0;i<6;i++){
     const fx = rx+i*54, on = i===2;
-    roundRect(roster, fx, y+182, 46, 56, 8, on?'#FBE3D2':'#F3F0E9', on?ALARM:'#EAE6DD', on?1.6:1);
-    person(roster.append('g').attr('transform','translate('+(fx+23)+','+(y+218)+') scale(.85)'),
+    const cell = roster.append('g').attr('class','actor');
+    roundRect(cell, fx, y+182, 46, 56, 8, on?'#FBE3D2':'#F3F0E9', on?ALARM:'#EAE6DD', on?1.6:1);
+    person(cell.append('g').attr('transform','translate('+(fx+23)+','+(y+218)+') scale(.85)'),
            ['#E8B48D','#C89B77','#8D6A50','#E8B48D','#C89B77','#8D6A50'][i],
            ['#9FB8D0','#A8C6BE','#D9A79A','#C0B7D6','#8FA9C4','#E0C08C'][i], '#6B5847');
   }
@@ -1523,6 +1602,29 @@ const personaG = gFeed.append('g').attr('opacity',0);
   });
   label(gRack, 500, py+80, '“Replacing 30 person creator teams.”', 12, 700, INK, 'middle');
 })();
+
+/* the pips blink at their own tempo — the farm is never asleep */
+let pipsOn = false;
+function pipPulse(on){
+  if (REDUCE) return;
+  if (!on){
+    if (!pipsOn) return;
+    pipsOn = false;
+    gRack.selectAll('circle.pip').interrupt('pulse').attr('opacity',1);
+    return;
+  }
+  if (pipsOn) return;
+  pipsOn = true;
+  gRack.selectAll('circle.pip').each(function(d,i){
+    const c = d3.select(this), per = 800 + (i % 7) * 170;
+    (function beat(dim){
+      if (!pipsOn) return;
+      c.transition('pulse').duration(per).ease(d3.easeSinInOut)
+        .attr('opacity', dim ? .3 : 1)
+        .on('end', () => beat(!dim));
+    })(i % 2 === 0);
+  });
+}
 
 /* ---- the flywheel: ONE component, two configurations ---- */
 const WHEEL_DARK = {
@@ -1601,8 +1703,21 @@ const twinLs = label(gWheel, 330, 546, 'funded · fast · a checkout', 9.5, 400,
 const twinRs = label(gWheel, 670, 546, 'underfunded · slow · an outcome', 9.5, 400, MUTE, 'middle').attr('opacity',0);
 
 /* spin: the loop is never at rest while it is on screen */
+function enterWheel(g){
+  if (REDUCE) return;
+  g.selectAll('g.stn').interrupt('enter').attr('opacity',0)
+    .transition('enter').duration(380).delay((d,i)=>120+i*90).ease(d3.easeCubicOut)
+    .attr('opacity',1);
+  g.selectAll('g.stn').select('circle').attr('r',31)
+    .transition('enter').duration(460).delay((d,i)=>120+i*90)
+    .ease(d3.easeBackOut.overshoot(1.3)).attr('r',40);
+  g.selectAll('path.head').interrupt('enter').attr('opacity',0)
+    .transition('enter').duration(280).delay((d,i)=>620+i*70).attr('opacity',.8);
+  drawOn(g.selectAll('path.arc'), 380, (d,i)=>430+i*80);
+}
+
 let spinKey = null;
-function spinWheels(key, list){
+function spinWheels(key, list, delay0){
   if (REDUCE) return;
   if (spinKey === key) return;
   spinKey = key;
@@ -1613,13 +1728,14 @@ function spinWheels(key, list){
     const arcs = g.selectAll('path.arc');
     // the health loop turns slower, because it is not being paid to hurry
     const dur = g === wheelGood ? 3000 : 2000;
-    arcs.attr('stroke-dasharray','9 7');
+    let first = true;
     (function step(){
       if (spinKey !== key) return;
-      arcs.attr('stroke-dashoffset',0)
-        .transition('spin').duration(dur).ease(d3.easeLinear)
+      arcs.attr('stroke-dasharray','9 7').attr('stroke-dashoffset',0)
+        .transition('spin').duration(dur).delay(first ? (delay0||0) : 0).ease(d3.easeLinear)
         .attr('stroke-dashoffset',-32)
         .on('end', function(){ if (this === arcs.node()) step(); });
+      first = false;
     })();
   });
 }
@@ -1765,10 +1881,11 @@ function renderLedger(key){
   ];
   ROWS.forEach((r,i)=>{
     const ry = y+76+i*54;
-    gMeth.append('path').attr('d','M '+(x+30)+' '+(ry-16)+' H '+(x+w-30))
+    const row = gMeth.append('g').attr('class','mrow');
+    row.append('path').attr('d','M '+(x+30)+' '+(ry-16)+' H '+(x+w-30))
       .attr('stroke','#EFECE5').attr('stroke-width',1);
-    label(gMeth, x+30, ry+4, r[0], 11, 700, INK);
-    label(gMeth, x+220, ry+4, r[1], 10, 400, '#55606A');
+    label(row, x+30, ry+4, r[0], 11, 700, INK);
+    label(row, x+220, ry+4, r[1], 10, 400, '#55606A');
   });
 })();
 
@@ -1875,7 +1992,15 @@ function render(key){
   show(scaleG, key === 'open' ? 1 : 0);
   if (key === 'open' && prev !== 'open') runCounter(true);
   show(serpG, (key === 'results' || key === 'close') ? 1 : 0);
+  serpLabel.text(key === 'close' ? 'one placement changed hands' : 'the first four answers were bought');
   show(fixG,  key === 'close' ? 1 : 0);
+  if (key === 'close' && prev !== 'close' && !REDUCE){
+    // the old first result gives way, and the evidence card takes the slot
+    adRow.filter((d,i)=>i===0).transition('swap').duration(300).attr('opacity',0);
+    fixG.attr('opacity',0).attr('transform','translate(0,-18)')
+      .transition('swap').duration(520).delay(360).ease(d3.easeCubicOut)
+      .attr('opacity',1).attr('transform','translate(0,0)');
+  }
   if (key === 'results' && prev !== 'results' && !REDUCE){
     adRow.attr('opacity',0).attr('transform',(d,i)=>'translate(0,'+(SERP_Y+i*74+10)+')')
       .transition('serp').duration(460).delay((d,i)=>200+i*150).ease(d3.easeCubicOut)
@@ -1887,6 +2012,7 @@ function render(key){
   const conOn = CON_KEYS.includes(key);
   show(gCon, conOn ? 1 : 0);
   if (conOn) renderConsole(key);
+  sonar(key === 'good3');
 
   /* ---- the feed ---- */
   const feedOn = key === 'feed1' || key === 'feed2';
@@ -1895,22 +2021,26 @@ function render(key){
   show(postG,     key === 'feed1' ? 1 : 0);
   show(notRealG,  key === 'feed1' ? 1 : 0);
   show(personaG,  key === 'feed2' ? 1 : 0);
+  engLive(key === 'feed1');
   if (key === 'feed1' && prev !== 'feed1' && !REDUCE){
-    notRealG.attr('opacity',0).transition('reveal').duration(600).delay(1100).attr('opacity',1);
+    notRealG.attr('opacity',0).attr('transform','translate(0,10)')
+      .transition('reveal').duration(600).delay(1100).ease(d3.easeCubicOut)
+      .attr('opacity',1).attr('transform','translate(0,0)');
   }
   if (key === 'feed2' && prev !== 'feed2' && !REDUCE){
     personaG.selectAll('text.pval').attr('opacity',0)
       .transition('spec').duration(280).delay((d,i)=>260+i*150).attr('opacity',1);
+    personaG.selectAll('g.actor').attr('opacity',0)
+      .transition('spec').duration(260).delay((d,i)=>1200+i*80).attr('opacity',1);
     drawOn(personaG.selectAll('path.pipe'), 500, (d,i)=>900+i*260);
   }
 
   /* ---- the farm ---- */
   show(gRack, key === 'feed3' ? 1 : 0);
+  pipPulse(key === 'feed3');
   if (key === 'feed3' && prev !== 'feed3' && !REDUCE){
     gRack.selectAll('g.dev').attr('opacity',0)
       .transition('dev').duration(280).delay((d,i)=>100+i*22).attr('opacity',1);
-    gRack.selectAll('circle.pip').attr('opacity',0)
-      .transition('dev').duration(300).delay((d,i)=>900+i*30).attr('opacity',1);
   }
 
   /* ---- the flywheels ---- */
@@ -1919,6 +2049,12 @@ function render(key){
   const twin = key === 'reprise';
   const darkWheelOn = key === 'feed4' || key === 'feed5' || twin;
   const goodWheelOn = key === 'good4' || twin;
+  // a wheel arriving from nothing assembles before it spins
+  let wheelFresh = false;
+  if (!REDUCE){
+    if (darkWheelOn && +wheelDark.attr('opacity') < .5){ enterWheel(wheelDark); wheelFresh = true; }
+    if (goodWheelOn && +wheelGood.attr('opacity') < .5){ enterWheel(wheelGood); wheelFresh = true; }
+  }
   show(wheelDark, darkWheelOn ? (key==='feed5' ? .28 : 1) : 0);
   show(wheelGood, goodWheelOn ? 1 : 0);
   wheelDark.transition('twin').duration(REDUCE?1:700).ease(d3.easeCubicInOut)
@@ -1931,7 +2067,8 @@ function render(key){
     .attr('opacity', twin ? 1 : 0));
   spinWheels(key, key === 'feed4' ? [wheelDark]
                 : key === 'good4' ? [wheelGood]
-                : twin ? [wheelDark, wheelGood] : null);
+                : twin ? [wheelDark, wheelGood] : null,
+             wheelFresh ? 1150 : 0);
   setTabbing(gWheel.selectAll('g.stn'), key === 'feed4' || key === 'good4');
 
   /* ---- the dashboard, the ledgers, the ladder, the register ---- */
@@ -1958,6 +2095,10 @@ function render(key){
       .transition('rise').duration(520).delay(760).attr('opacity',.8);
   }
   show(gMeth, key === 'methods' ? 1 : 0);
+  if (key === 'methods' && prev !== 'methods' && !REDUCE){
+    gMeth.selectAll('g.mrow').attr('opacity',0)
+      .transition('mrow').duration(360).delay((d,i)=>180+i*110).attr('opacity',1);
+  }
 
   setTabbing(gCon.selectAll('g.chip'), key === 'mach6');
 }

@@ -2050,6 +2050,10 @@ function render(key){
 
   show(gField,  mapScene ? 1 : 0);
   if (mapScene && !axesDrawn){ axesDrawn = true; drawOn(gField.selectAll('path.ax'), 900); }
+  if (key === 'map' && prev === 'beliefs' && !REDUCE){
+    fields.interrupt('hover').attr('opacity',0)
+      .transition('sweep').duration(520).delay((d,i)=>260+i*110).attr('opacity',.16);
+  }
   show(gState,  (key==='states'||key==='factions'||key==='meanings') ? 1 : 0);
   stFig.attr('display', MOBILE() ? 'none' : null);
   show(gRing,   key==='factions' ? 1 : 0);
