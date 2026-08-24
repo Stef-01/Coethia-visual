@@ -445,7 +445,7 @@ const SCENES = [
 
 { key:'results', frame:'dark', h:'The Auction Answers First',
   body:`<p>The first answers are bought. In 2026 what is often being sold into this exact moment is a peptide — compounds like BPC-157 and TB-500, which an FDA advisory committee voted <strong>8 to 6</strong> to recommend for compounding in July 2026, overruling the agency’s own scientists, who had found the safety and efficacy evidence wanting.</p>
-        <p>Beside the peptides sit the supplement sellers — compounds with no validation requirement at all, auctioned into the same moment of fear. A recommendation is not an approval. The agency had not acted. The market did not wait.</p>`,
+        <p>Beside the peptides sit the telehealth clinics and the supplement sellers — compounds with no validation requirement at all, auctioned into the same moment of fear. A recommendation is not an approval. The agency had not acted. The market did not wait.</p>`,
   src:`<b>Sources:</b> <a href="https://www.fda.gov/advisory-committees/advisory-committee-calendar/july-23-24-2026-meeting-pharmacy-compounding-advisory-committee-07232026" target="_blank" rel="noopener">FDA Pharmacy Compounding Advisory Committee, 23–24 July 2026</a>; <a href="https://www.ajmc.com/view/fda-panel-backs-6-peptides-for-compounding" target="_blank" rel="noopener">AJMC</a> and <a href="https://www.cnn.com/2026/07/31/health/what-are-peptides-fda-next-steps-wellness" target="_blank" rel="noopener">CNN</a> coverage of the vote and agency staff opposition.` },
 
 { key:'thesis', frame:'dark', h:'The AI Adpocalypse',
@@ -973,14 +973,16 @@ const SERP_Y = PH.y+150;
 const AD_ROWS = [
   { t:'Clinical-Grade Recovery Peptides', d:'meridian-longevity · Free consult' },
   { t:'BPC-157 — Research Grade, 99% Pure', d:'apex-research-labs · Ships today' },
+  { t:'Heal Faster: Peptide Protocols', d:'vitalis-rx · Telehealth visit $29' },
   { t:'Doctors Won’t Say It — Natural GLP-1', d:'herbal-metabolic · 60% off today' },
   { t:'Ancient Root Extract — 3,000 Years', d:'herbal-heritage · Buy 2, get 1 free' }
 ];
+const AD_DY = 66;
 const adRow = serpG.selectAll('g.ad').data(AD_ROWS).join('g').attr('class','ad')
-  .attr('transform',(d,i)=>'translate(0,'+(SERP_Y+i*74)+')');
+  .attr('transform',(d,i)=>'translate(0,'+(SERP_Y+i*AD_DY)+')');
 adRow.each(function(d){
   const g = d3.select(this);
-  roundRect(g, SCR.x+14, 0, SCR.w-28, 62, 12, '#28333A');
+  roundRect(g, SCR.x+14, 0, SCR.w-28, 58, 12, '#28333A');
   const badge = g.append('g');
   roundRect(badge, SCR.x+26, 10, 34, 15, 3, '#3E4B54');
   mono(badge, SCR.x+31, 21, 'AD', 7.5, '#D9D2C6');
@@ -988,14 +990,13 @@ adRow.each(function(d){
   label(g, SCR.x+26, 42, d.d, 9.5, 400, '#8FA0A9');
 });
 const organicG = serpG.append('g');
-[0,1].forEach(i=>{
-  const y = SERP_Y + 4*74 + 10 + i*54;
-  label(organicG, SCR.x+26, y+16, i===0 ? 'Rotator cuff injury — Mayo Clinic' : 'When shoulder pain doesn’t improve — NHS',
-        10, 600, '#6E7C85');
+(function(){
+  const y = SERP_Y + 5*AD_DY + 8;
+  label(organicG, SCR.x+26, y+16, 'Rotator cuff injury — Mayo Clinic', 10, 600, '#6E7C85');
   organicG.append('rect').attr('x',SCR.x+26).attr('y',y+24).attr('width',SCR.w-70).attr('height',3)
     .attr('rx',1.5).attr('fill','#333F47');
-});
-const serpLabel = label(serpG, 500, SERP_Y-14, 'the first four answers were bought', 9.5, 400, '#8FA0A9', 'middle');
+})();
+const serpLabel = label(serpG, 500, SERP_Y-14, 'the first five answers were bought', 9.5, 400, '#8FA0A9', 'middle');
 
 // the close: the same page, one placement different
 const fixG = gDark.append('g').attr('opacity',0);
@@ -1455,17 +1456,20 @@ mach2: { crumb:'New campaign · review', step:'BLOCKED', head:'Policy review', r
 
 mach3: { crumb:'New campaign · bidding', step:'STEP 3 OF 6', head:'Bidding', rail:2,
   draw(g){
-    let y = CY0 - 4;
-    mCard(g, CX0, y, CW*0.9, 96);
-    label(g, CX0+18, y+26, 'What do you want to focus on?', 10.5, 500, GTEXT);
-    roundRect(g, CX0+18, y+38, 220, 34, 5, '#FFFFFF', GBORD, 1.1);
-    label(g, CX0+32, y+60, 'Conversions', 10.5, 400, GTEXT);
-    g.append('path').attr('d','M '+(CX0+218)+' '+(y+52)+' l 5 6 l 5 -6')
-      .attr('fill','none').attr('stroke',GSUB).attr('stroke-width',1.5);
-    const ck = g.append('g');
-    mCheck(ck, CX0+262, y+45, 1);
-    label(ck, CX0+286, y+57, 'Set a target cost per action ($74)', 9.8, 400, GTEXT);
-    y += 112;
+    let y = CY0 - 6;
+    label(g, CX0, y+4, 'How do you want to bid?', 10.5, 500, GTEXT);
+    [['Maximise conversions', 'with a target cost per action ($74)', true],
+     ['Maximise clicks', '', false],
+     ['Target impression share', '', false],
+     ['Manual CPC', 'no longer recommended', false]].forEach((r,i)=>{
+      const row = g.append('g');
+      const ry = y + 24 + i*27;
+      if (r[2]) roundRect(row, CX0-8, ry-13, CW*0.62, 25, 6, '#e8f0fe');
+      mRadio(row, CX0+6, ry-2, r[2]);
+      label(row, CX0+24, ry+2, r[0], 10.3, r[2]?600:400, r[2]?GTEXT:'#55606A');
+      if (r[1]) label(row, CX0+24+r[0].length*6.2+14, ry+2, r[1], 8.8, 400, GSUB);
+    });
+    y += 24 + 4*27 + 10;
     y = mField(g, CX0, y, CW*0.6, 'Conversion action', 'Consultation booked', { active:true });
     mCounters(g, y+8, [
       { l:'Target CPA', v:74, pre:'$', hi:true },
@@ -1536,12 +1540,20 @@ mach6: { crumb:'New campaign · custom segment', step:'STEP 4 OF 6', head:'Audie
     mRadio(r2, mx+30, y+30, true);
     label(r2, mx+48, y+34, isNarrow() ? 'Searched these terms on Google'
       : 'People who searched for any of these terms on Google', 9.8, 600, GTEXT);
+    const r3 = modal.append('g');
+    mRadio(r3, mx+30, y+58, false);
+    label(r3, mx+48, y+62, isNarrow() ? 'Browse types of websites'
+      : 'People who browse types of websites', 9.8, 400, GTEXT);
+    const r4 = modal.append('g');
+    mRadio(r4, mx+30, y+86, false);
+    label(r4, mx+48, y+90, isNarrow() ? 'Use types of apps'
+      : 'People who use types of apps', 9.8, 400, GTEXT);
     // choose-your-adventure: the reader assembles the audience term by term
     const segG = modal.append('g').attr('class','segchips');
-    segG.property('__geom', { x:mx+48, y:y+48, w:mw*0.55 });
-    const simNote = label(modal, mx+48, y+118, '…and people who searched similar terms.', 8.8, 600, GSUB)
+    segG.property('__geom', { x:mx+48, y:y+104, w:mw*0.55 });
+    const simNote = label(modal, mx+48, y+174, '…and people who searched similar terms.', 8.8, 600, GSUB)
       .attr('opacity',0).attr('class','simnote');
-    y = y + 128;
+    y = y + 184;
     // audience size panel
     const px = mx + mw*0.62, pw = mw*0.38 - 22;
     mCard(modal, px, my+52, pw, 150);
@@ -1550,13 +1562,17 @@ mach6: { crumb:'New campaign · custom segment', step:'STEP 4 OF 6', head:'Audie
     az.attr('class','azn');
     mono(modal, px+14, my+118, 'WEEKLY IMPRESSIONS, EST.', 6.6, GSUB);
     [['Search', .62],['YouTube', .9],['Display', .74]].forEach((sfc,i)=>{
-      const by = my+132 + i*16;
+      const by = my+130 + i*15;
       label(modal, px+14, by+8, sfc[0], 8.2, 400, GSUB);
       modal.append('rect').attr('x',px+66).attr('y',by+2).attr('width',(pw-84)).attr('height',5)
         .attr('rx',2.5).attr('fill',GSURF);
       modal.append('rect').attr('x',px+66).attr('y',by+2).attr('width',(pw-84)*sfc[1]).attr('height',5)
         .attr('rx',2.5).attr('fill','#aecbfa');
     });
+    modal.append('path').attr('d','M '+(px+14)+' '+(my+182)+' H '+(px+pw-14))
+      .attr('stroke',GBORD).attr('stroke-width',1);
+    mono(modal, px+14, my+196, 'CONDITION NAMED', 6.6, GSUB);
+    label(modal, px+pw-14, my+197, 'never', 11, 700, GERR, 'end');
     // the restriction, beside what it fails to restrict
     mBanner(modal, mx+22, y+20, mw*0.55, 'err', 'Restricted: health conditions',
       ['Audiences built on a sensitive health condition — or on',
@@ -1618,7 +1634,19 @@ mach9: { crumb:'New campaign · ads', step:'STEP 5 OF 6', head:'Create your ad',
       label(row, CX0+14, sy+24, hd.t, 9.3, i===rsaPick ? 600 : 400, i===rsaPick ? GBLUED : GTEXT);
       label(row, CX0+lw-10, sy+24, hd.c, 8, 400, GSUB, 'end');
     });
-    y = y + 6 + 3*(36+8) + 8;
+    y = y + 6 + 3*(36+8) + 4;
+    mono(g, CX0, y+2, '— PLUS 12 MORE THE MACHINE ROTATES · 13 OF 15 FILLED', 6.8, GSUB);
+    const sw = (lw - 5*6) / 6;
+    for (let i = 0; i < 12; i++){
+      const sx = CX0 + (i%6)*(sw+6), sy = y + 10 + Math.floor(i/6)*17;
+      const filled = i < 10;
+      const slot = g.append('g').attr('class','slot');
+      roundRect(slot, sx, sy, sw, 12, 3, filled ? '#FFFFFF' : GSURF, GBORD, 1);
+      if (filled) slot.append('rect').attr('x',sx+4).attr('y',sy+4.5)
+        .attr('width',(sw-8)*(0.5+((i*29)%45)/100)).attr('height',3).attr('rx',1.5)
+        .attr('fill','#bdc1c6');
+    }
+    y = y + 10 + 2*17 + 8;
     mono(g, CX0, y+2, 'DESCRIPTIONS — 4 OF 4', 7.2, GSUB);
     mSlots(g, y+10, CX0, lw, ['Description 1'], 1, ['86/90']);
     const px = CX0 + CW*0.56;
@@ -3191,7 +3219,7 @@ function render(key){
   show(scaleG, key === 'open' ? 1 : 0);
   if (key === 'open' && prev !== 'open') runCounter(true);
   show(serpG, (key === 'results' || key === 'close') ? 1 : 0);
-  serpLabel.text(key === 'close' ? 'one placement changed hands' : 'the first four answers were bought');
+  serpLabel.text(key === 'close' ? 'one placement changed hands' : 'the first five answers were bought');
   show(fixG,  key === 'close' ? 1 : 0);
   if (key === 'close' && prev !== 'close' && !REDUCE){
     // the old first result gives way, and the evidence card takes the slot
@@ -3201,9 +3229,9 @@ function render(key){
       .attr('opacity',1).attr('transform','translate(0,0)');
   }
   if (key === 'results' && prev !== 'results' && !REDUCE){
-    adRow.attr('opacity',0).attr('transform',(d,i)=>'translate(0,'+(SERP_Y+i*74+10)+')')
-      .transition('serp').duration(460).delay((d,i)=>200+i*150).ease(d3.easeCubicOut)
-      .attr('opacity',1).attr('transform',(d,i)=>'translate(0,'+(SERP_Y+i*74)+')');
+    adRow.attr('opacity',0).attr('transform',(d,i)=>'translate(0,'+(SERP_Y+i*AD_DY+10)+')')
+      .transition('serp').duration(460).delay((d,i)=>200+i*130).ease(d3.easeCubicOut)
+      .attr('opacity',1).attr('transform',(d,i)=>'translate(0,'+(SERP_Y+i*AD_DY)+')');
     organicG.attr('opacity',0).transition('serp').duration(500).delay(900).attr('opacity',1);
   } else if (key === 'results'){ adRow.attr('opacity',1); organicG.attr('opacity',1); }
 
