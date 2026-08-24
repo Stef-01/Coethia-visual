@@ -78,6 +78,13 @@ Verified: 2026-08-24 (round 1). Re-verify: M7 (Mar 2027), M10 (Jun 2027).
 | F11 | Ad Rank multiplies bid by quality components (expected CTR, relevance, landing-page experience); higher quality reaches equal rank at lower cost — the "honesty subsidy" arithmetic (QS 2 @ ~$25 vs QS 10 @ ~$5) is an illustration of the documented mechanism, stamped as such in-piece | [Google Ads Help — Ad Rank](https://support.google.com/google-ads/answer/1752122), auction breakdowns cited at C6 | `subsidy` |
 | F12 | Action-rate comparison (broad display ≪ contextual pre-roll ~3.5% ≪ high-intent search interception 12%+) is a practitioner benchmark, presented as such, not a trial result | practitioner briefing material (policy deck, 2026) — labelled in-piece | `subsidy` |
 
+## H. The scale of the two economies (`scale`)
+
+| # | Claim | Sources | Scene |
+|---|---|---|---|
+| H1 | The global wellness economy reached $6.8T in 2024 — almost 4× the pharmaceutical industry's $1.8T, larger than sports ($2.7T), tourism ($5T), the green economy ($5.1T) and IT ($5.3T); forecast $9.8T by 2029 | [GWI 2025 Global Wellness Economy Monitor](https://globalwellnessinstitute.org/industry-research/2025-global-wellness-economy-monitor/), [GWI press release](https://globalwellnessinstitute.org/press-room/press-releases/the-global-wellness-economy-hits-a-record-6-8-trillion-and-is-forecast-to-reach-9-8-trillion-by-2029/) | `scale` |
+| H2 | Reader-supplied references placed in-piece: Dahlke et al., Proc ACM HCI 2025 (doi:10.1145/3757571) → `cycle`; Lee & Hancock, JCMC 2024 (doi:10.1093/jcmc/zmad048) → `chamber`; Google Ads Help "About audience segments" → `mach6`; Matz et al., PNAS 2017 (doi:10.1073/pnas.1710966114) → `sig3` | as listed, linked in-piece | various |
+
 ## G. The feed's structural forces (Act 0/II — argued claims)
 
 The five forces (`forces`), the misinformation cycle (`cycle`), the hook
