@@ -837,6 +837,17 @@ function setTitle(txt){
 /* small shared helpers -------------------------------------------------- */
 /* touch targets: SVG shrinks with the viewport, fingers do not. An invisible
    pad rect inside an interactive group buys back the 44px minimum. */
+/* a citation you can click at the exact point the stat pops out */
+function srcLink(g, x, y, txt, href, anchor){
+  const a = g.append('a').attr('href', href).attr('target','_blank')
+    .attr('rel','noopener').style('cursor','pointer');
+  a.append('text').attr('x',x).attr('y',y).attr('text-anchor',anchor||'middle')
+    .attr('font-family',MONO).call(typed,7).attr('letter-spacing','.12em')
+    .attr('fill','#8A8474').attr('text-decoration','underline')
+    .text(txt + ' ↗');
+  return a;
+}
+
 function padHit(g, x, y, w, h, pad){
   g.insert('rect', ':first-child')
     .attr('x', x-pad).attr('y', y-pad).attr('width', w+2*pad).attr('height', h+2*pad)
@@ -1682,6 +1693,8 @@ good2: { crumb:'New campaign · custom segment', step:'INTERCEPT', head:'The sam
       { l:'RCT evidence', s:'search → hotline' },
       { l:'988, first 30 months', v:4400, hi:true },
       { l:'Fewer deaths than projected', s:'ages 15–23' }], true);
+    srcLink(g, CX0, y+218, 'SOURCES: JMIR RCT · 988 OUTCOME STUDY',
+      'https://ncbi.nlm.nih.gov/pmc/articles/PMC10160926', 'start');
   } },
 
 preroll: { crumb:'New campaign · placements', step:'INFILTRATE', head:'Placements — YouTube channels', rail:3, tint:true,
@@ -1949,6 +1962,9 @@ const WSIDE = 350, PSIDE = Math.round(WSIDE*Math.sqrt(SCALE_P/SCALE_W)); // 180
   label(gScale, 190, baseY+84, 'bars: share of the wellness economy’s size', 8, 400, '#B9B2A4')
     .attr('class','ctxr');
   label(gScale, 500, baseY+104, 'Wellness now out-earns every one of them — with no gate but marketing.', 11, 700, INK, 'middle')
+    .attr('class','ctxr');
+  srcLink(gScale, 500, baseY+124, 'SOURCE: GLOBAL WELLNESS INSTITUTE, 2025 MONITOR',
+    'https://globalwellnessinstitute.org/industry-research/2025-global-wellness-economy-monitor/')
     .attr('class','ctxr');
   // where it is headed: the dashed outline of 2029
   const GSIDE = Math.round(WSIDE*Math.sqrt(9.8/SCALE_W));   // ≈420
@@ -3014,6 +3030,8 @@ bindTip(sg2.selectAll('g.sig2card'), d => '<b>'+d.t+'</b><br>'+d.w, d => d.t + '
     .attr('font-weight',700).attr('fill',INK).text('3,500,000');
   n.property('__v', 3500000);
   label(sg3, cx, 196, 'people · three field experiments · psychologically matched ads', 10.5, 400, MUTE, 'middle');
+  srcLink(sg3, cx, 216, 'MATZ, KOSINSKI, NAVE & STILLWELL · PNAS 2017',
+    'https://doi.org/10.1073/pnas.1710966114');
   const BARS = [
     { y:268, l:'Clicks',    lift:'+40%', frac:.40 },
     { y:368, l:'Purchases', lift:'+50%', frac:.50 }
