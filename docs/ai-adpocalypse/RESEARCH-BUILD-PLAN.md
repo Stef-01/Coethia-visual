@@ -1,8 +1,18 @@
 # The AI Adpocalypse — 1-Year Research & Build Plan
 
-**Companion to:** [PRD.md](PRD.md) · v1 · 2026-08-24 · horizon: Sep 2026 → Aug 2027
+**Companions:** [PRD.md](PRD.md) (v2 FINAL — storyboard locked) ·
+[claims.md](claims.md) (evidence registry) · v2 · 2026-08-24 ·
+horizon: Sep 2026 → Aug 2027
 **Operating law:** research before storyboard, storyboard before build, every act
 gated, everything committed to main, every session logged.
+
+**What is already done (2026-08-24):** desk research complete across all five
+movements; `claims.md` v1 built with 30+ double-sourced claims; the storyboard
+is locked at 29 scenes with SME-level content in every scene; the structural
+finding — that peptides are banned from Google Ads and telehealth requires
+LegitScript certification, so the story is a policy wall being *routed around*
+rather than a vacuum — is folded into Act I. The year below therefore begins
+with **verification and archival**, not discovery.
 
 ---
 
@@ -10,8 +20,8 @@ gated, everything committed to main, every session logged.
 
 | Quarter | Mode | Output |
 |---|---|---|
-| Q1 (Sep–Nov 2026) | Research & evidence | Claims registry, verified walkthrough, 6-lens research dossier, ethics/legal gate |
-| Q2 (Dec–Feb 2027) | Design & prototype | Locked storyboard, copy draft 1, component kit, Act I vertical slice |
+| Q1 (Sep–Nov 2026) | Verify & deepen | First-hand console walkthrough, registry v2 (open items closed), 6-lens dossier, ethics/legal gate |
+| Q2 (Dec–Feb 2027) | Design & prototype | Copy draft 1 from the locked storyboard, component kit, Act I vertical slice |
 | Q3 (Mar–May 2027) | Production | All 29 scenes built, motion + interaction passes, mobile layouts |
 | Q4 (Jun–Aug 2027) | Hardening & launch | QA matrix, fact-recheck, legal signoff, launch, post-launch loop |
 
@@ -31,16 +41,30 @@ work, not the log entry.
   audience shelf taxonomy, custom-segment builder copy) in
   `docs/ai-adpocalypse/walkthrough-notes.md`. This is the piece's spine —
   primary-source, not blog-post, fidelity.
+- **Verify the wall directly (claim C8, the structural spine):** attempt a
+  peptide-term campaign in the live account and document the policy block and
+  the LegitScript certification requirement as the console presents them. The
+  whole of Act I rests on this being exactly as described.
 - **Persona-farm dossier:** archive DoubleSpeed's live site + pricing;
-  survey the adjacent vendor class (AI UGC, creative-scoring, device-farm
-  tooling); snapshot everything (claims rot).
+  survey the adjacent vendor class (AI UGC actors — Arcads, Creatify —
+  creative-scoring, device-farm tooling); snapshot everything (claims rot).
 - **Peptide market scan:** catalogue live ad creative + influencer content
   for peptide vendors (ad-library pulls, TikTok/IG examples); document the
-  "Research Use Only" pattern, pricing, funnels. Save exemplars for stylized
+  "Research Use Only" pattern, pricing, and the SEO/affiliate/clinic funnel
+  that substitutes for banned paid search. Save exemplars for stylized
   recreation reference — never for reproduction.
-- Deliverable: `claims.md` v1 — every anchor claim from PRD §8 sourced ×2.
-- **Verify:** registry has zero single-source claims; walkthrough notes cover
-  all 10 Act I screens.
+- **Close the five open items in `claims.md`:** trace B4 to the underlying
+  Belgian study; replace or label the vendor-reported F2 benchmark; re-check
+  the FDA 503A Bulks List status (B1/B2); verify C8 in-console; archive D1/D2.
+- Deliverable: `claims.md` v2 — zero single-sourced claims, zero open items.
+- **Verify:** walkthrough notes cover all 10 Act I screens and both Act III
+  console screens; registry clean.
+
+> **Status 2026-08-24:** desk research for the registry is **done** — `claims.md`
+> v1 carries 30+ sourced claims across all five movements, and the SME finding
+> that reshaped Act I (the peptide ad ban + LegitScript wall, PRD §2) is
+> already folded into the locked storyboard. M1 is therefore reduced from
+> "discover the story" to "verify it first-hand and archive it."
 
 ### M2 (Oct 2026) — Six-lens research dossier (LAW 4 RSG)
 
@@ -72,24 +96,32 @@ changes copy or structure:
 ### M3 (Nov 2026) — Ethics/legal gate + storyboard inputs
 
 - Ethics review: does any scene teach beyond publicly documented tooling?
-  (PRD §2 checklist, applied scene by scene.)
-- Legal review pass 1: fictional-vendor name cleared, trade-dress abstraction
-  rules written, quoted-material register.
+  (PRD §3 checklist, applied scene by scene — all 29.)
+- Legal review pass 1: fictional-vendor name ("Meridian Longevity") cleared
+  against real entities, trade-dress abstraction rules written, quoted-material
+  register agreed.
 - Expert input: 2–3 conversations (public-health comms practitioner, paid-
   media practitioner, platform-policy person) — recorded into the dossier.
-- **Gate:** written go/no-go on the tutorial-precision approach. Storyboard
-  work does not start until this is green.
+  The paid-media practitioner reviews Act I for console fidelity; the
+  public-health practitioner reviews Act III for operational realism.
+- **Gate:** written go/no-go on the tutorial-precision approach. Build does not
+  start until this is green.
 
 ## Q2 — Design & prototype (M4–M6)
 
-### M4 (Dec 2026) — Storyboard lock
+### M4 (Dec 2026) — Storyboard revision + copy draft 1
 
-- 29-scene storyboard finalized from PRD §4 + Q1 insights: per scene — key,
-  frame, headline, side-copy outline, stage spec, motion spec, interaction
-  spec, claims-registry references. Cut list opened (hard cap 29).
-- Copy draft 0 for Acts 0–I.
+The storyboard is already locked (PRD §5). This month reconciles it against
+what Q1 verification actually found and writes real copy.
+
+- Revise any scene the M1 console walkthrough contradicted (field names,
+  option lists, policy wording), and any claim the registry cleanup moved.
+- **Copy draft 1** for all 29 scenes at publication fidelity — the PRD carries
+  outline-level prose; this turns it into finished text in the series voice
+  (declarative, unhedged, sourced, no throat-clearing).
+- Cut list opened (hard cap 29 scenes).
 - **Verify:** every scene has a claims mapping or an explicit "no factual
-  claims" mark.
+  claims" mark; every claim cited in copy exists in registry v2.
 
 ### M5 (Jan 2027) — Component kit
 
