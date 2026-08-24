@@ -934,7 +934,7 @@ const AD_ROWS = [
   { t:'Clinical-Grade Recovery Peptides', d:'meridian-longevity · Free consult' },
   { t:'BPC-157 — Research Grade, 99% Pure', d:'apex-research-labs · Ships today' },
   { t:'Doctors Won’t Say It — Natural GLP-1', d:'herbal-metabolic · 60% off today' },
-  { t:'Shoulder Not Healing? Start Here', d:'restore-clinic · Book online' }
+  { t:'Ancient Root Extract — 3,000 Years', d:'herbal-heritage · Buy 2, get 1 free' }
 ];
 const adRow = serpG.selectAll('g.ad').data(AD_ROWS).join('g').attr('class','ad')
   .attr('transform',(d,i)=>'translate(0,'+(SERP_Y+i*74)+')');
@@ -1210,7 +1210,7 @@ function mTree(g, y, rows){
     if (r.on) roundRect(row, CX0-6, ry-6, CW*0.6, h-6, 4, '#e8f0fe');
     mCheck(row, CX0+ind, ry, r.on ? 1 : (r.dis ? 2 : 0));
     label(row, CX0+ind+26, ry+12, r.t, 10.3, r.on?600:400, r.dis ? '#9aa0a6' : GTEXT);
-    if (r.n) label(row, CX0+CW*0.6-12, ry+12, r.n, 8.8, 400, GSUB, 'end');
+    if (r.n) label(row, CX0+CW*0.6-(r.chev?48:12), ry+12, r.n, 8.8, 400, GSUB, 'end');
     if (r.chev) row.append('path')
       .attr('d','M '+(CX0+ind+CW*0.6-34)+' '+(ry+4)+' l 5 5 l -5 5')
       .attr('fill','none').attr('stroke',GSUB).attr('stroke-width',1.5)
@@ -1395,7 +1395,7 @@ mach2: { crumb:'New campaign · review', step:'BLOCKED', head:'Policy review', r
       ['Telehealth clinic, certified. Ads may serve.']);
   } },
 
-mach3: { crumb:'New campaign · bidding', step:'STEP 2 OF 6', head:'Bidding', rail:2,
+mach3: { crumb:'New campaign · bidding', step:'STEP 3 OF 6', head:'Bidding', rail:2,
   draw(g){
     let y = CY0 - 4;
     mCard(g, CX0, y, CW*0.9, 96);
@@ -1415,7 +1415,7 @@ mach3: { crumb:'New campaign · bidding', step:'STEP 2 OF 6', head:'Bidding', ra
       { l:'Est. spend / day', v:2812, pre:'$' }]);
   } },
 
-mach4: { crumb:'New campaign · settings', step:'STEP 3 OF 6', head:'Locations', rail:3,
+mach4: { crumb:'New campaign · settings', step:'STEP 4 OF 6', head:'Locations', rail:3,
   draw(g){
     let y = CY0 - 10;
     const rows = [
@@ -1429,11 +1429,11 @@ mach4: { crumb:'New campaign · settings', step:'STEP 3 OF 6', head:'Locations',
       if (r.n) label(row, CX0+240, y+i*30+4, r.n, 8.8, 400, GSUB);
     });
     y = mMap(g, y+84);
-    label(g, CX0, y-70, 'Language: English', 10, 400, GTEXT);
-    label(g, CX0, y-52, 'Presence: people in or regularly in your targeted locations', 9.3, 400, GSUB);
+    label(g, CX0, y-4, 'Language: English', 10, 400, GTEXT);
+    label(g, CX0, y+14, 'Presence: people in or regularly in your targeted locations', 9.3, 400, GSUB);
   } },
 
-mach5: { crumb:'New campaign · settings', step:'STEP 3 OF 6', head:'Audience segments', rail:3,
+mach5: { crumb:'New campaign · settings', step:'STEP 4 OF 6', head:'Audience segments', rail:3,
   draw(g){
     let y = CY0 - 12;
     y = mTabs(g, CX0, y, ['Search','Browse'], 1);
@@ -1456,7 +1456,7 @@ mach5: { crumb:'New campaign · settings', step:'STEP 3 OF 6', head:'Audience se
        'inferred, never asked.']);
   } },
 
-mach6: { crumb:'New campaign · custom segment', step:'STEP 3 OF 6', head:'Audience segments', rail:3, modal:true,
+mach6: { crumb:'New campaign · custom segment', step:'STEP 4 OF 6', head:'Audience segments', rail:3, modal:true,
   draw(g){
     // the builder opens as a modal over the wizard
     g.append('rect').attr('x',CON.x+1).attr('y',CON.y+45).attr('width',CON.w-2).attr('height',CON.h-46)
@@ -1510,7 +1510,7 @@ mach6: { crumb:'New campaign · custom segment', step:'STEP 3 OF 6', head:'Audie
     mBtn(btn, mx+mw-108, CON.y+CON.h-64, 'Create', true);
   } },
 
-mach7: { crumb:'New campaign · settings', step:'STEP 3 OF 6', head:'Demographics', rail:3,
+mach7: { crumb:'New campaign · settings', step:'STEP 4 OF 6', head:'Demographics', rail:3,
   draw(g){
     let y = CY0 - 4;
     y = mDemoTable(g, y,
@@ -1525,7 +1525,7 @@ mach7: { crumb:'New campaign · settings', step:'STEP 3 OF 6', head:'Demographic
       { dead:true });
   } },
 
-mach8: { crumb:'New campaign · keywords', step:'STEP 4 OF 6', head:'Keywords', rail:4,
+mach8: { crumb:'New campaign · keywords', step:'STEP 5 OF 6', head:'Keywords', rail:4,
   draw(g){
     let y = CY0 - 8;
     mCard(g, CX0, y, CW*0.9, 92);
@@ -1542,7 +1542,7 @@ mach8: { crumb:'New campaign · keywords', step:'STEP 4 OF 6', head:'Keywords', 
     label(g, CX0, y+2, 'A filter on doubt: the questions this ad will never be present for.', 9.3, 400, GSUB);
   } },
 
-mach9: { crumb:'New campaign · ads', step:'STEP 4 OF 6', head:'Create your ad', rail:4,
+mach9: { crumb:'New campaign · ads', step:'STEP 5 OF 6', head:'Create your ad', rail:4,
   draw(g){
     const lw = CW*0.5;
     let y = CY0 - 14;
