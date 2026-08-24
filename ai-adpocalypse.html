@@ -755,7 +755,7 @@ const FRAMES = {
   hook: '60 30 880 620',
   bld:  '100 60 720 600',   /* covers persona art 120..800 × 150..550 + breathing room */
   dash: '100 100 860 480',  /* the metrics dashboard: 120..928 × 140..560 */
-  cyoa: '50 20 900 650',
+  cyoa: '50 14 900 680',
   cham: '110 30 780 620',
   meth: '120 90 760 520'
 };
@@ -774,7 +774,7 @@ const FRAMES_MOBILE = {
   hook: '240 20 520 780',
   bld:  '230 30 540 850',   /* narrow: panel and pipeline stack via layoutPersona */
   dash: '270 60 460 700',   /* narrow: cells stack 2-wide via layoutDash */
-  cyoa: '230 5 540 840',
+  cyoa: '225 5 550 870',
   cham: '210 20 580 700',
   meth: '170 100 660 540'
 };
@@ -1452,6 +1452,19 @@ mach2: { crumb:'New campaign · review', step:'BLOCKED', head:'Policy review', r
     mBanner(s3, CX0, y-6, CW*0.9, 'ok', 'Eligible',
       ['Telehealth clinic, certified. Ads may serve.']);
     s3.attr('opacity',0);
+    // the counterfactual invitation, and the synthesis once both paths are seen
+    const s5 = g.append('g').attr('class','s5').attr('opacity',0)
+      .style('cursor','pointer').style('pointer-events','none')
+      .attr('aria-label','See the other path');
+    padHit(s5, CX0, CON.y+CON.h-72, CW*0.8, 22, 8);
+    s5.append('text').attr('class','s5t').attr('x',CX0).attr('y',CON.y+CON.h-56)
+      .attr('font-family',SANS).call(typed,10.5).attr('font-weight',700)
+      .attr('fill',GBLUE).attr('text-decoration','underline');
+    const s6 = g.append('g').attr('class','s6').attr('opacity',0);
+    s6.append('path').attr('d','M '+CX0+' '+(CON.y+CON.h-84)+' H '+(CX0+CW*0.9))
+      .attr('stroke',GBORD).attr('stroke-width',1);
+    label(s6, CX0, CON.y+CON.h-62, 'You have seen both paths. They end at the same door:', 10.5, 400, '#3c4043');
+    label(s6, CX0, CON.y+CON.h-44, 'the wall holds — until the seller becomes a shape it permits.', 10.5, 700, GTEXT);
   } },
 
 mach3: { crumb:'New campaign · bidding', step:'STEP 3 OF 6', head:'Bidding', rail:2,
@@ -1810,82 +1823,245 @@ good3: { crumb:'New campaign · settings', step:'FIND THE GAP', head:'Demographi
    THE FORCES, THE CYCLE, THE HOOKS, THE FUNNELS, THE CHAMBER
    ===================================================================== */
 
-/* ---- the five forces: a board that opens on click ---- */
+/* ---- the five forces: one metric at the hub, five drawn mechanisms ---- */
 const FORCES = [
-  { id:'truth', t:'Engagement ≠ truth',
-    d:['Algorithms optimise strictly for engagement and session length —','never accuracy. Emotionally charged misinformation outperforms','clinical fact structurally, not occasionally: the metric that decides','what you see cannot perceive the difference.'] },
-  { id:'novel', t:'Novelty rewards pseudo-science',
-    d:['Feeds reward shock, outrage and novelty. Pseudo-science is','inherently novel — a new secret cure every week. Clinical data is','inherently not: a replicated finding is old news by definition. The','house style of science is repetition; the feed’s is surprise.'] },
-  { id:'revenue', t:'Desperation is recurring revenue',
-    d:['There is vast unethical revenue in cures for permanent chronic','disease — and for conditions medicine cannot yet treat well. A','customer who cannot be cured cannot be satisfied, and cannot stop','buying. The product fails; the subscription renews.'] },
-  { id:'chamber', t:'Chambers seal themselves',
+  { id:'truth', t:'Engagement ≠ truth', l1:'Engagement', l2:'≠ truth', glyph:'scale',
+    tag:'THE METRIC IS BLIND',
+    d:['Algorithms optimise strictly for engagement and session length — never','accuracy. Emotionally charged misinformation outperforms clinical fact','structurally, not occasionally: the metric that decides what you see','cannot perceive the difference.'] },
+  { id:'novel', t:'Novelty beats replication', l1:'Novelty beats', l2:'replication', glyph:'spark',
+    tag:'SURPRISE OUTRANKS PROOF',
+    d:['Feeds reward shock, outrage and novelty. Pseudo-science is inherently','novel — a new secret cure every week. Clinical data is inherently not:','a replicated finding is old news by definition. The house style of','science is repetition; the feed’s is surprise.'] },
+  { id:'revenue', t:'Desperation renews', l1:'Desperation', l2:'renews', glyph:'cycle',
+    tag:'THE UNCURABLE CUSTOMER',
+    d:['There is vast unethical revenue in cures for permanent chronic disease','— and for conditions medicine cannot yet treat well. A customer who','cannot be cured cannot be satisfied, and cannot stop buying. The','product fails; the subscription renews.'] },
+  { id:'chamber', t:'Chambers self-seal', l1:'Chambers', l2:'self-seal', glyph:'ring',
+    tag:'DWELL TIME BUILDS WALLS',
     d:['Health is politicised and recommenders are powerful: the similarly','convinced find each other — looksmaxxing forums, alternative','ivermectin groups, self-reinforcing eating-disorder communities —','and the algorithm walls off the counter-content.'] },
-  { id:'masq', t:'The clinical masquerade',
+  { id:'masq', t:'The clinical masquerade', l1:'The clinical', l2:'masquerade', glyph:'mask',
+    tag:'THE FEED CREATES ITS PATIENT',
     d:['Distressing content at algorithmic dose can produce psychological','symptoms that masquerade as the very conditions the feed then','sells cures for. The machine can manufacture the demand','it monetises.'] }
 ];
-const forceTiles = gForce.append('g');
+
+/* each force is a mechanism, so each gets a drawing of its mechanism */
+function forceGlyph(g, key, k, col, col2){
+  k = k || 1;
+  const G = g.append('g').attr('class','fg fg-'+key);
+  if (key === 'scale'){
+    // the beam tips toward the flame
+    const beam = G.append('g').attr('class','beam');
+    beam.append('path').attr('d','M -15 0 H 15').attr('stroke',col).attr('stroke-width',2).attr('stroke-linecap','round');
+    beam.append('path').attr('d','M -15 0 v 7').attr('stroke',col).attr('stroke-width',1.5);
+    beam.append('path').attr('d','M 15 0 v 7').attr('stroke',col).attr('stroke-width',1.5);
+    beam.append('path').attr('d','M -19 11 a 4.5 4.5 0 0 0 8 0 Z').attr('fill',col2);   // flame pan
+    beam.append('path').attr('d','M 11 11 a 4.5 4.5 0 0 0 8 0 Z').attr('fill','none').attr('stroke',col).attr('stroke-width',1.3);
+    beam.append('path').attr('d','M -15 4 q -2.5 -5 0 -8 q 2.5 3 0 8').attr('fill',col2); // the flame
+    beam.append('path').attr('d','M 12.5 5 l 2 2 l 3.5 -4').attr('stroke',col).attr('stroke-width',1.5)
+      .attr('fill','none').attr('stroke-linecap','round').attr('stroke-linejoin','round'); // the checkmark
+    beam.attr('transform','rotate(-9)');
+    G.append('path').attr('d','M 0 0 L -4 8 H 4 Z').attr('fill',col);   // pivot
+  } else if (key === 'spark'){
+    for (let i=0;i<8;i++){
+      const a = i*Math.PI/4;
+      G.append('path').attr('class','ray')
+        .attr('d','M '+(Math.cos(a)*5)+' '+(Math.sin(a)*5-3)+' L '+(Math.cos(a)*13)+' '+(Math.sin(a)*13-3))
+        .attr('stroke',col2).attr('stroke-width',2).attr('stroke-linecap','round');
+    }
+    G.append('circle').attr('cy',-3).attr('r',3.5).attr('fill',col2);
+    G.append('path').attr('d','M -13 14 H 13').attr('stroke',col).attr('stroke-width',1.6)
+      .attr('stroke-linecap','round').attr('stroke-dasharray','3 3');   // the flat, replicated line
+  } else if (key === 'cycle'){
+    G.append('path').attr('class','loop')
+      .attr('d','M 0 -13 A 13 13 0 1 1 -12.3 -4.2')
+      .attr('fill','none').attr('stroke',col).attr('stroke-width',2).attr('stroke-linecap','round');
+    G.append('path').attr('d','M -12.3 -4.2 l -4 -5 M -12.3 -4.2 l 6 -2.6')
+      .attr('stroke',col).attr('stroke-width',2).attr('stroke-linecap','round');
+    G.append('text').attr('y',5).attr('text-anchor','middle').attr('font-family',SANS)
+      .attr('font-size',13*k).attr('font-weight',700).attr('fill',col2).text('$');
+  } else if (key === 'ring'){
+    G.append('path').attr('class','wall')
+      .attr('d','M 9.2 -10.6 A 14 14 0 1 1 -13.9 -1.7')
+      .attr('fill','none').attr('stroke',col).attr('stroke-width',2).attr('stroke-linecap','round');
+    G.append('path').attr('class','gapclose')
+      .attr('d','M -13.9 -1.7 A 14 14 0 0 1 9.2 -10.6')
+      .attr('fill','none').attr('stroke',col2).attr('stroke-width',2)
+      .attr('stroke-linecap','round').attr('opacity',0);
+    [[-4,-2],[4,3],[-1,6]].forEach(p=>
+      G.append('circle').attr('cx',p[0]).attr('cy',p[1]).attr('r',2.6).attr('fill',col2));
+  } else if (key === 'mask'){
+    G.append('path').attr('class','pulse')
+      .attr('d','M -16 10 h 7 l 3 -6 l 4 10 l 3 -7 h 15')
+      .attr('fill','none').attr('stroke',col2).attr('stroke-width',1.6)
+      .attr('stroke-linecap','round').attr('stroke-linejoin','round').attr('opacity',.9);
+    const m = G.append('g').attr('class','face');
+    m.append('path').attr('d','M -11 -14 h 22 q 3 0 3 3 v 7 q 0 9 -14 12 q -14 -3 -14 -12 v -7 q 0 -3 3 -3 Z')
+      .attr('fill',col).attr('opacity',.95);
+    m.append('ellipse').attr('cx',-5).attr('cy',-6).attr('rx',3).attr('ry',2).attr('fill',PAPER);
+    m.append('ellipse').attr('cx',5).attr('cy',-6).attr('rx',3).attr('ry',2).attr('fill',PAPER);
+  }
+  G.attr('transform', (G.attr('transform')||'') + ' scale('+k+')');
+  return G;
+}
+
+const forceHub   = gForce.append('g');
+const forceNodes = gForce.append('g');
 const forcePanel = gForce.append('g');
 let forceOpen = null;
-function drawForces(){
-  forceTiles.selectAll('*').remove();
+const forceSeen = new Set();
+
+function forceGeom(){
   const nar = isNarrow();
-  const cols = nar ? 1 : 5;
-  const tw = nar ? 460 : 164, th = nar ? 44 : 96, gap = 12;
-  const x0 = nar ? 270 : 500 - (5*tw + 4*gap)/2;
+  return nar
+    ? { hub:[500,96], xs:[500,500,500,500,500], ys:[196,268,340,412,484], nr:24,
+        px:262, py:544, pw:476, ph:252, glx:318, gly:622 }
+    : { hub:[500,120], xs:[150,325,500,675,850], ys:[312,290,282,290,312], nr:36,
+        px:120, py:404, pw:760, ph:222, glx:206, gly:516 };
+}
+function drawForces(){
+  forceHub.selectAll('*').remove();
+  forceNodes.selectAll('*').remove();
+  const G = forceGeom();
+  const nar = isNarrow();
+  // the hub: the one metric everything else falls out of
+  const hub = forceHub.append('g').attr('class','fhub');
+  hub.append('circle').attr('cx',G.hub[0]).attr('cy',G.hub[1]).attr('r',34).attr('fill',INK);
+  hub.append('path').attr('d','M '+(G.hub[0]-5)+' '+(G.hub[1]-9)+' l 12 9 l -12 9 Z').attr('fill',PAPER);
+  hub.append('circle').attr('cx',G.hub[0]).attr('cy',G.hub[1]).attr('r',41)
+    .attr('fill','none').attr('stroke',INK).attr('stroke-width',1).attr('stroke-dasharray','2 4');
+  if (!nar) mono(forceHub, G.hub[0], G.hub[1]-54, 'THE ONE METRIC — WATCH TIME', 7.5, INK, 'middle');
   FORCES.forEach((f,i)=>{
-    const x = nar ? x0 : x0 + i*(tw+gap);
-    const y = nar ? 54 + i*(th+10) : 64;
+    const x = G.xs[i], y = G.ys[i];
+    forceHub.append('path').attr('class','spoke')
+      .attr('d', nar
+        ? 'M '+(G.hub[0]-70)+' '+(G.hub[1]+40)+' Q '+(G.hub[0]-110)+' '+((G.hub[1]+y)/2)+' '+(x-(G.nr+64))+' '+y
+        : 'M '+G.hub[0]+' '+(G.hub[1]+44)+' Q '+(G.hub[0]+(x-G.hub[0])*.35)+' '+((G.hub[1]+y)/2+30)+' '+x+' '+(y-G.nr-8))
+      .attr('fill','none').attr('stroke', forceSeen.has(f.id) ? '#B8492E' : '#C9C3B6')
+      .attr('stroke-width', forceOpen===f.id ? 2 : 1.3);
     const on = forceOpen === f.id;
-    const tile = forceTiles.append('g').attr('class','ftile').datum(f)
+    const node = forceNodes.append('g').attr('class','ftile').datum(f)
       .attr('tabindex',-1).attr('role','button')
       .attr('aria-label', f.t + '. ' + f.d.join(' '))
+      .attr('aria-pressed', on ? 'true' : 'false')
       .style('cursor','pointer');
-    padHit(tile, x, y, tw, th, 8);
-    roundRect(tile, x, y, tw, th, 12, on ? '#212E36' : '#FFFFFF', on ? null : LINE, 1.3);
-    mono(tile, x+14, y+22, '0'+(i+1), 7.5, on ? '#F9C9B4' : ALARM);
-    const words = nar ? [f.t] : f.t.split(' ').reduce((acc,w)=>{
-      const last = acc[acc.length-1];
-      if (last && (last+' '+w).length <= 14) acc[acc.length-1] = last+' '+w;
-      else acc.push(w);
-      return acc;
-    },[]);
-    words.forEach((ln,k)=> label(tile, x+14, y+(nar?30:44)+k*15, ln, nar?11:10, 700, on ? '#F8F6F1' : INK));
+    padHit(node, x-G.nr-8, y-G.nr-8, 2*G.nr+16, 2*G.nr+16, 6);
+    node.append('circle').attr('cx',x).attr('cy',y).attr('r', on ? G.nr+4 : G.nr)
+      .attr('fill', on ? INK : '#FFFFFF')
+      .attr('stroke', on ? INK : (forceSeen.has(f.id) ? ALARM : '#B9B2A4'))
+      .attr('stroke-width', on ? 2 : 1.4);
+    forceGlyph(node.append('g').attr('transform','translate('+x+','+y+')'),
+      f.glyph, nar ? .78 : 1, on ? PAPER : INK, on ? '#F9C9B4' : ALARM);
+    if (forceSeen.has(f.id) && !on){
+      node.append('circle').attr('cx',x+G.nr-6).attr('cy',y-G.nr+6).attr('r',6.5).attr('fill',ALARM);
+      node.append('path').attr('d','M '+(x+G.nr-9)+' '+(y-G.nr+6)+' l 2 2.4 l 4 -4.6')
+        .attr('stroke','#FFFFFF').attr('stroke-width',1.5).attr('fill','none')
+        .attr('stroke-linecap','round').attr('stroke-linejoin','round');
+    }
+    if (nar){
+      label(node, x-G.nr-16, y-3, f.l1, 10.5, on?700:600, INK, 'end');
+      label(node, x-G.nr-16, y+11, f.l2, 10.5, on?700:600, INK, 'end');
+      mono(node, x-G.nr-16, y+26, '0'+(i+1), 6.5, on ? ALARM : MUTE, 'end');
+    } else {
+      label(node, x, y+G.nr+20, f.l1, 10.5, on?700:600, INK, 'middle');
+      label(node, x, y+G.nr+34, f.l2, 10.5, on?700:600, INK, 'middle');
+      mono(node, x, y-G.nr-10, '0'+(i+1), 6.5, on ? ALARM : MUTE, 'middle');
+    }
   });
 }
 function drawForcePanel(){
   forcePanel.selectAll('*').remove();
+  const G = forceGeom();
   const nar = isNarrow();
   const f = FORCES.find(x=>x.id===forceOpen);
-  const px = nar ? 270 : 220, pw = nar ? 460 : 560,
-        py = nar ? 340 : 210, ph = nar ? 210 : 150;
   if (!f){
-    label(forcePanel, nar?500:500, py+ph/2, 'Open a force to read its mechanism.', 11, 400, MUTE, 'middle')
-      .attr('opacity',.8);
+    label(forcePanel, 500, G.py+G.ph/2-6, 'Open a force. Each is one mechanism of the same metric.', 11, 400, MUTE, 'middle');
+    drawForceDots(G);
     return;
   }
-  roundRect(forcePanel, px, py, pw, ph, 14, '#FFFFFF', ALARM, 1.5);
-  mono(forcePanel, px+20, py+28, 'FORCE 0'+(FORCES.indexOf(f)+1), 7.5, ALARM);
-  label(forcePanel, px+20, py+52, f.t, 13, 700, INK);
-  f.d.forEach((ln,i)=> label(forcePanel, px+20, py+76+i*18, ln, 10, 400, '#3A4750'));
+  const i = FORCES.indexOf(f);
+  roundRect(forcePanel, G.px, G.py, G.pw, G.ph, 16, '#FFFFFF', ALARM, 1.4);
+  // the mechanism, drawn large
+  forcePanel.append('circle').attr('cx',G.glx).attr('cy',G.gly).attr('r',52).attr('fill','#FBE3D2');
+  forceGlyph(forcePanel.append('g').attr('transform','translate('+G.glx+','+G.gly+')'),
+    f.glyph, 2, INK, ALARM);
+  const tx = G.glx + 84;
+  mono(forcePanel, tx, G.py+34, 'FORCE 0'+(i+1)+' · '+f.tag, 7.2, ALARM);
+  label(forcePanel, tx, G.py+60, f.t, nar ? 12.5 : 14, 700, INK);
+  let lines = f.d;
+  if (nar){
+    const words = f.d.join(' ').split(' ');
+    lines = ['']; let li = 0;
+    words.forEach(w=>{
+      if ((lines[li]+' '+w).trim().length > 38){ li++; lines[li]=w; }
+      else lines[li] = (lines[li]+' '+w).trim();
+    });
+  }
+  lines.forEach((ln,k)=> label(forcePanel, tx, G.py+(nar?80:84)+k*(nar?15:18), ln, nar ? 8.8 : 10, 400, '#3A4750'));
+  // the education-module trail: next unexplored force, or the synthesis
+  const next = FORCES.find(x=>!forceSeen.has(x.id));
+  if (next){
+    const nx = forcePanel.append('g').attr('class','fnext').datum(next)
+      .attr('tabindex',0).attr('role','button')
+      .attr('aria-label','Next force: '+next.t)
+      .style('cursor','pointer');
+    padHit(nx, tx, G.py+G.ph-42, 300, 24, 8);
+    label(nx, tx, G.py+G.ph-24, '→ next force: '+next.t, 10.5, 700, ALARM);
+  } else {
+    label(forcePanel, tx, G.py+G.ph-24, 'All five seen — and every one favours the seller.', 10.5, 700, INK);
+  }
+  drawForceDots(G);
   if (!REDUCE){
     forcePanel.attr('opacity',0).attr('transform','translate(0,8)')
       .transition('fp').duration(320).ease(d3.easeCubicOut)
       .attr('opacity',1).attr('transform','translate(0,0)');
   }
+  // the mechanism moves when it opens
+  if (!REDUCE){
+    const big = forcePanel.select('g.fg-'+f.glyph);
+    if (f.glyph==='scale'){
+      big.select('.beam').attr('transform','rotate(0)')
+        .transition('mech').duration(900).delay(200).ease(d3.easeCubicOut).attr('transform','rotate(-9)');
+    } else if (f.glyph==='spark'){
+      big.selectAll('.ray').attr('opacity',0)
+        .transition('mech').duration(300).delay((d,k)=>150+k*60).attr('opacity',1);
+    } else if (f.glyph==='cycle'){
+      drawOn(big.select('.loop'), 900, ()=>200);
+    } else if (f.glyph==='ring'){
+      big.select('.gapclose').attr('opacity',1);
+      drawOn(big.select('.gapclose'), 700, ()=>350);
+    } else if (f.glyph==='mask'){
+      big.select('.face').attr('transform','translate(0,-6)').attr('opacity',0)
+        .transition('mech').duration(600).delay(250).ease(d3.easeCubicOut)
+        .attr('transform','translate(0,0)').attr('opacity',1);
+    }
+  }
+}
+function drawForceDots(G){
+  const dx = G.px + G.pw - 20 - 4*18;
+  FORCES.forEach((f,i)=>{
+    forcePanel.append('circle').attr('cx',dx+i*18).attr('cy',G.py+G.ph-22).attr('r',4.5)
+      .attr('fill', forceSeen.has(f.id) ? ALARM : 'none')
+      .attr('stroke', ALARM).attr('stroke-width',1.2);
+  });
+  mono(forcePanel, dx-10, G.py+G.ph-18, forceSeen.size+' OF 5', 6.5, MUTE, 'end');
 }
 function setForce(id){
-  forceOpen = forceOpen === id ? null : id;
+  forceOpen = id;
+  if (id) forceSeen.add(id);
   drawForces(); drawForcePanel(); applyTypeScale(); wireForces();
 }
 function wireForces(){
-  forceTiles.selectAll('g.ftile')
+  forceNodes.selectAll('g.ftile')
+    .on('click', (ev,f)=> setForce(f.id))
+    .on('keydown', function(ev,f){
+      if (ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); setForce(f.id); }
+    });
+  forcePanel.selectAll('g.fnext')
     .on('click', (ev,f)=> setForce(f.id))
     .on('keydown', function(ev,f){
       if (ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); setForce(f.id); }
     });
 }
 drawForces(); drawForcePanel(); wireForces();
-label(gForce, 500, isNarrow()?30:40, 'One metric — watch time. Five consequences.', 12, 700, INK, 'middle');
+const PAPER_HEAD = label(gForce, 500, 34, 'One metric. Five consequences.', 12.5, 700, INK, 'middle');
 
 /* ---- the misinformation cycle ---- */
 const CYCLE = [
@@ -2149,6 +2325,7 @@ const CYOA = [
 const cyoaCards = gCyoa.append('g');
 const cyoaPanel = gCyoa.append('g');
 let cyoaOpen = null;
+const cyoaSeen = new Set();
 function drawCyoaCards(){
   cyoaCards.selectAll('*').remove();
   const nar = isNarrow();
@@ -2157,15 +2334,25 @@ function drawCyoaCards(){
     const y = nar ? 30 + i*64 : 60;
     const w = nar ? 470 : 200, h = nar ? 54 : 92;
     const on = cyoaOpen === c.id;
+    const seen = cyoaSeen.has(c.id);
     const card = cyoaCards.append('g').attr('class','ccard').datum(c)
       .attr('tabindex',-1).attr('role','button')
       .attr('aria-label','Walk the funnel: '+c.short+' — '+c.mech)
-      .style('cursor','pointer');
+      .style('cursor','pointer')
+      .attr('opacity', cyoaOpen && !on ? .45 : 1);
     padHit(card, x, y, w, h, 6);
     roundRect(card, x, y, w, h, 12, on ? '#212E36' : c.tint, on ? null : 'rgba(33,46,54,.14)', 1.2);
     label(card, x+14, y+(nar?23:30), c.short, nar?10.5:10, 700, on ? '#F8F6F1' : INK);
     label(card, x+14, y+(nar?41:52), c.mech, 8.6, 600, on ? '#F9C9B4' : '#8A6A55');
-    if (!nar) label(card, x+14, y+76, on ? 'walking the funnel ↓' : 'tap to walk the funnel', 8, 400, on ? '#D9D2C6' : MUTE);
+    if (!nar) label(card, x+14, y+76,
+      on ? 'walking the funnel ↓' : (seen ? 'seen ✓' : 'tap to walk the funnel'),
+      8, 400, on ? '#D9D2C6' : (seen ? ALARM : MUTE));
+    if (seen && !on){
+      card.append('circle').attr('cx',x+w-14).attr('cy',y+14).attr('r',7).attr('fill',ALARM);
+      card.append('path').attr('d','M '+(x+w-17.5)+' '+(y+14)+' l 2.4 2.8 l 4.6 -5.4')
+        .attr('stroke','#FFFFFF').attr('stroke-width',1.6).attr('fill','none')
+        .attr('stroke-linecap','round').attr('stroke-linejoin','round');
+    }
   });
 }
 function drawCyoaPanel(){
@@ -2179,12 +2366,21 @@ function drawCyoaPanel(){
     return;
   }
   const bh = nar ? 84 : 82;
+  // the walk is a timeline, not floating boxes: a rail with numbered stops
+  cyoaPanel.append('path').attr('class','cbeat')
+    .attr('d','M '+(px+1)+' '+(py+18)+' V '+(py+4*(bh+8)+18))
+    .attr('stroke','#D9C6B8').attr('stroke-width',2);
   c.beats.forEach((b,i)=>{
     const by = py + i*(bh+8);
     const row = cyoaPanel.append('g').attr('class','cbeat');
-    roundRect(row, px, by, pw, bh, 12, i===4 ? '#FBEDE7' : '#FFFFFF',
+    row.append('circle').attr('cx',px+1).attr('cy',by+18).attr('r',9)
+      .attr('fill', i===4 ? ALARM : '#FFFFFF').attr('stroke', i===4 ? ALARM : '#D9C6B8').attr('stroke-width',1.6);
+    row.append('text').attr('x',px+1).attr('y',by+21.5).attr('text-anchor','middle')
+      .attr('font-family',MONO).call(typed,6.8).attr('font-weight',500)
+      .attr('fill', i===4 ? '#FFFFFF' : '#8A6A55').text(i+1);
+    roundRect(row, px+18, by, pw-18, bh, 12, i===4 ? '#FBEDE7' : '#FFFFFF',
               i===4 ? ALARM : LINE, i===4 ? 1.5 : 1.2);
-    mono(row, px+16, by+22, b[0], 7.3, i===4 ? ALARM : '#8A6A55');
+    mono(row, px+34, by+22, b[0], 7.3, i===4 ? ALARM : '#8A6A55');
     const words = b[1].split(' ');
     let lines = [''], li = 0;
     const maxc = nar ? 58 : 92;
@@ -2192,7 +2388,33 @@ function drawCyoaPanel(){
       if ((lines[li]+' '+w).trim().length > maxc){ li++; lines[li]=w; }
       else lines[li] = (lines[li]+' '+w).trim();
     });
-    lines.forEach((ln,k)=> label(row, px+16, by+42+k*15, ln, 9.8, 400, '#3A4750'));
+    lines.forEach((ln,k)=> label(row, px+34, by+42+k*15, ln, 9.8, 400, '#3A4750'));
+  });
+  // the module trail: the next costume, or the synthesis
+  const endY = py + 5*(bh+8) + 4;
+  const remaining = CYOA.filter(x=>!cyoaSeen.has(x.id));
+  if (remaining.length){
+    const nx = remaining[0];
+    const btn = cyoaPanel.append('g').attr('class','cnext').datum(nx)
+      .attr('tabindex',0).attr('role','button')
+      .attr('aria-label','See the next funnel: '+nx.short)
+      .style('cursor','pointer');
+    padHit(btn, px+18, endY, pw-18, 24, 8);
+    btn.append('text').attr('x',px+18).attr('y',endY+16)
+      .attr('font-family',SANS).call(typed,10.5).attr('font-weight',700)
+      .attr('fill',ALARM).attr('text-decoration','underline')
+      .text('→ Same funnel, different costume — now walk “'+nx.short+'”');
+  } else {
+    cyoaPanel.append('text').attr('x',px+18).attr('y',endY+16)
+      .attr('font-family',SANS).call(typed,11).attr('font-weight',700)
+      .attr('fill',INK)
+      .text('Four costumes walked. One funnel. The hook changes; the bottle never does.');
+  }
+  // progress
+  CYOA.forEach((x,i)=>{
+    cyoaPanel.append('circle').attr('cx',px+pw-8-3*22+i*22).attr('cy',endY+12).attr('r',4.5)
+      .attr('fill', cyoaSeen.has(x.id) ? ALARM : 'none')
+      .attr('stroke',ALARM).attr('stroke-width',1.2);
   });
   if (!REDUCE){
     cyoaPanel.selectAll('g.cbeat').attr('opacity',0).attr('transform','translate(0,10)')
@@ -2201,11 +2423,17 @@ function drawCyoaPanel(){
   }
 }
 function setCyoa(id){
-  cyoaOpen = cyoaOpen === id ? null : id;
+  cyoaOpen = id;
+  if (id) cyoaSeen.add(id);
   drawCyoaCards(); drawCyoaPanel(); applyTypeScale(); wireCyoa();
 }
 function wireCyoa(){
   cyoaCards.selectAll('g.ccard')
+    .on('click', (ev,c)=> setCyoa(c.id))
+    .on('keydown', function(ev,c){
+      if (ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); setCyoa(c.id); }
+    });
+  cyoaPanel.selectAll('g.cnext')
     .on('click', (ev,c)=> setCyoa(c.id))
     .on('keydown', function(ev,c){
       if (ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); setCyoa(c.id); }
@@ -2283,6 +2511,30 @@ function chamLoop(on){
         .on('end', fly);
     })();
   });
+}
+
+/* ---- the wall as an education module: see one path, then the other ---- */
+const wallSeen = new Set();
+function playWall(d){
+  wallSeen.add(d);
+  const dur = REDUCE ? 1 : 420;
+  conBody.select('g.s4').transition('wall').duration(dur)
+    .attr('opacity', d === 'appeal' ? 1 : 0);
+  conBody.select('g.s3').transition('wall').duration(dur).delay(d==='shape'&&!REDUCE?160:0)
+    .attr('opacity', d === 'shape' ? 1 : 0);
+  // dim the chosen button, keep the other live
+  conBody.selectAll('g.wallbtn').attr('opacity', b => b === d ? .45 : 1);
+  const s5 = conBody.select('g.s5'), s6 = conBody.select('g.s6');
+  if (wallSeen.size >= 2){
+    s5.attr('opacity',0).style('pointer-events','none');
+    s6.transition('wall').duration(REDUCE?1:460).delay(REDUCE?0:520).attr('opacity',1);
+  } else {
+    s5.select('text.s5t').text(d === 'appeal'
+      ? '→ Now see what happens if the vendor restructures instead'
+      : '→ Now see what would have happened if they had appealed');
+    s5.style('pointer-events','all')
+      .transition('wall').duration(REDUCE?1:380).delay(REDUCE?0:620).attr('opacity',1);
+  }
 }
 
 /* ---- mach9's headlines: the reader picks, the ad follows ---- */
@@ -2430,20 +2682,22 @@ function renderConsole(key){
   if (key === 'mach9'){ wireRsa(); }
   if (key === 'mach2'){
     if (REDUCE) conBody.selectAll('g.s2').attr('opacity',1);
+    wallSeen.clear();
     conBody.selectAll('g.wallbtn')
       .attr('tabindex',0).attr('role','button')
       .attr('aria-label', d => d==='appeal' ? 'Appeal and keep selling peptides' : 'Restructure as a telehealth clinic')
       .on('click.wall keydown.wall', function(ev,d){
         if (ev.type==='keydown' && ev.key!=='Enter' && ev.key!==' ') return;
         ev.preventDefault();
-        const dur = REDUCE ? 1 : 420;
-        if (d === 'appeal'){
-          conBody.select('g.s4').transition('wall').duration(dur).attr('opacity',1);
-          conBody.select('g.s3').transition('wall').duration(dur).attr('opacity',0);
-        } else {
-          conBody.select('g.s4').transition('wall').duration(dur).attr('opacity',0);
-          conBody.select('g.s3').transition('wall').duration(dur).delay(REDUCE?0:160).attr('opacity',1);
-        }
+        playWall(d);
+      });
+    conBody.select('g.s5')
+      .attr('tabindex',0).attr('role','button')
+      .on('click.wall keydown.wall', function(ev){
+        if (ev.type==='keydown' && ev.key!=='Enter' && ev.key!==' ') return;
+        ev.preventDefault();
+        const other = wallSeen.has('appeal') ? 'shape' : 'appeal';
+        playWall(other);
       });
   }
 
@@ -3327,11 +3581,20 @@ function render(key){
   }
   show(gForce, key === 'forces' ? 1 : 0);
   if (key === 'forces'){ drawForces(); drawForcePanel(); applyTypeScale(); wireForces(); }
-  setTabbing(gForce.selectAll('g.ftile'), key === 'forces');
-  if (key === 'forces' && prev !== 'forces' && !REDUCE){
-    forceTiles.selectAll('g.ftile').attr('opacity',0)
-      .transition('rise').duration(380).delay((d,i)=>140+i*110).ease(d3.easeCubicOut)
-      .attr('opacity',1);
+  setTabbing(gForce.selectAll('g.ftile, g.fnext'), key === 'forces');
+  if (key === 'forces' && prev !== 'forces'){
+    if (!REDUCE){
+      forceHub.select('g.fhub').attr('opacity',0)
+        .transition('rise').duration(420).delay(100).attr('opacity',1);
+      drawOn(forceHub.selectAll('path.spoke'), 480, (d,i)=>360+i*90);
+      forceNodes.selectAll('g.ftile').attr('opacity',0)
+        .transition('rise').duration(360).delay((d,i)=>520+i*100).ease(d3.easeCubicOut)
+        .attr('opacity',1);
+    }
+    // the module opens itself: force one begins the walk
+    if (!forceOpen){
+      const t = setTimeout(()=>{ if (current==='forces' && !forceOpen) setForce('truth'); }, REDUCE ? 60 : 1450);
+    }
   }
 
   show(gScale, key === 'scale' ? 1 : 0);
@@ -3369,7 +3632,7 @@ function render(key){
 
   show(gCyoa, key === 'cyoa' ? 1 : 0);
   if (key === 'cyoa'){ drawCyoaCards(); drawCyoaPanel(); applyTypeScale(); wireCyoa(); }
-  setTabbing(gCyoa.selectAll('g.ccard'), key === 'cyoa');
+  setTabbing(gCyoa.selectAll('g.ccard, g.cnext'), key === 'cyoa');
 
   show(gCham, key === 'chamber' ? 1 : 0);
   chamLoop(key === 'chamber');
