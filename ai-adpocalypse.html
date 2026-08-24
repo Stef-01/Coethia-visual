@@ -1,0 +1,2041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The AI Adpocalypse — a Public Health Disaster</title>
+<meta name="description" content="A walkthrough of the precision advertising machine now pointed at patients — the ad console screen by screen, the synthetic-creator layer behind it, and the same machinery turned around for public health.">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#F8F6F1">
+<meta property="og:title" content="The AI Adpocalypse">
+<meta property="og:description" content="Precision persuasion is pointed at patients. Public health is not in the auction. A scrollytelling walkthrough of the machine — and of turning it around.">
+<meta property="og:type" content="article">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='44' fill='%23F37940'/%3E%3Ccircle cx='50' cy='50' r='20' fill='%23F8F6F1'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@300;400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- D3 from the folder first so the piece runs with no network at all; the CDN
+     is the fallback for when this file travels on its own. -->
+<script src="d3.v7.min.js"></script>
+<script>
+window.d3 || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"><\/script>');
+</script>
+<style>
+:root{
+  --bg:#F8F6F1;
+  --ink:#212E36;
+  --ink-body:#333333;
+  --ink-mute:#6F6F6F;
+  --accent:#F37940;
+  --teal:#7FCCC8;
+
+  --serif: Optima, "Gill Sans", "Gill Sans MT", Candara, "Libre Franklin", sans-serif;
+  --sans: "Libre Franklin", Helvetica, Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--bg); color:var(--ink-body);
+  font-family:var(--sans); font-weight:300; font-size:17px; line-height:1.85;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  font-kerning:normal;
+}
+strong{font-weight:700;color:var(--ink)}
+::selection{background:#F9C9B4;color:var(--ink)}
+
+/* ---------- MASTHEAD + READING PROGRESS ---------- */
+.masthead{
+  background:#FFFFFF;border-bottom:1px solid #E9E5DC;
+  padding:20px 24px;display:flex;align-items:center;justify-content:space-between;
+}
+.masthead .wordmark{display:flex;align-items:center;gap:12px;text-decoration:none}
+.masthead .wordmark svg{display:block;transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.masthead .wordmark:hover svg{transform:rotate(-8deg) scale(1.06)}
+.masthead .wordmark span{transition:color .2s ease;font-family:var(--serif);font-size:21px;color:var(--ink);letter-spacing:.01em}
+.masthead .wordmark:hover span{color:#B8492E}
+.masthead .wordmark:focus-visible{outline:3px solid var(--ink);outline-offset:4px}
+.masthead .tag{
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:#6F6F6F;
+}
+.mastnav{display:flex;align-items:center;gap:22px}
+.mastnav a{
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:#6F6F6F;text-decoration:none;transition:color .18s ease;
+  display:inline-flex;align-items:center;gap:7px;
+}
+.mastnav a:hover{color:#B8492E}
+.mastnav a:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.mastnav .aro{display:inline-block;transition:transform .3s cubic-bezier(.16,1,.3,1);font-size:14px;line-height:1}
+.mastnav a:hover .aro.r{transform:translateX(4px)}
+.mastnav a:hover .aro.l{transform:translateX(-4px)}
+@media (max-width:640px){
+  .mastnav{gap:14px}
+  .mastnav .nl{display:none}
+}
+@media (prefers-reduced-motion: reduce){
+  .mastnav .aro{transition:none}
+  .mastnav a:hover .aro{transform:none}
+}
+.wordmark svg circle{
+  transition:transform .5s cubic-bezier(.16,1,.3,1);
+  transform-box:fill-box;transform-origin:center;
+}
+.wordmark:hover svg circle:nth-child(1){transform:translate(-3px,-2px)}
+.wordmark:hover svg circle:nth-child(2){transform:translate(2px,-3px)}
+.wordmark:hover svg circle:nth-child(3){transform:translate(3px,2px)}
+.wordmark:hover svg circle:nth-child(4){transform:translate(-2px,3px)}
+.wordmark:hover svg circle:nth-child(5){transform:scale(1.25)}
+@media (prefers-reduced-motion: reduce){
+  .wordmark svg circle{transition:none}
+  .wordmark:hover svg circle{transform:none}
+}
+.progress{display:none}
+@supports (animation-timeline: scroll()) {
+  .progress{
+    display:block;position:fixed;top:0;left:0;width:100%;height:3px;z-index:60;
+    background:var(--accent);transform-origin:0 50%;transform:scaleX(0);
+    animation:readprogress linear both;animation-timeline:scroll(root);
+    pointer-events:none;
+  }
+  @keyframes readprogress{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  .masthead{
+    animation:mastLift linear both;
+    animation-timeline:scroll(root);animation-range:0 140px;
+  }
+  @keyframes mastLift{
+    from{box-shadow:0 1px 0 rgba(33,46,54,0)}
+    to{box-shadow:0 2px 16px rgba(33,46,54,.09)}
+  }
+}
+
+/* ---------- PAPER GRAIN ---------- */
+.grain{
+  position:fixed;inset:0;z-index:55;pointer-events:none;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  background-size:240px 240px;
+}
+
+.measure{max-width:808px;margin:0 auto;padding-left:24px;padding-right:24px}
+
+/* ---------- HERO ---------- */
+.hero{padding-top:90px;padding-bottom:40px;text-align:center}
+@media (prefers-reduced-motion: no-preference){
+  .hero .kicker,.hero h1,.hero .deck,.hero .portrait-row,.hero p,.hero .scrollcue{
+    animation:riseIn .7s cubic-bezier(.16,1,.3,1) both;
+  }
+  .hero h1{animation-delay:.08s}
+  .hero .deck{animation-delay:.16s}
+  .hero .portrait-row{animation-delay:.26s}
+  .hero p{animation-delay:.34s}
+  .hero .scrollcue{animation-delay:.44s}
+}
+@keyframes riseIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.kicker{
+  font-family:var(--mono); font-size:13px; font-weight:400; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--ink); display:inline-block;
+  border-bottom:1px solid var(--accent); padding-bottom:7px;
+}
+h1{
+  font-family:var(--serif); font-weight:400; font-size:clamp(38px,6vw,74px);
+  line-height:1.07; color:var(--ink); margin:38px 0 22px; letter-spacing:-.01em;
+  text-wrap:balance;
+}
+.deck{
+  font-family:var(--serif); font-weight:500; font-size:clamp(20px,2.4vw,30px);
+  line-height:1.16; color:var(--ink); margin:0 auto 44px; max-width:700px; text-wrap:balance;
+}
+.portrait-row{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:48px}
+.portrait-row svg{transition:transform .18s cubic-bezier(.16,1,.3,1)}
+.portrait-row svg:hover{transform:translateY(-4px) scale(1.05)}
+.hero p{max-width:640px;margin:0 auto 22px}
+.scrollcue{
+  font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+  color:#6F6F6F;margin:70px 0 30px
+}
+.cue-arrow{display:inline-block}
+@media (prefers-reduced-motion: no-preference){
+  .cue-arrow{animation:cueBob 2.8s ease-in-out 1.4s infinite}
+}
+@keyframes cueBob{
+  0%,72%,100%{transform:translateY(0)}
+  84%{transform:translateY(5px)}
+}
+
+/* ---------- SCROLLER ---------- */
+.scroller{display:flex;align-items:flex-start;max-width:1352px;margin:0 auto;padding:0 24px}
+.graphic{
+  flex:1 1 auto; position:sticky; top:0; height:100vh;
+  display:flex; align-items:center; justify-content:center; min-width:0;
+}
+.graphic svg{width:100%;height:100%;display:block}
+.scroll-scenes{flex:0 0 450px;width:450px;border-left:1px solid var(--ink)}
+.step{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:8vh 0}
+.step-inner{padding:0 22px}
+
+@media (prefers-reduced-motion: no-preference){
+  .reveal-ready .step-inner > *{
+    opacity:0; transform:translateY(16px);
+    transition:opacity .62s cubic-bezier(.16,1,.3,1), transform .62s cubic-bezier(.16,1,.3,1);
+  }
+  .reveal-ready .step-inner.in > *{opacity:1;transform:none}
+  .reveal-ready .step-inner.in > *:nth-child(2){transition-delay:.05s}
+  .reveal-ready .step-inner.in > *:nth-child(3){transition-delay:.11s}
+  .reveal-ready .step-inner.in > *:nth-child(4){transition-delay:.18s}
+  .reveal-ready .step-inner.in > *:nth-child(5){transition-delay:.24s}
+}
+.step h2{
+  font-family:var(--serif); font-weight:500; font-size:26px; line-height:1.26;
+  color:var(--ink); margin:0 0 13px; text-wrap:balance;
+}
+.step hr{border:0;border-top:1px solid var(--ink);margin:0 0 20px}
+@media (prefers-reduced-motion: no-preference){
+  .reveal-ready .step-inner > hr{
+    transform:none;transform-origin:0 50%;
+    clip-path:inset(0 100% 0 0);
+    transition:clip-path .72s cubic-bezier(.16,1,.3,1), opacity .3s ease;
+  }
+  .reveal-ready .step-inner.in > hr{clip-path:inset(0 0 0 0)}
+}
+.step p{margin:0 0 18px;font-size:19px;line-height:1.76}
+.hint{font-size:15px;color:#B8492E;display:flex;gap:9px;align-items:flex-start;margin-top:26px;line-height:1.5}
+.hint svg{flex:0 0 auto;margin-top:3px}
+.note{font-size:12px;line-height:1.55;opacity:.8;margin-top:22px}
+
+.chip{
+  background:var(--c); color:var(--t,#212E36); padding:1px 7px 2px;
+  font-weight:600; font-size:.93em; border-radius:2px; white-space:nowrap;
+}
+.creedlist{list-style:none;margin:0 0 18px;padding:0}
+.creedlist li{margin:0 0 12px;font-size:18px;line-height:1.5}
+.creedlist .quote{display:block;font-size:16px;color:var(--ink-body)}
+
+/* ---------- OUTRO / CTA / METHODS ---------- */
+.outro{padding-top:90px;padding-bottom:10px}
+.outro p{max-width:680px}
+.outro h2{font-family:var(--serif);font-weight:500;font-size:clamp(26px,3.2vw,38px);line-height:1.2;color:var(--ink);margin:0 0 10px}
+.outro hr{border:0;border-top:1px solid var(--ink);margin:0 0 26px}
+.cta{background:#FFFFFF;margin-top:70px;padding:78px 0}
+.cta-inner{
+  max-width:1000px;margin:0 auto;padding:0 24px;
+  display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;
+}
+.cta .t{font-family:var(--serif);font-size:clamp(28px,3.4vw,44px);font-weight:400;color:var(--ink);line-height:1.14;text-wrap:balance}
+.cta .lead{font-size:17px;line-height:1.75;margin:0 0 26px}
+.btn{
+  display:inline-block;font-family:var(--sans);font-size:15px;font-weight:600;
+  color:#FFFFFF;background:#B8492E;padding:14px 28px;text-decoration:none;
+  border-radius:999px;transition:background .18s ease,transform .18s ease;
+}
+.btn:hover{background:var(--ink)}
+.btn:active{transform:scale(.98)}
+.btn .arrow{display:inline-block;transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.btn:hover .arrow{transform:translateX(5px)}
+.btn:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.btn[aria-disabled="true"]{opacity:.55;cursor:not-allowed}
+.btn[aria-disabled="true"]:hover{background:#B8492E}
+.cta-note{font-size:13px;color:#6F6F6F;margin-top:14px}
+@media (max-width:760px){
+  .cta-inner{grid-template-columns:1fr;gap:26px}
+}
+.methods{padding-top:64px;padding-bottom:110px;font-size:13px;line-height:1.8}
+.methods-grid{display:grid;grid-template-columns:5fr 7fr;gap:48px;max-width:1000px;margin:0 auto;padding:0 24px}
+.methods .col p{opacity:.78}
+.methods h3{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);margin:0 0 12px;font-weight:500}
+@media (max-width:760px){
+  .methods-grid{grid-template-columns:1fr;gap:8px}
+}
+
+/* ---------- TOOLTIP ---------- */
+#tip{
+  position:fixed;pointer-events:none;opacity:0;
+  background:var(--ink);color:var(--bg);font-size:12px;line-height:1.5;
+  padding:9px 12px;max-width:250px;z-index:99;font-family:var(--sans);
+  transform:translateY(7px) scale(.97);transform-origin:top left;
+  transition:opacity .15s ease, transform .3s cubic-bezier(.16,1,.3,1);
+  box-shadow:0 8px 26px rgba(33,46,54,.20);
+}
+#tip.on{opacity:1;transform:none}
+#tip b{font-weight:600}
+@media (prefers-reduced-motion: reduce){
+  #tip{transition:opacity .1s linear;transform:none}
+}
+
+@media (max-width:960px){
+  .scroller{display:block;padding:0 18px}
+  .graphic{position:sticky;top:0;height:56vh;height:56svh;z-index:2;
+    background:var(--bg);border-bottom:1px solid var(--ink)}
+  .scroll-scenes{width:100%;border-left:0;border-top:0}
+  .step{min-height:64vh;padding:38px 0 12vh;display:block;justify-content:flex-start}
+  .step-inner{padding:0}
+}
+@media (max-width:600px){
+  .graphic{height:46vh;height:46svh}
+}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  .portrait-row svg,.masthead .wordmark svg{transition:none}
+  .portrait-row svg:hover{transform:none}
+  .masthead .wordmark:hover svg{transform:none}
+  .cue-arrow{animation:none}
+  .btn .arrow{transition:none}
+  .btn:hover .arrow{transform:none}
+}
+
+/* ---------- PRINT ---------- */
+@media print{
+  .progress,.grain,.scrollcue,.hint,.masthead .tag,.cta-note{display:none !important}
+  body{background:#fff;color:#000;font-size:10.5pt;line-height:1.5}
+  .masthead{border-bottom:1px solid #000;padding:0 0 10px;margin-bottom:20px;box-shadow:none}
+  .measure{max-width:none;padding:0}
+  .hero{padding-top:0;text-align:left}
+  h1{font-size:26pt}
+  .deck{font-size:14pt;margin-left:0}
+  .hero p{max-width:none}
+  .scroller{display:block;padding:0}
+  .graphic{position:static !important;height:auto !important;border:0 !important;
+    break-inside:avoid;margin-bottom:16px}
+  .graphic svg{height:300px}
+  .scroll-scenes{width:100% !important;border:0 !important}
+  .step{min-height:0 !important;padding:0 0 14px !important;break-inside:avoid}
+  .step-inner,.step-inner > *{opacity:1 !important;transform:none !important;
+    clip-path:none !important;animation:none !important;transition:none !important}
+  .step h2{font-size:13pt}
+  .step p{font-size:10.5pt;line-height:1.45}
+  .cta{background:none;padding:18px 0;margin-top:24px}
+  .btn{background:none;color:#000;border:1px solid #000}
+  a{color:#000}
+}
+
+/* ---------- ACT 0/CLOSE: the dark stage ----------
+   Token inversion, not new colour: the same palette held the other way up. */
+.scroller.dark .graphic{background:var(--ink);border-bottom-color:var(--ink)}
+.graphic{transition:background .8s cubic-bezier(.16,1,.3,1)}
+@media (prefers-reduced-motion: reduce){ .graphic{transition:none} }
+
+/* the act rule that separates the five movements in the step rail */
+.actmark{
+  font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:#B8492E;border-top:1px solid #B8492E;padding-top:9px;margin-bottom:26px;
+}
+.step .src{
+  font-size:12px;line-height:1.6;opacity:.72;margin-top:20px;
+  padding-left:12px;border-left:2px solid #DCD5C6;
+}
+.step .src b{font-weight:600;opacity:.9}
+</style>
+</head>
+<body>
+
+<div class="progress" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="masthead">
+  <a class="wordmark" href="index.html" aria-label="The Reachable — home">
+    <svg width="30" height="30" viewBox="-50 -50 100 100" aria-hidden="true">
+      <circle cx="-16" cy="-12" r="15" fill="#C3DCEB"/>
+      <circle cx="18" cy="-18" r="11" fill="#FFD733"/>
+      <circle cx="24" cy="14" r="14" fill="#F37940"/>
+      <circle cx="-10" cy="24" r="10" fill="#E74D4E"/>
+      <circle cx="4" cy="-2" r="7" fill="#7FCCC8"/>
+    </svg>
+    <span>The Reachable</span>
+  </a>
+  <nav class="mastnav" aria-label="Explainers">
+    <a href="belief-based-communication.html"><span class="aro l">&lsaquo;</span> <span class="nl">Noise &amp; Belief</span></a>
+    <a href="index.html"><span class="nl">Home</span> <span class="aro r">&rsaquo;</span></a>
+  </nav>
+</header>
+
+<div class="hero measure">
+  <div class="kicker">Health Communication &nbsp;/&nbsp; USA &nbsp;/&nbsp; Explainer</div>
+  <h1>The AI Adpocalypse</h1>
+  <div class="deck">The Most Precise Persuasion Machine Ever Built Is Selling Unregulated Medicine. Public Health Is Not Even in the Auction</div>
+  <div class="portrait-row" id="heroPortraits"></div>
+  <p>Google takes roughly a billion health questions a day. The answers at the top were bought — and in 2026 what is being sold into that moment is increasingly a compound no regulator has approved. This piece walks the machine that does the selling, screen by screen, then follows the pitch into the synthetic-creator layer that makes it look like a friend’s advice.</p>
+  <p><strong>Then it turns the machine around, because every capability in it is available to public health — and almost none of it is being used.</strong></p>
+  <div class="scrollcue"><span class="cue-arrow" aria-hidden="true">↓</span> &nbsp;scroll</div>
+</div>
+
+<section class="scroller" id="scroller">
+  <div class="graphic"><svg id="viz" preserveAspectRatio="xMidYMid meet" role="group"
+    aria-label="Animated chart. A late-night health search is answered by bought results; an advertising console is then walked screen by screen — objective, policy wall, bidding, location, audience shelf, custom segments built from past searches, demographics, keywords, ad builder and auction. The scene then moves to a phone feed where synthetic creators are specified and manufactured on device farms, and a testing flywheel amplifies winners. A ledger compares the machine with public health across six dimensions. The final movement re-runs the same console for public health: grant inventory, search interception, finding unreached populations, a credible-messenger loop, a capability ladder and a register of what it would take."></svg></div>
+  <div class="scroll-scenes" id="scenes"></div>
+</section>
+
+<div class="outro measure">
+  <h2>The Reprise, in Prose</h2>
+  <hr>
+  <p>Nothing in the first two movements is an exploit. Every screen is the public campaign wizard, working as documented and as intended. The policy wall is real: research peptides are banned from the platform outright, and telehealth advertisers must be certified before a single impression serves. The seller does not break the wall. It becomes a shape the wall permits, and then buys an audience assembled from what frightened people typed into a search box.</p>
+  <p>That is the gap this piece is about. You cannot build an audience out of someone’s medical condition. You can build one out of their search history — and for the person on the other end, at 1 a.m., there is no difference.</p>
+  <p><strong>The machinery is neutral. The asymmetry is the disaster.</strong> Thirteen point eight billion dollars of pharmaceutical promotion and two-week creative cycles on one side; a proposed fifty-three per cent cut to the CDC on the other. Nothing about the technology decides who gets reached tonight. Money, skill and rules decide.</p>
+</div>
+
+<div class="cta">
+  <div class="cta-inner">
+    <div class="t">Run It the Other Way</div>
+    <div>
+      <p class="lead">Every screen in this piece is available to a health department for the price of learning it. Grant inventory is sitting unused, the search interception evidence exists, and the loop that the sellers perfected works just as well pointed at comprehension.</p>
+      <a class="btn" href="belief-based-communication.html" role="button">Read the belief argument&nbsp;&nbsp;<span class="arrow" aria-hidden="true">&rarr;</span></a>
+      <div class="cta-note">Concept prototype — the vendor in this piece is fictional and every figure on screen is synthetic.</div>
+    </div>
+  </div>
+</div>
+
+<div class="methods">
+  <div class="methods-grid">
+    <div class="col">
+      <h3>Credits</h3>
+      <p>The third piece in this series, sharing the palette, illustration idiom and motion grammar of <em>How Does Politics Shape American Health?</em> and <em>From Health Noise to Health Belief</em>. Structure and motion vocabulary ultimately adapted from Surgo Ventures’ <em>COVID-19 Vaccine Persona Explainer</em> (design: Daisy Chung; development: Julia Janicki). All artwork and code here are original.</p>
+    </div>
+    <div class="col">
+      <h3>Methods, and What Is Real</h3>
+      <p><strong>The vendor is fictional.</strong> “Meridian Longevity” is invented and is not intended to resemble any company. Every dollar figure, audience size, conversion count and metric shown <em>inside</em> the console is synthetic and generated in this file.</p>
+      <p><strong>The console is a stylised recreation, not a screenshot.</strong> Field names, option lists and policy language follow the platform’s own public documentation; the chrome, layout and styling are drawn in this series’ visual language. Nothing shown here goes beyond what the public campaign wizard shows any advertiser, and no technique is demonstrated that is not already documented in the platform’s help pages.</p>
+      <p><strong>Figures in the narration are real and sourced.</strong> Health-search volume, the July 2026 FDA advisory-committee vote, gray-market product quality, platform policy and certification requirements, vendor pricing and product claims, creative-testing tempo, advertising and public-health budgets, grant terms, the suicide-prevention search RCT, 988 outcomes, the truth® campaign evaluations and the EU Digital Services Act provisions are all drawn from published sources, listed in the project’s claims register.</p>
+      <p><strong>The regulatory picture is moving.</strong> The advisory committee’s recommendation on the six peptides is advisory, not an approval, and the agency had not acted at the time of writing. Where it has moved since, the correction belongs here.</p>
+    </div>
+  </div>
+</div>
+
+<div id="tip" aria-hidden="true"></div>
+
+<script>
+window.addEventListener('DOMContentLoaded', function(){
+  if (typeof d3 !== 'undefined') return;
+  var s = document.querySelector('.scroller');
+  if (s) s.insertAdjacentHTML('beforebegin',
+    '<div class="measure" style="border:1px solid #212E36;padding:18px 22px;margin:30px auto;font-size:15px">' +
+    'The interactive graphics could not load (the D3 library needs a network connection). The narration below is still readable.</div>');
+});
+</script>
+<script>
+/* =====================================================================
+   1. THE FICTION, AND WHAT IS SYNTHETIC
+
+   Meridian Longevity is invented. Every number rendered inside the console
+   below is generated here, from a seeded function, and is a placeholder.
+   Every number in the narration is real and sourced — see the Methods block.
+   ===================================================================== */
+
+let _s = 20260824;
+function rnd(){ _s = (_s * 1103515245 + 12345) & 0x7fffffff; return _s / 0x7fffffff; }
+
+const VENDOR = 'Meridian Longevity';
+
+/* =====================================================================
+   2. SCENE COPY
+   ===================================================================== */
+
+const SCENES = [
+
+/* ---------- ACT 0 — THE SYMPTOM ---------- */
+
+{ key:'open', frame:'dark', act:'Act one · the symptom', h:'A Search at 1 a.m.',
+  body:`<p>Google takes something on the order of <strong>a billion health questions every day</strong> — roughly seven per cent of everything it is asked. Around four in five American adults have brought a question about their own body to a search box.</p>
+        <p>This is where health decisions actually begin now. Not in a clinic. In a text field, at night, alone, by someone who has already decided not to bother anyone about it yet.</p>`,
+  src:`<b>Sources:</b> Google Health, via Becker’s Hospital Review; US health-information-seeking surveys; searches for common primary-care symptoms rose several-fold between 2004 and 2019.` },
+
+{ key:'results', frame:'dark', h:'The Auction Answers First',
+  body:`<p>The first answers are bought. In 2026 what is often being sold into this exact moment is a peptide — compounds like BPC-157 and TB-500, which an FDA advisory committee voted <strong>8 to 6</strong> to recommend for compounding in July 2026, overruling the agency’s own scientists, who had found the safety and efficacy evidence wanting.</p>
+        <p>A recommendation is not an approval. The agency had not acted. The market did not wait.</p>`,
+  src:`<b>Sources:</b> FDA Pharmacy Compounding Advisory Committee, 23–24 July 2026 (six of seven peptides recommended for the 503A Bulks List); AJMC, CNN and Medscape coverage of the vote and of agency staff opposition.` },
+
+{ key:'thesis', frame:'dark', h:'The AI Adpocalypse',
+  body:`<p>Precision persuasion is now cheap, fast, and pointed at people at their most frightened. Health promotion is slower, poorer, and aimed at nobody in particular.</p>
+        <p>What follows is the machine, end to end. First the advertising console, screen by screen, as an advertising manager actually meets it. Then the synthetic-creator layer that launders the same pitch into something that looks like a friend’s advice.</p>
+        <p><strong>Then we turn it around.</strong></p>` },
+
+/* ---------- ACT I — THE MACHINE ---------- */
+
+{ key:'mach1', frame:'con', act:'Act two · the machine', h:'Step One: Pick a Goal',
+  body:`<p>The first question the console asks is what you want more of. Choose <strong>Sales</strong> and every screen after it reshapes around a checkout — which bid strategies appear, which audience tools are offered, which numbers get reported back.</p>
+        <p>Nothing anywhere in this flow asks what you are selling, whether it works, or what happens to the person who buys it. The objective is the machine’s entire theory of success.</p>`,
+  note:'Stylised recreation. Field names follow the platform’s public documentation; the chrome is drawn in this series’ visual language.' },
+
+{ key:'mach2', frame:'con', h:'The Wall',
+  body:`<p>Here is what most people assume does not exist. <strong>Research peptides and unapproved supplements are banned from the platform outright</strong>, and any pharmacy or telehealth advertiser must be certified by LegitScript before a single US impression serves. Compounded-medication claims are scrutinised. This is enforced, and accounts are shut down for it.</p>
+        <p>So the seller does not fight the wall. It becomes a shape the wall permits: a <em>longevity and recovery telehealth clinic</em>, advertising a consultation. The product does not change. The advertisable entity does.</p>`,
+  src:`<b>Sources:</b> Google Ads healthcare and medicines policy; LegitScript certification requirement for US pharmacy and telemedicine advertisers, recognised by Google and mirrored by Meta.` },
+
+{ key:'mach3', frame:'con', h:'The Machine Bids for You',
+  body:`<p>Smart bidding hands the auction decisions to Google’s models and asks only one thing in return: what counts as a conversion. The advertiser defines it — <em>consultation booked</em> — and from that moment the system optimises toward booked consultations using everything it knows about everyone.</p>
+        <p>It is extremely good at this. And the only feedback the loop ever receives is that a checkout happened. No signal from the outcome. No signal from the harm.</p>` },
+
+{ key:'mach4', frame:'con', h:'Where the Buyers Live',
+  body:`<p>Geography first, because clinics are licensed by state and delivery is physical. The rings go where the money and the gyms are.</p>
+        <p>This is the least sinister screen in the entire flow, and it is worth noticing why: it targets <em>places</em>. Everything from here on targets people.</p>` },
+
+{ key:'mach5', frame:'con', h:'The Audience Shelf',
+  body:`<p>Before you build anything of your own, there is a shelf. Ready-made segments, assembled from behaviour across the platform’s properties: what people are into, what they are shopping for, which life event they are in the middle of.</p>
+        <p>You browse human beings by category, the way you would browse a parts catalogue. It is the same crime the previous piece in this series spent fourteen scenes on — labels standing in for people — except now the labels are inferred rather than asked.</p>` },
+
+{ key:'mach6', frame:'con', h:'The Loophole',
+  body:`<p>Here is the gap, in the console’s own words. You <strong>may not</strong> build an audience out of someone’s health condition. That is restricted, and so is targeting people whose browsing implies one.</p>
+        <p>But you <strong>may</strong> build an audience out of what they typed into Google. Not who they are — what they wanted to know at 1 a.m. The system finds those searchers, then expands to people who searched <em>similar</em> terms.</p>
+        <p><strong>The condition was never named. It did not need to be.</strong> The search is the condition, volunteered. The ban stops the vocabulary; the product delivers the meaning.</p>`,
+  hint:'Hover a search term to see what it gives away',
+  src:`<b>Sources:</b> Google Ads custom segments accept four inputs, one of which is “people who searched for any of these terms on Google”, reaching those and similar searchers; industry health-segment policy restricts audiences built on sensitive conditions or on activity implying them.` },
+
+{ key:'mach7', frame:'con', h:'Sorting People Into Boxes',
+  body:`<p>Age and gender are available everywhere. Household income — seven tiers, from the top ten per cent down — and parental status are <em>not</em> offered in Search; they belong to Display, Video and Demand Gen. So the operator runs a second campaign to reach them.</p>
+        <p>This is the ordinary competence of the job: knowing which surface exposes which facet of a person, and buying the combination. Note what the <em>Unknown</em> row means. Everyone the machine failed to classify is still targetable, and still gets an ad.</p>` },
+
+{ key:'mach8', frame:'con', h:'Words That Summon Ads',
+  body:`<p>The keywords are clean. The banned compound appears nowhere. Longevity and anti-aging demand has been climbing steeply, so the vendor buys the adjacent, permitted vocabulary — while the custom segment quietly carries the intent the keywords are not allowed to say.</p>
+        <p>Then the negatives. A negative keyword list is a mundane efficiency tool, and it is also <strong>a filter on doubt</strong>: the advertiser chooses which questions it will not be present for. Someone searching for side effects is not a customer. They are excluded, by name.</p>` },
+
+{ key:'mach9', frame:'con', h:'Fifteen Headlines, One Fig Leaf',
+  body:`<p>The ad is written in fragments — fifteen headlines, four descriptions — and the machine assembles whichever combination performs. The advertiser never writes the whole message, only the parts. The strength meter grades diversity and relevance.</p>
+        <p><strong>It does not grade truth.</strong> And there in the fine print sits the phrase doing the legal work: <em>for research use only</em>. That label has never made a product legal to put in a human body. It means the seller has read the same rules you have.</p>` },
+
+{ key:'mach10', frame:'con', h:'Two Hundred Milliseconds',
+  body:`<p>Between the Enter key and the page, in roughly a tenth to a third of a second, a modified second-price auction runs. Ad Rank is recalculated for <em>every single auction</em> from the bid, live quality signals and context — the same advertiser can win at noon and lose at midnight. There are undisclosed quality floors an ad must clear to appear at all.</p>
+        <p>All of it, per person, per query, continuously. The woman who searched at 1 a.m. was met by a system that had been rehearsing for her all day.</p>` },
+
+/* ---------- ACT II — THE FEED ---------- */
+
+{ key:'feed1', frame:'feed', act:'Act three · the feed', h:'Meanwhile, on the Feed',
+  body:`<p>Paid search is the narrow channel. The wide one is the feed, where peptide content is not advertising at all — it is a person like you, telling you what worked.</p>
+        <p>There are well over a hundred thousand Instagram posts and hundreds of millions of TikTok views on these compounds, and the line between drug, supplement and wellness content has been deliberately blurred. Almost none of it is labelled as marketing.</p>
+        <p><strong>Because increasingly it is not marketing. It is manufacturing.</strong></p>` },
+
+{ key:'feed2', frame:'feed', h:'Build-a-Creator',
+  body:`<p>You do not hire a creator. You specify one. The tooling markets exactly this — hyper-specific synthetic creators for any niche, a <em>62-year-old mom in Phoenix</em>, a <em>Gen-Z skater in Atlanta</em> — configured like campaign settings, because that is what they are.</p>
+        <p>Parallel platforms turn a script and a chosen synthetic performer into a testimonial video in about two minutes, from libraries of three hundred-plus digital actors, from around a hundred and ten dollars a month.</p>
+        <p><strong>The persona is demographic targeting made flesh:</strong> not aiming a message at a segment, but growing a person that segment will trust.</p>`,
+  src:`<b>Sources:</b> DoubleSpeed product pages (persona specification, niche examples); Arcads and Creatify AI-actor platforms (roster size, render time, pricing).` },
+
+{ key:'feed3', frame:'rack', h:'The Farm',
+  body:`<p>The accounts run on real phones on a real US carrier — not emulators — and they behave: scrolling, swiping, commenting, warming up before they ever sell anything. Agent accounts engage each other so the ecosystem looks populated. Comment seeding is a feature.</p>
+        <p>It costs a hundred and fifty to two hundred and fifty dollars a month, and the pitch is that it replaces a thirty-person creator team.</p>
+        <p><strong>The economics of astroturf just fell through the floor</strong> — and the floor was the last thing protecting the feed.</p>`,
+  src:`<b>Sources:</b> DoubleSpeed published tiers and product claims, including deployment on real US-carrier devices and account warm-up behaviour.` },
+
+{ key:'feed4', frame:'wheel', h:'The Dark Flywheel',
+  body:`<p>Then the loop closes. Platforms generate variants in bulk and score them <em>before</em> spend, trained on millions of past ads. Winners get budget; winners get remixed into the next generation.</p>
+        <p>Leading teams push twenty to fifty creatives a month against three to five for everyone else, and creative fatigue now burns an idea out in two or three weeks — so the loop has to keep spinning.</p>
+        <p><strong>Look closely at the shape.</strong> It is the same flywheel the previous piece proposed for health communication. Identical mechanism. It is already running, at industrial scale, for the other side.</p>`,
+  hint:'Hover a station to see what it does' },
+
+{ key:'feed5', frame:'wheel', h:'Optimised for Everything but Truth',
+  body:`<p>Every signal in the loop is a signal about attention or money. Not one is a signal about whether the claim was true or the person got better.</p>
+        <p>There are rules now. TikTok requires realistic synthetic media to be labelled and uses provenance credentials to catch what creators do not disclose. Meta requires advertisers to disclose AI-generated people. The FTC treats AI-generated testimonials as fake reviews outright — no disclaimer sufficient — with penalties above fifty thousand dollars per violation, and brands liable for their agents.</p>
+        <p><strong>The rules exist. The volume is the point.</strong> Enforcement is per violation. The machine’s output is per minute.</p>`,
+  src:`<b>Sources:</b> TikTok AI-content labelling and C2PA detection; Meta advertiser disclosure requirements; FTC Fake Reviews Rule (16 CFR Part 465) and 2026 penalty schedule.` },
+
+{ key:'feed6', frame:'ledg', h:'Six Lines. Health Loses All Six.',
+  body:`<p>Line the two sides up and the argument stops being rhetorical.</p>
+        <p>US pharmaceutical direct-to-consumer advertising runs north of ten billion dollars a year; ten companies alone spent <strong>$13.8 billion</strong> on advertising and promotion in 2023, and that spending skews toward drugs with <em>low added therapeutic benefit</em> — the ones that most need persuading.</p>
+        <p>Against that: the FY2026 proposal cut the CDC by about <strong>53 per cent</strong> against FY2024, and 444 CDC grants worth $5.78 billion were terminated by May 2026.</p>`,
+  hint:'Hover a line for the evidence behind it',
+  src:`<b>Sources:</b> CSRxP analysis of manufacturer promotional spending; eMarketer pharma digital ad spend; Johns Hopkins on DTC and added benefit; Trust for America’s Health and George Washington University on FY2026 CDC reductions and grant terminations.` },
+
+/* ---------- ACT III — THE COUNTERATTACK ---------- */
+
+{ key:'flip', frame:'con', act:'Act four · the counterattack', h:'Hold the Machine the Other Way',
+  body:`<p>Everything you have just watched is available to a health department for the price of learning it. Not a metaphor and not an analogue — <strong>the same console</strong>.</p>
+        <p>The rest of this piece runs it again for the other side, with what the evidence says actually works, and what it says does not.</p>` },
+
+{ key:'good1', frame:'con', h:'The Same Console, Rerun',
+  body:`<p>Google Ad Grants gives eligible nonprofits up to <strong>$10,000 a month</strong> of search inventory. It comes with rules that read like limits and function like discipline: keep account click-through above five per cent, target geography specifically, use Smart Bidding — which, incidentally, lifts the old two-dollar cost-per-click ceiling that made the grant useless for competitive terms.</p>
+        <p>The inventory is sitting there. Most organisations that qualify either do not have the account or do not have anyone who can run it.</p>`,
+  src:`<b>Sources:</b> Google Ad Grants program terms (monthly cap, 5% CTR requirement, geo-targeting policy, Smart Bidding requirement and CPC-cap exemption, Goodstack verification).` },
+
+{ key:'good2', frame:'con', h:'Intercept the Search',
+  body:`<p>The audience the seller built is available to you. The person searching at 1 a.m. can be met with the truth instead: that gray-market vials have been found containing <strong>10 to 90 per cent less active ingredient than labelled</strong>, alongside contamination and heavy metals; that “for research use only” is not a legal category for human use; that an advisory recommendation is not an approval.</p>
+        <p>This is not theoretical. A randomised controlled trial of suicide-prevention Google Ads measured people moving from a search to a hotline contact and demonstrated the reach, speed and cost of exactly this move. In 988’s first two and a half years, roughly <strong>4,400 fewer</strong> Americans aged 15 to 23 died by suicide than projected.</p>
+        <p><strong>Meeting people at the search works — when somebody bothers to buy the placement.</strong></p>`,
+  src:`<b>Sources:</b> Belgian market analysis of gray-market peptide content and contamination; randomised controlled trial of suicide-prevention search advertising; 988 Lifeline outcome study, July 2022 – December 2024.` },
+
+{ key:'good3', frame:'con', h:'Find the Unreached',
+  body:`<p>Turned around, the targeting grid is an epidemiological instrument. The same dimensions that let a seller find the top ten per cent of household income let a health department find the bottom fifty in a county with one clinic and no Spanish-language outreach.</p>
+        <p>Public health already holds the denominator data the advertisers are guessing at. And the previous piece’s argument still runs underneath this one: <strong>the segment tells you where to buy the impression; belief tells you what to put in it.</strong></p>` },
+
+{ key:'good4', frame:'wheel', h:'A Credible-Messenger Flywheel',
+  body:`<p>The same loop, with honest metrics. And here the piece has to be careful, because the evidence is genuinely mixed.</p>
+        <p>The largest randomised trials of social-media health advertising — clinician-produced video delivered to nearly eighteen million Facebook users in the United States and eleven and a half million in France — found real effects. The systematic reviews find those effects <em>variable, and often not statistically significant</em>.</p>
+        <p><strong>Which is an argument for running the loop, not for skipping it.</strong> The commercial side learned what works by testing at volume and reading the results. Public health has been running one campaign at a time and calling the result knowledge.</p>`,
+  hint:'Hover a station to see what it does',
+  src:`<b>Sources:</b> Athey et al., large-scale social-media vaccination RCTs (PNAS / NBER w30618); systematic review and meta-analysis of social-media vaccine interventions.` },
+
+{ key:'good5', frame:'tier', h:'Three Ways In, Again',
+  body:`<p>The capability ladder from the previous piece applies here directly. <strong>Information</strong>: what your population is actually searching and believing, delivered as intelligence rather than as a survey two years late. <strong>Training</strong>: somebody in the building who can run the console. <strong>Service</strong>: campaign operations at commercial tempo.</p>
+        <p>It starts as a report and ends as a flywheel your team owns — which is precisely how the other side got here.</p>` },
+
+{ key:'good6', frame:'ledg', h:'What It Would Take',
+  body:`<p><strong>Money.</strong> The truth® campaign is the existence proof. It is credited with roughly 450,000 fewer young people starting smoking between 2000 and 2004, about 2.5 million more between 2015 and 2018, and responsibility for around 22 per cent of a two-year decline in youth smoking — at roughly $1,076 per quality-adjusted life year, with billions in societal savings. Counter-marketing is not a hopeful idea. It is a costed intervention with a better return than most things public health buys.</p>
+        <p><strong>Rules.</strong> The EU’s Digital Services Act already bans profiling-based advertising on special-category data including health, and bans profiled advertising to minors — with no consent override. The United States has no equivalent. That is a policy choice, not a technical fact.</p>
+        <p><strong>Skills, and evidence.</strong> Google put $250 million of ad grants behind the WHO and a hundred-plus governments during COVID. It took a pandemic. It should take a Tuesday.</p>`,
+  src:`<b>Sources:</b> AJPM and AJPH evaluations of the truth® campaign; FinishIt cost-effectiveness analysis; EU Digital Services Act Articles on advertising and profiling; Google’s 2020 COVID-19 ad grant commitment.` },
+
+/* ---------- REPRISE & CLOSE ---------- */
+
+{ key:'reprise', frame:'wheel', act:'Act five · the reprise', h:'Two Flywheels, One Attention',
+  body:`<p>Two loops. The same machinery. The same person in the middle.</p>
+        <p>One is funded, fast, and pointed at a checkout. The other is underfunded, slow, and pointed at an outcome. <strong>Nothing about the technology decides which one reaches someone tonight.</strong></p>` },
+
+{ key:'close', frame:'dark', h:'The Same Search, Answered Differently',
+  body:`<p>The person searching at 1 a.m. is not going to become a more critical consumer of pharmacology. That was never the fix.</p>
+        <p>The fix is that somebody bought the placement above the peptide seller, wrote something true in a voice she trusts, and measured whether it landed. Every piece of that is purchasable today.</p>
+        <p><strong>The adpocalypse is not that the machine exists. It is that only one side is using it.</strong></p>` },
+
+{ key:'methods', frame:'meth', h:'How This Was Made',
+  body:`<p>A fictional vendor. A stylised recreation of a public advertising console — field names accurate, chrome invented, no screenshots. Every metric inside the console is synthetic; every figure in the narration is sourced beneath the scene that uses it.</p>
+        <p>Nothing in this piece demonstrates a technique that is not already documented in the platform’s own help pages. The wall is real, the certification requirement is real, and the gap between them is the argument.</p>`,
+  note:'The regulatory status of these compounds was moving while this was built. Corrections belong in the Methods block below.' }
+
+];
+
+const HAND = `<svg width="15" height="17" viewBox="0 0 15 17" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 8V2.6a1.3 1.3 0 0 1 2.6 0V8m0-1.6a1.3 1.3 0 0 1 2.6 0V8m0-1a1.3 1.3 0 0 1 2.6 0v4.4c0 2.6-1.7 5-4.6 5-2.6 0-4-1.4-5-3.2L1.3 10a1.3 1.3 0 0 1 2.2-1.3L4.5 10"/></svg>`;
+const TOUCH = typeof matchMedia === 'function' && matchMedia('(hover: none)').matches;
+const hintText = t => TOUCH ? t.replace(/^Hover/, 'Tap') : t;
+
+const scenesSel = d3.select('#scenes');
+SCENES.forEach(s => {
+  const st = scenesSel.append('div').attr('class','step').attr('data-key', s.key);
+  const inner = st.append('div').attr('class','step-inner');
+  if (s.act) inner.append('div').attr('class','actmark').text(s.act);
+  inner.append('h2').text(s.h);
+  inner.append('hr');
+  inner.append('div').html(s.body);
+  if (s.hint) inner.append('div').attr('class','hint').html(HAND + '<span>' + hintText(s.hint) + '</span>');
+  if (s.src) inner.append('div').attr('class','src').html(s.src);
+  if (s.note) inner.append('div').attr('class','note').text(s.note);
+});
+
+/* =====================================================================
+   3. GEOMETRY + TYPE SCALE  (same machinery as the companion pieces)
+   ===================================================================== */
+
+const svg = d3.select('#viz');
+const SANS = 'Libre Franklin, Helvetica, Arial, sans-serif';
+const MONO = 'IBM Plex Mono, monospace';
+
+const REDUCE  = typeof matchMedia === 'function'
+  && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const FADE    = REDUCE ? 1 : 500;
+const CAMERA  = REDUCE ? 1 : 900;
+const VALUE_EASE = REDUCE ? d3.easeLinear : d3.easeCubicOut;
+
+const INK='#212E36', PAPER='#F8F6F1', MUTE='#6F6F6F', ALARM='#B8492E',
+      RED='#E74D4E', TEAL='#7FCCC8', TEAL_D='#3E8E89', BLUE='#C3DCEB',
+      GOLD='#FFD733', ACCENT='#F37940', LINE='#DCD5C6';
+
+function show(sel, v, dur){ sel.transition('vis').duration(dur || FADE).attr('opacity', v); }
+
+function drawOn(sel, dur, delayFn){
+  sel.each(function(d, i){
+    let L = 0;
+    try { L = this.getTotalLength(); } catch(e){ L = 0; }
+    if (!L || REDUCE){ d3.select(this).style('opacity',1).attr('stroke-dashoffset',0); return; }
+    d3.select(this)
+      .attr('stroke-dasharray', L + ' ' + L)
+      .attr('stroke-dashoffset', L)
+      .style('opacity', 1)
+      .transition('draw').duration(dur || 900)
+      .delay(delayFn ? delayFn(d, i) : 0)
+      .ease(d3.easeCubicInOut)
+      .attr('stroke-dashoffset', 0)
+      .on('end interrupt', function(){
+        d3.select(this).attr('stroke-dasharray', null).attr('stroke-dashoffset', null);
+      });
+  });
+}
+
+let TK = 1;
+const MIN_LABEL_PX = 9.6, BASE_LABEL = 12;
+function renderScale(frame){
+  const n = svg.node(); if (!n) return 1;
+  const r = n.getBoundingClientRect();
+  const vbAttr = frame || svg.attr('viewBox'); if (!vbAttr || !r.width) return 1;
+  const vb = vbAttr.split(/[\s,]+/).map(Number);
+  if (!vb[2] || !vb[3]) return 1;
+  return Math.min(r.width / vb[2], r.height / vb[3]);
+}
+function computeTK(frame){
+  const sc = renderScale(frame);
+  TK = Math.max(1, Math.min(2.35, MIN_LABEL_PX / (BASE_LABEL * sc)));
+}
+const MOBILE = () => TK > 1.3;
+function typed(sel, base){ return sel.attr('data-fs', base).attr('font-size', base * TK); }
+function applyTypeScale(){
+  svg.selectAll('text[data-fs],tspan[data-fs]')
+     .attr('font-size', function(){ return +this.getAttribute('data-fs') * TK; });
+}
+
+const FRAMES = {
+  dark: '250 30 500 640',
+  con:  '60 90 880 560',
+  feed: '250 40 500 620',
+  rack: '60 60 880 600',
+  wheel:'150 96 700 540',
+  ledg: '80 60 840 590',
+  tier: '60 60 880 600',
+  meth: '120 90 760 520'
+};
+const FRAMES_MOBILE = {
+  dark: '290 40 420 660',
+  con:  '175 96 650 630',
+  feed: '280 50 440 640',
+  rack: '120 80 760 620',
+  wheel:'175 110 650 560',
+  ledg: '90 96 820 700',
+  tier: '150 70 700 620',
+  meth: '170 100 660 540'
+};
+function isNarrow(){ return innerWidth <= 960; }
+const frameFor = name => (isNarrow() ? FRAMES_MOBILE : FRAMES)[name];
+
+/* =====================================================================
+   4. LAYERS
+   ===================================================================== */
+
+const gDark  = svg.append('g').attr('opacity',0);   // phone + query + results
+const gCon   = svg.append('g').attr('opacity',0);   // the advertising console
+const gFeed  = svg.append('g').attr('opacity',0);   // the feed + persona builder
+const gRack  = svg.append('g').attr('opacity',0);   // the device farm
+const gWheel = svg.append('g').attr('opacity',0);   // the flywheel(s)
+const gDash  = svg.append('g').attr('opacity',0);   // what the loop measures
+const gLedg  = svg.append('g').attr('opacity',0);   // the ledgers
+const gTier  = svg.append('g').attr('opacity',0);   // the capability ladder
+const gMeth  = svg.append('g').attr('opacity',0);   // the register
+const gTitle = svg.append('g').attr('opacity',0);
+const gHit   = svg.append('g');
+const gStamp = svg.append('g').attr('opacity',0).attr('pointer-events','none');
+
+[gDark,gCon,gFeed,gRack,gWheel,gDash,gLedg,gTier,gMeth,gTitle,gStamp]
+  .forEach(g => g.attr('aria-hidden','true'));
+
+const stampText = gStamp.append('text')
+  .attr('text-anchor','start').attr('font-family',SANS)
+  .attr('font-weight',500).attr('fill',MUTE)
+  .text('Synthetic figures · stylised recreation · fictional vendor');
+function placeStamp(frame){
+  const vb = (frame || svg.attr('viewBox') || '0 0 1000 700').split(/[\s,]+/).map(Number);
+  stampText.attr('data-fs', 10.5).attr('font-size', 10.5 * TK)
+    .attr('x', vb[0] + 4).attr('y', vb[1] + vb[3] - 6);
+}
+function stampTone(dark){
+  stampText.transition('tone').duration(FADE).attr('fill', dark ? '#7C8A93' : MUTE);
+}
+
+const titleText = gTitle.append('text')
+  .attr('x',500).attr('y',126).attr('text-anchor','middle')
+  .attr('font-family',SANS).call(typed,17).attr('font-weight',700)
+  .attr('fill',INK);
+function setTitle(txt){
+  if (titleText.text() === txt) return;
+  if (REDUCE){ titleText.text(txt); return; }
+  titleText.transition('title').duration(200).attr('opacity',0)
+    .on('end', function(){
+      d3.select(this).text(txt).transition('title').duration(280).attr('opacity',1);
+    });
+}
+
+/* small shared helpers -------------------------------------------------- */
+function roundRect(g, x, y, w, h, r, fill, stroke, sw){
+  const rect = g.append('rect').attr('x',x).attr('y',y).attr('width',w).attr('height',h)
+    .attr('rx',r).attr('fill',fill||'none');
+  if (stroke) rect.attr('stroke',stroke).attr('stroke-width',sw||1.2);
+  return rect;
+}
+function label(g, x, y, txt, size, weight, fill, anchor){
+  return g.append('text').attr('x',x).attr('y',y).attr('text-anchor',anchor||'start')
+    .attr('font-family',SANS).call(typed,size||11).attr('font-weight',weight||400)
+    .attr('fill',fill||INK).text(txt);
+}
+function mono(g, x, y, txt, size, fill, anchor){
+  return g.append('text').attr('x',x).attr('y',y).attr('text-anchor',anchor||'start')
+    .attr('font-family',MONO).call(typed,size||8).attr('letter-spacing','.14em')
+    .attr('fill',fill||MUTE).text(txt);
+}
+// a person, drawn the way the whole series draws people
+function person(g, skin, cloth, hair){
+  g.append('path').attr('d','M -13 20 q 0 -15 13 -15 q 13 0 13 15 Z').attr('fill',cloth);
+  g.append('circle').attr('cy',-5).attr('r',9).attr('fill',skin);
+  if (hair) g.append('path').attr('d','M -9 -8 q 2 -9 9 -9 q 7 0 9 9 q -9 -4 -18 0 Z').attr('fill',hair);
+  return g;
+}
+
+/* =====================================================================
+   5. ACT 0 — THE DARK STAGE
+   The same tokens, held the other way up: ink field, paper type.
+   ===================================================================== */
+
+const PH = { x:350, y:80, w:300, h:560 };   // the phone
+const SCR = { x:PH.x+16, y:PH.y+22, w:PH.w-32, h:PH.h-44 };
+
+gDark.append('rect').attr('x',200).attr('y',10).attr('width',600).attr('height',680)
+  .attr('fill','none');
+// device
+roundRect(gDark, PH.x, PH.y, PH.w, PH.h, 34, '#161F25', '#39474F', 1.6);
+roundRect(gDark, SCR.x, SCR.y, SCR.w, SCR.h, 22, '#1D272D');
+gDark.append('rect').attr('x',470).attr('y',PH.y+34).attr('width',60).attr('height',7)
+  .attr('rx',3.5).attr('fill','#39474F');
+
+// the clock — small, and the reason the scene lands
+mono(gDark, 500, PH.y+64, '1:04 AM', 8.5, '#7C8A93', 'middle');
+
+// search field
+const qField = gDark.append('g');
+roundRect(qField, SCR.x+16, PH.y+86, SCR.w-32, 42, 21, '#2B3840', '#41525C', 1.2);
+qField.append('circle').attr('cx',SCR.x+38).attr('cy',PH.y+107).attr('r',6)
+  .attr('fill','none').attr('stroke','#8FA0A9').attr('stroke-width',1.6);
+qField.append('path').attr('d','M '+(SCR.x+42)+' '+(PH.y+111)+' l 5 5')
+  .attr('stroke','#8FA0A9').attr('stroke-width',1.6).attr('stroke-linecap','round');
+const qText = qField.append('text').attr('x',SCR.x+54).attr('y',PH.y+111)
+  .attr('font-family',SANS).call(typed,11.5).attr('fill','#EDE8DF');
+const qCaret = qField.append('rect').attr('y',PH.y+99).attr('width',1.6).attr('height',15)
+  .attr('fill',ACCENT).attr('x',SCR.x+54);
+
+// what the box offers back, before a single human has been consulted
+const SUGGEST = ['why won’t my shoulder heal after 6 months',
+                 'why won’t my shoulder heal — peptides',
+                 'why won’t my shoulder heal reddit'];
+const sugG = gDark.append('g').attr('opacity',0);
+SUGGEST.forEach((t,i)=>{
+  const sy = PH.y+140+i*34;
+  sugG.append('circle').attr('cx',SCR.x+38).attr('cy',sy).attr('r',5)
+    .attr('fill','none').attr('stroke','#5A6970').attr('stroke-width',1.4);
+  sugG.append('path').attr('d','M '+(SCR.x+41)+' '+(sy+3)+' l 4 4')
+    .attr('stroke','#5A6970').attr('stroke-width',1.4).attr('stroke-linecap','round');
+  label(sugG, SCR.x+54, sy+4, t, 9.5, 400, '#8FA0A9');
+});
+
+const QUERY = 'why won’t my shoulder heal';
+let typeTimer = null;
+function typeQuery(on){
+  clearInterval(typeTimer);
+  if (!on){ qText.text(''); qCaret.attr('opacity',0); return; }
+  if (REDUCE){ qText.text(QUERY); qCaret.attr('opacity',0); return; }
+  let i = 0;
+  qText.text('');
+  qCaret.attr('opacity',1);
+  typeTimer = setInterval(()=>{
+    i++;
+    qText.text(QUERY.slice(0,i));
+    const w = qText.node().getComputedTextLength();
+    qCaret.attr('x', SCR.x+54+w+2);
+    if (i >= QUERY.length){
+      clearInterval(typeTimer);
+      qCaret.transition('blink').duration(1).attr('opacity',1);
+      (function blink(o){
+        qCaret.transition('blink').duration(520).attr('opacity',o)
+          .on('end',()=>blink(o?0:1));
+      })(0);
+    }
+  }, 78);
+}
+
+// the scale line, above the phone
+const scaleG = gDark.append('g').attr('opacity',0);
+const scaleNum = scaleG.append('text').attr('x',500).attr('y',52).attr('text-anchor','middle')
+  .attr('font-family',SANS).call(typed,26).attr('font-weight',700).attr('fill','#EDE8DF');
+label(scaleG, 500, 70, 'health questions asked today', 10, 400, '#7C8A93', 'middle');
+function runCounter(on){
+  if (!on) return;
+  const T = 1000000000;
+  if (REDUCE){ scaleNum.text('1,000,000,000'); return; }
+  scaleNum.transition('count').duration(2200).ease(d3.easeCubicOut)
+    .tween('t', function(){
+      const i = d3.interpolateNumber(0, T);
+      return t => scaleNum.text(Math.round(i(t)).toLocaleString('en-US'));
+    });
+}
+
+// the results page — ads first, organic pushed under
+const serpG = gDark.append('g').attr('opacity',0);
+const SERP_Y = PH.y+150;
+const AD_ROWS = [
+  { t:'Clinical-Grade Recovery Peptides', d:'meridian-longevity · Free consult' },
+  { t:'BPC-157 — Research Grade, 99% Pure', d:'apex-research-labs · Ships today' },
+  { t:'Heal Faster: Peptide Protocols', d:'vitalis-rx · Telehealth visit $29' },
+  { t:'Shoulder Not Healing? Start Here', d:'restore-clinic · Book online' }
+];
+const adRow = serpG.selectAll('g.ad').data(AD_ROWS).join('g').attr('class','ad')
+  .attr('transform',(d,i)=>'translate(0,'+(SERP_Y+i*74)+')');
+adRow.each(function(d){
+  const g = d3.select(this);
+  roundRect(g, SCR.x+14, 0, SCR.w-28, 62, 12, '#28333A');
+  const badge = g.append('g');
+  roundRect(badge, SCR.x+26, 10, 34, 15, 3, '#3E4B54');
+  mono(badge, SCR.x+31, 21, 'AD', 7.5, '#D9D2C6');
+  label(g, SCR.x+68, 22, d.t, 10.5, 700, '#EDE8DF');
+  label(g, SCR.x+26, 42, d.d, 9.5, 400, '#8FA0A9');
+});
+const organicG = serpG.append('g');
+[0,1].forEach(i=>{
+  const y = SERP_Y + 4*74 + 10 + i*54;
+  label(organicG, SCR.x+26, y+16, i===0 ? 'Rotator cuff injury — Mayo Clinic' : 'When shoulder pain doesn’t improve — NHS',
+        10, 600, '#6E7C85');
+  organicG.append('rect').attr('x',SCR.x+26).attr('y',y+24).attr('width',SCR.w-70).attr('height',3)
+    .attr('rx',1.5).attr('fill','#333F47');
+});
+label(serpG, 500, SERP_Y-14, 'the first four answers were bought', 9.5, 400, '#8FA0A9', 'middle');
+
+// the close: the same page, one placement different
+const fixG = gDark.append('g').attr('opacity',0);
+roundRect(fixG, SCR.x+14, SERP_Y, SCR.w-28, 76, 12, '#1E3A38', TEAL, 1.4);
+const fixBadge = fixG.append('g');
+roundRect(fixBadge, SCR.x+26, SERP_Y+10, 34, 15, 3, TEAL_D);
+mono(fixBadge, SCR.x+31, SERP_Y+21, 'AD', 7.5, '#EDF6F5');
+label(fixG, SCR.x+68, SERP_Y+22, 'What the evidence actually says', 10.5, 700, '#DFF1EF');
+label(fixG, SCR.x+26, SERP_Y+42, 'BPC-157 is not approved. Gray-market vials have', 9.5, 400, '#A9CFCB');
+label(fixG, SCR.x+26, SERP_Y+56, 'been found with 10–90% less than labelled.', 9.5, 400, '#A9CFCB');
+
+/* =====================================================================
+   6. THE CONSOLE
+   One frame, one content group, re-dressed per screen from a spec.
+   Nothing here goes beyond what the public campaign wizard shows.
+   ===================================================================== */
+
+/* On a phone the console is not cropped — it becomes a narrower, taller
+   window, and every control below sizes itself from CW. */
+let CON, CX0, CY0, CW;
+function conMetrics(){
+  CON = isNarrow() ? { x:190, y:110, w:620, h:600 }
+                   : { x:90,  y:120, w:820, h:500 };
+  CX0 = CON.x + 34;
+  CY0 = CON.y + 106;
+  CW  = CON.w - 68;
+}
+conMetrics();
+
+const conFrame = gCon.append('g');
+const conBody  = gCon.append('g');     // redrawn per screen
+let conShell, conBar, conUrlPill, conUrl, conAcct, conHead, conStep;
+function drawConFrame(){
+  conFrame.selectAll('*').remove();
+  conShell = roundRect(conFrame, CON.x, CON.y, CON.w, CON.h, 16, '#FFFFFF', LINE, 1.4);
+  conBar = conFrame.append('g');
+  conBar.append('path').attr('d','M '+CON.x+' '+(CON.y+38)+' H '+(CON.x+CON.w))
+    .attr('stroke',LINE).attr('stroke-width',1.2);
+  [0,1,2].forEach(i=>{
+    conBar.append('circle').attr('cx',CON.x+24+i*15).attr('cy',CON.y+19).attr('r',4.5)
+      .attr('fill','#E7E2D8');
+  });
+  const pillW = Math.min(300, CW*0.52);
+  conUrlPill = roundRect(conBar, CON.x+80, CON.y+8, pillW, 22, 11, '#F3F0E9');
+  conUrl = mono(conBar, CON.x+94, CON.y+23, '', 8, MUTE);
+  conAcct = mono(conBar, CON.x+CON.w-24, CON.y+23, '', 8, MUTE, 'end');
+  conHead = label(conFrame, CX0, CON.y+70, '', 14, 700, INK);
+  conStep = mono(conFrame, CON.x+CON.w-34, CON.y+70, '', 8, ALARM, 'end');
+}
+drawConFrame();
+
+/* ---- control primitives: each draws at y and returns the next y ---- */
+
+function ctlCards(g, y, items, sel, tint){
+  const n = items.length, gap = 12;
+  const w = Math.min(180, (CW - gap*(n-1)) / n), h = 62;
+  items.forEach((it,i)=>{
+    const x = CX0 + i*(w+gap);
+    const on = i === sel;
+    const card = g.append('g').attr('class', on ? 'sel' : 'opt');
+    const r = roundRect(card, x, y, w, h, 12, on ? (tint||'#FBE3D2') : '#F7F5F0',
+                        on ? (tint?TEAL_D:ALARM) : '#EAE6DD', on ? 1.8 : 1.2);
+    if (on) r.attr('data-sel','1');
+    card.append('circle').attr('cx',x+18).attr('cy',y+20).attr('r',7)
+      .attr('fill','none').attr('stroke', on ? (tint?TEAL_D:ALARM) : '#C9C3B6').attr('stroke-width',1.6);
+    if (on) card.append('circle').attr('cx',x+18).attr('cy',y+20).attr('r',3.6)
+      .attr('fill', tint?TEAL_D:ALARM).attr('class','dot');
+    label(card, x+32, y+24, it.t || it, 10.5, on?700:400, on?INK:'#55606A');
+    if (it.d) label(card, x+18, y+44, it.d, 9, 400, MUTE);
+  });
+  return y + h + 20;
+}
+
+const FULL = f => isNarrow() ? 1 : f;   // narrow screens have no margin to give
+function ctlRadio(g, y, items, sel, tint){
+  const h = 30;
+  items.forEach((it,i)=>{
+    const on = i === sel;
+    const row = g.append('g');
+    if (on) roundRect(row, CX0-8, y+i*h-9, CW*FULL(0.62), h-4, 8, tint?'#E7F2F1':'#FBE3D2');
+    row.append('circle').attr('cx',CX0+8).attr('cy',y+i*h).attr('r',6.5)
+      .attr('fill','none').attr('stroke', on ? (tint?TEAL_D:ALARM) : '#C9C3B6').attr('stroke-width',1.5);
+    if (on) row.append('circle').attr('cx',CX0+8).attr('cy',y+i*h).attr('r',3.2).attr('fill',tint?TEAL_D:ALARM);
+    label(row, CX0+24, y+i*h+4, it.t||it, 10.5, on?700:400, on?INK:'#55606A');
+    if (it.d) label(row, CX0+24+ (it.t||it).length*6.2 + 14, y+i*h+4, it.d, 9.5, 400, MUTE);
+  });
+  return y + items.length*h + 16;
+}
+
+function ctlChips(g, y, items, opts){
+  opts = opts || {};
+  const pad = 10*TK, gap = 9, h = 20 + 8*TK;
+  let x = CX0, row = 0;
+  const out = [];
+  items.forEach((it,i)=>{
+    const t = it.t || it;
+    const w = Math.max(58, t.length*5.6*TK + pad*2);
+    if (x + w > CX0 + CW - 4){ x = CX0; row++; }
+    const cy = y + row*(h+gap);
+    const cg = g.append('g').attr('class','chip').datum(it);
+    roundRect(cg, x, cy, w, h, h/2, opts.tint || '#F7EFE7',
+              opts.stroke || ALARM, 1.3).attr('stroke-dasharray', opts.dashed ? '5 4' : null);
+    label(cg, x+w/2, cy+h/2+3.4*TK, t, 9.5, 600, opts.fg || ALARM, 'middle');
+    out.push({ g:cg, x:x, y:cy, w:w, h:h, d:it });
+    x += w + gap;
+  });
+  g.property('__chips', out);
+  return y + (row+1)*(h+gap) + 12;
+}
+
+function ctlList(g, y, items, tint){
+  const h = 34;
+  items.forEach((it,i)=>{
+    const row = g.append('g');
+    const on = it.on;
+    roundRect(row, CX0, y+i*h, CW*FULL(0.72), h-6, 8, on ? (tint?'#E7F2F1':'#FBF2EA') : '#FAF8F4',
+              on ? (tint?TEAL:'#EFD5C2') : '#EFECE5', 1.1);
+    const bx = CX0+12, by = y+i*h+7;
+    roundRect(row, bx, by, 14, 14, 3.5, on ? (tint?TEAL_D:ALARM) : 'none', on ? null : '#C9C3B6', 1.4);
+    if (on) row.append('path').attr('d','M '+(bx+3.5)+' '+(by+7)+' l 3 3.4 l 5 -6.4')
+      .attr('stroke','#FFFFFF').attr('stroke-width',1.8).attr('fill','none')
+      .attr('stroke-linecap','round').attr('stroke-linejoin','round');
+    label(row, bx+26, y+i*h+18, it.t, 10.5, on?600:400, on?INK:'#55606A');
+    if (it.n) label(row, CX0+CW*FULL(0.72)-14, y+i*h+18, it.n, 9, 400, MUTE, 'end');
+  });
+  return y + items.length*h + 14;
+}
+
+function ctlNotice(g, y, title, lines, kind){
+  const h = 34 + lines.length*16;
+  const alarm = kind !== 'ok';
+  const box = g.append('g');
+  roundRect(box, CX0, y, CW*FULL(0.84), h, 12, alarm ? '#FBEDE7' : '#E7F2F1',
+            alarm ? ALARM : TEAL_D, 1.5).attr('stroke-dasharray', alarm ? '6 4' : null);
+  box.append('circle').attr('cx',CX0+22).attr('cy',y+22).attr('r',9)
+    .attr('fill', alarm ? ALARM : TEAL_D);
+  label(box, CX0+22, y+26, alarm ? '!' : '✓', 11, 700, '#FFFFFF', 'middle');
+  label(box, CX0+42, y+26, title, 11, 700, alarm ? ALARM : TEAL_D);
+  lines.forEach((ln,i)=> label(box, CX0+42, y+46+i*16, ln, 9.8, 400, '#4A5560'));
+  return y + h + 16;
+}
+
+function ctlField(g, y, lab, val, tint){
+  mono(g, CX0, y, lab, 8, MUTE);
+  roundRect(g, CX0, y+8, CW*FULL(0.72), 34, 8, '#FAF8F4', '#E3DFD6', 1.2);
+  label(g, CX0+14, y+30, val, 10.5, 600, tint?TEAL_D:INK);
+  return y + 58;
+}
+
+function ctlGrid(g, y, cols, rows, cells, tint){
+  const lw = 56 + 26*TK;
+  const cw = (CW-lw-6)/cols.length, ch = 20 + 6*TK;
+  cols.forEach((c,i)=> label(g, CX0+lw+i*cw+cw/2, y-6, c, 8.5, 600, MUTE, 'middle'));
+  rows.forEach((r,j)=>{
+    label(g, CX0+lw-8, y+14+j*ch, r, 9.5, 400, '#55606A', 'end');
+    cols.forEach((c,i)=>{
+      const st = cells(i,j);   // 0 off · 1 on · 2 excluded
+      const cell = g.append('g');
+      roundRect(cell, CX0+lw+i*cw+2, y+j*ch, cw-4, ch-5, 5,
+        st===1 ? (tint?'#BFE3E0':'#F7D9C7') : (st===2 ? '#F2EFE9' : '#FAF8F4'),
+        st===1 ? (tint?TEAL_D:ALARM) : '#EAE6DD', st===1?1.4:1);
+      if (st===2){
+        cell.append('path').attr('d','M '+(CX0+lw+i*cw+cw/2-5)+' '+(y+j*ch+(ch-5)/2-5)+
+          ' l 10 10 M '+(CX0+lw+i*cw+cw/2+5)+' '+(y+j*ch+(ch-5)/2-5)+' l -10 10')
+          .attr('stroke','#B9B2A4').attr('stroke-width',1.4).attr('stroke-linecap','round');
+      }
+    });
+  });
+  return y + rows.length*ch + 18;
+}
+
+function ctlSlots(g, y, n, cols, filled, tint){
+  const w = (CW*FULL(0.78))/cols - 8, h = 20;
+  for (let i=0;i<n;i++){
+    const r = Math.floor(i/cols), c = i%cols;
+    const on = i < filled;
+    const sg = g.append('g').attr('class','slot');
+    roundRect(sg, CX0+c*(w+8), y+r*(h+7), w, h, 5,
+      on ? (tint?'#E7F2F1':'#F7EFE7') : '#FAF8F4', on ? (tint?TEAL:'#EFD5C2') : '#EAE6DD', 1.1);
+    if (on) sg.append('rect').attr('x',CX0+c*(w+8)+8).attr('y',y+r*(h+7)+8.5)
+      .attr('width',w-16-(i%3)*9).attr('height',3).attr('rx',1.5)
+      .attr('fill', tint?TEAL_D:'#C98F70');
+  }
+  return y + Math.ceil(n/cols)*(h+7) + 14;
+}
+
+function ctlMeter(g, y, val, tint){
+  const cx = CX0+CW*(isNarrow()?0.88:0.86), cy = y+16, r = 26;
+  const arc = d3.arc().innerRadius(r-6).outerRadius(r).startAngle(-Math.PI*0.72);
+  g.append('path').attr('transform','translate('+cx+','+cy+')')
+    .attr('d', arc({ endAngle: Math.PI*0.72 })).attr('fill','#EFECE5');
+  const live = g.append('path').attr('class','meter').attr('transform','translate('+cx+','+cy+')')
+    .attr('fill', tint?TEAL_D:'#5FA88A')
+    .attr('d', arc({ endAngle: -Math.PI*0.72 }));
+  live.property('__arc', arc).property('__val', val);
+  label(g, cx, cy+4, 'Excellent', 8.5, 700, tint?TEAL_D:'#3F7D66', 'middle');
+  mono(g, cx, cy+26, 'AD STRENGTH', 7, MUTE, 'middle');
+  return y;
+}
+
+function ctlCounters(g, y, items, tint){
+  const w = (CW*FULL(0.92))/items.length;
+  items.forEach((it,i)=>{
+    const x = CX0 + i*w;
+    const cell = g.append('g');
+    mono(cell, x, y, it.l, 7.5, MUTE);
+    const t = label(cell, x, y+26, '0', 19, 700, it.hi ? (tint?TEAL_D:ALARM) : INK);
+    if (!REDUCE && it.v != null){
+      t.transition('count').duration(1400).delay(300+i*120).ease(VALUE_EASE)
+        .tween('t', function(){
+          const iv = d3.interpolateNumber(0, it.v);
+          return k => t.text(it.pre ? it.pre + Math.round(iv(k)).toLocaleString('en-US') : Math.round(iv(k)).toLocaleString('en-US'));
+        });
+    } else if (it.v != null){
+      t.text((it.pre||'') + it.v.toLocaleString('en-US'));
+    } else { t.text(it.s); }
+  });
+  return y + 52;
+}
+
+function ctlMap(g, y, tint){
+  const cy = y + 96;
+  const METROS = [[CX0+130,cy-30,52],[CX0+300,cy+16,40],[CX0+440,cy-42,34],[CX0+560,cy+30,30]];
+  g.append('path')
+    .attr('d','M '+(CX0+40)+' '+(cy+60)+' q 120 -70 250 -30 q 130 40 300 -34 q 80 -34 120 6')
+    .attr('fill','none').attr('stroke','#E3DFD6').attr('stroke-width',1.4);
+  METROS.forEach((m,i)=>{
+    const ring = g.append('g');
+    ring.append('circle').attr('cx',m[0]).attr('cy',m[1]).attr('r',m[2])
+      .attr('fill', tint?'rgba(127,204,200,.16)':'rgba(243,121,64,.13)')
+      .attr('stroke', tint?TEAL_D:ACCENT).attr('stroke-width',1.4).attr('stroke-dasharray','5 4');
+    ring.append('circle').attr('cx',m[0]).attr('cy',m[1]).attr('r',4.5).attr('fill', tint?TEAL_D:ALARM);
+  });
+  label(g, CX0, y+8, tint ? 'Counties with one clinic or fewer' : 'Metro radius targets', 10, 600, INK);
+  return y + 190;
+}
+
+
+/* ---- the auction, drawn at the speed it happens ---- */
+function ctlAuction(g, y){
+  const lanes = [
+    { n:'Meridian Longevity', bid:.72, q:.86, win:true },
+    { n:'Vitalis Rx',         bid:.88, q:.52 },
+    { n:'Restore Clinic',     bid:.54, q:.71 },
+    { n:'Apex Research',      bid:.66, q:.33 }
+  ];
+  const nameW = 96 + 34*TK;
+  const bw = CW - nameW - 74, h = 26, gap = 12;
+  const thr = 0.55;
+  lanes.forEach((L,i)=>{
+    const ly = y + i*(h+gap);
+    label(g, CX0, ly+18, L.n, 10, L.win?700:400, L.win?INK:'#66727C');
+    const track = roundRect(g, CX0+nameW, ly+3, bw, h-6, 10, '#F3F0E9');
+    const rank = L.bid * L.q + 0.12;
+    const bar = roundRect(g, CX0+nameW, ly+3, 4, h-6, 10, L.win ? ALARM : '#D8D2C6').attr('class','rankbar');
+    bar.property('__w', bw*rank);
+    if (L.win){
+      const tag = g.append('g').attr('class','winner').attr('opacity',0);
+      roundRect(tag, CX0+nameW+bw+10, ly+3, 60, h-6, 10, '#FBE3D2');
+      label(tag, CX0+nameW+bw+40, ly+17, 'served', 9, 700, ALARM, 'middle');
+    }
+  });
+  const tx = CX0+nameW+bw*thr;
+  g.append('path').attr('class','thr').attr('d','M '+tx+' '+(y-6)+' V '+(y+lanes.length*(h+gap)))
+    .attr('stroke',INK).attr('stroke-width',1.3).attr('stroke-dasharray','4 4').attr('opacity',.5);
+  mono(g, tx, y-12, 'AD RANK THRESHOLD', 7, MUTE, 'middle');
+  label(g, CX0, y+lanes.length*(h+gap)+26,
+    'Recalculated for every auction, from bid × live quality signals × context.', 9.5, 400, MUTE);
+  return y + lanes.length*(h+gap) + 40;
+}
+
+/* =====================================================================
+   7. THE TWELVE SCREENS
+   Every field name below follows the platform's public documentation.
+   ===================================================================== */
+
+const SCREENS = {
+
+mach1: { url:'ads console · new campaign', step:'STEP 1 OF 7', head:'Choose your objective',
+  draw(g){
+    let y = CY0;
+    y = ctlCards(g, y, [
+      { t:'Sales',   d:'Drive purchases' },
+      { t:'Leads',   d:'Capture contacts' },
+      { t:'Traffic', d:'Visits to a site' },
+      { t:'Awareness',d:'Reach and frequency' }], 0);
+    y = ctlNotice(g, y+6, 'What the console never asks',
+      ['Whether the product works. Whether the claim is true.',
+       'Whether the person who converts is helped or harmed.'], 'warn');
+  } },
+
+mach2: { url:'ads console · policy', step:'BLOCKED', head:'Campaign setup — policy review',
+  draw(g){
+    let y = CY0 - 4;
+    y = ctlField(g, y, 'CAMPAIGN NAME', 'BPC-157 — Recovery Peptides');
+    y = ctlChips(g, y, ['bpc-157', 'tb-500 injection', 'buy research peptides'],
+      { tint:'#F6E9E4', stroke:ALARM, fg:ALARM, dashed:true });
+    y = ctlNotice(g, y, 'Not eligible to run',
+      ['Research chemicals and unapproved supplements are not',
+       'permitted. Telehealth advertisers must hold certification.'], 'warn');
+    y = ctlField(g, y+4, 'CAMPAIGN NAME (RESUBMITTED)', 'Meridian Longevity — Recovery Consults', true);
+    ctlNotice(g, y, 'Eligible', ['Telehealth clinic, certified. Ads may serve.'], 'ok');
+  } },
+
+mach3: { url:'ads console · bidding', step:'STEP 2 OF 7', head:'Bidding',
+  draw(g){
+    let y = CY0;
+    y = ctlRadio(g, y, [
+      { t:'Maximise conversions', d:'with an optional target cost per action' },
+      { t:'Maximise clicks' },
+      { t:'Target impression share' },
+      { t:'Manual CPC' }], 0);
+    y = ctlField(g, y, 'CONVERSION ACTION', 'Consultation booked');
+    ctlCounters(g, y+10, [
+      { l:'TARGET CPA', v:74, pre:'$', hi:true },
+      { l:'CONVERSIONS / DAY', v:38 },
+      { l:'SPEND / DAY', v:2812, pre:'$' }]);
+  } },
+
+mach4: { url:'ads console · locations', step:'STEP 3 OF 7', head:'Locations and languages',
+  draw(g){
+    let y = CY0 - 8;
+    y = ctlMap(g, y);
+    ctlList(g, y-24, [
+      { t:'Presence: people in or regularly in your targeted locations', on:true },
+      { t:'English', on:true, n:'primary' }]);
+  } },
+
+mach5: { url:'ads console · audiences', step:'STEP 4 OF 7', head:'Audience segments — browse',
+  draw(g){
+    let y = CY0;
+    y = ctlList(g, y, [
+      { t:'Affinity — Health & Fitness Buffs', n:'ready-made' },
+      { t:'In-market — Sports & Fitness Supplements', on:true, n:'ready-made' },
+      { t:'Life events — Recently started a fitness routine', n:'ready-made' },
+      { t:'Detailed demographics — Education, homeownership…', n:'ready-made' },
+      { t:'Your data — site visitors, customer lists', n:'first-party' }]);
+    ctlNotice(g, y+2, 'A shelf of people, browsable by category',
+      ['Assembled from behaviour across the platform’s properties —',
+       'inferred, never asked.'], 'warn');
+  } },
+
+mach6: { url:'ads console · custom segment', step:'STEP 4 OF 7', head:'Build a custom segment',
+  draw(g){
+    let y = CY0 - 6;
+    y = ctlNotice(g, y, 'Restricted: health conditions',
+      ['Audiences built on a sensitive health condition — or on',
+       'activity implying one — may not be used here.'], 'warn');
+    y = ctlList(g, y-2, [
+      { t:'People with these interests or purchase intentions' },
+      { t:'People who searched for any of these terms on Google', on:true },
+      { t:'People who browse types of websites' },
+      { t:'People who use types of apps' }]);
+    y = ctlChips(g, y-4, [
+      { t:'bpc-157 dosage',      w:'A compound name, spelled right. This is someone weeks into research, not a browser.' },
+      { t:'tb-500 healing',      w:'An outcome attached to a compound: they have already decided what they want it to do.' },
+      { t:'wolverine stack',     w:'Community vocabulary. They are reading forums, which means they trust peers over clinicians.' },
+      { t:'shoulder won’t heal', w:'The injury underneath all of it — volunteered, in plain language, at 1 a.m.' },
+      { t:'peptide clinic near me', w:'Purchase intent with a geography attached. The most valuable four words on this screen.' }],
+      { tint:'#F7EFE7', stroke:ALARM, fg:ALARM });
+    label(g, CX0, y+2, '…and people who searched similar terms.', 10, 700, ALARM);
+    ctlCounters(g, y+22, [
+      { l:'ESTIMATED AUDIENCE', v:412000, hi:true },
+      { l:'CONDITION NAMED', s:'never' }]);
+  } },
+
+mach7: { url:'ads console · demographics', step:'STEP 5 OF 7', head:'Demographics',
+  draw(g){
+    let y = CY0 - 4;
+    y = ctlGrid(g, y,
+      ['18–24','25–34','35–44','45–54','55–64','65+','Unknown'],
+      ['Male','Female','Unknown'],
+      (i,j)=> (i>=1 && i<=4 && j<=1) ? 1 : (i===0 ? 2 : 0));
+    y = ctlNotice(g, y-4, 'Not available in Search',
+      ['Household income (7 tiers, top 10% down) and parental',
+       'status are Display, Video and Demand Gen dimensions.'], 'warn');
+    ctlChips(g, y-6, ['+ new Demand Gen campaign', 'Household income: Top 10%', '11–20%'],
+      { tint:'#EFEAE0', stroke:'#B9B2A4', fg:'#55606A' });
+  } },
+
+mach8: { url:'ads console · keywords', step:'STEP 6 OF 7', head:'Keywords',
+  draw(g){
+    let y = CY0 - 4;
+    y = ctlChips(g, y, ['recovery therapy clinic', '“longevity medicine near me”', '[sports injury treatment]', 'peptide therapy consult'],
+      { tint:'#F7EFE7', stroke:ALARM, fg:ALARM });
+    label(g, CX0, y+2, 'Clean. The banned compound appears nowhere.', 10, 600, INK);
+    y += 24;
+    mono(g, CX0, y, 'NEGATIVE KEYWORDS — WHERE THIS AD WILL NOT APPEAR', 8, MUTE);
+    y = ctlChips(g, y+14, ['fda warning', 'side effects', 'scam', 'lawsuit', 'reddit', 'is it safe'],
+      { tint:'#F2EFE9', stroke:'#B9B2A4', fg:'#66727C', dashed:true });
+    label(g, CX0, y+2, 'A filter on doubt: the advertiser chooses which questions it is absent for.', 10, 400, MUTE);
+  } },
+
+mach9: { url:'ads console · ad', step:'STEP 7 OF 7', head:'Responsive search ad',
+  draw(g){
+    let y = CY0 - 6;
+    mono(g, CX0, y, 'HEADLINES — 15 SLOTS, ASSEMBLED BY THE MACHINE', 8, MUTE);
+    y = ctlSlots(g, y+12, 15, 5, 13);
+    mono(g, CX0, y, 'DESCRIPTIONS', 8, MUTE);
+    y = ctlSlots(g, y+12, 4, 2, 4);
+    ctlMeter(g, CY0+30, .88);
+    y = ctlNotice(g, y+4, 'For research use only.',
+      ['The phrase doing the legal work. It has never made a product',
+       'legal to put in a human body.'], 'warn');
+  } },
+
+mach10: { url:'ads console · auction', step:'LIVE', head:'One query, one auction',
+  draw(g){
+    let y = CY0 - 6;
+    const q = g.append('g');
+    roundRect(q, CX0, y, CW*FULL(0.62), 30, 15, '#FAF8F4', '#E3DFD6', 1.2);
+    label(q, CX0+16, y+20, '“why won’t my shoulder heal”', 10.5, 600, INK);
+    mono(q, CX0+CW*FULL(0.62)-(isNarrow()?70:-16), y+20, '~200 ms', 9, ALARM);
+    ctlAuction(g, y+58);
+  } },
+
+/* ---- the flip: the same console, the other buyer ---- */
+
+flip: { url:'ads console · new campaign', step:'SAME CONSOLE', head:'County Health Department', tint:true,
+  draw(g){
+    let y = CY0 + 10;
+    y = ctlCards(g, y, [
+      { t:'Sales',   d:'Drive purchases' },
+      { t:'Leads',   d:'Capture contacts' },
+      { t:'Traffic', d:'Visits to a resource' },
+      { t:'Awareness',d:'Reach the unreached' }], 3, true);
+    ctlNotice(g, y+10, 'Everything you just watched is available here',
+      ['Same screens. Same targeting primitives. Different buyer,',
+       'and a different definition of a conversion.'], 'ok');
+  } },
+
+good1: { url:'ads console · grants', step:'GRANT ACCOUNT', head:'Ad Grants', tint:true,
+  draw(g){
+    let y = CY0;
+    y = ctlCounters(g, y+10, [
+      { l:'MONTHLY INVENTORY', v:10000, pre:'$', hi:true },
+      { l:'ACCOUNT CTR FLOOR', s:'5%' },
+      { l:'COST', s:'$0' }], true);
+    y = ctlList(g, y+8, [
+      { t:'Smart Bidding required — the $2 manual CPC ceiling no longer applies', on:true },
+      { t:'Specific geo-targeting — a policy requirement, not an option', on:true },
+      { t:'Nonprofit verification via Goodstack', on:true },
+      { t:'Performance Max now permitted', on:true }], true);
+    ctlNotice(g, y, 'The inventory is sitting there',
+      ['Most organisations that qualify either have no account,',
+       'or nobody in the building who can run one.'], 'ok');
+  } },
+
+good2: { url:'ads console · custom segment', step:'INTERCEPT', head:'The same audience, met differently', tint:true,
+  draw(g){
+    let y = CY0 - 6;
+    y = ctlChips(g, y, ['bpc-157 dosage', 'tb-500 healing', 'wolverine stack', 'shoulder won’t heal'],
+      { tint:'#E7F2F1', stroke:TEAL_D, fg:TEAL_D });
+    const card = g.append('g');
+    roundRect(card, CX0, y+4, CW*FULL(0.86), 132, 14, '#FFFFFF', TEAL_D, 1.6);
+    mono(card, CX0+18, y+28, 'WHAT THE EVIDENCE ACTUALLY SAYS', 8, TEAL_D);
+    [ 'BPC-157 is not approved. A July 2026 advisory committee',
+      'recommended it for compounding, 8–6, over agency scientists.',
+      'Gray-market vials have been found with 10–90% less active',
+      'ingredient than labelled, with contamination and heavy metals.',
+      '“For research use only” is not a legal category for human use.'
+    ].forEach((ln,i)=> label(card, CX0+18, y+52+i*17, ln, 10, i<2?400:400, '#3A4750'));
+    y += 150;
+    ctlCounters(g, y, [
+      { l:'RCT EVIDENCE', s:'search → hotline' },
+      { l:'988, FIRST 30 MONTHS', v:4400, hi:true },
+      { l:'FEWER DEATHS THAN PROJECTED', s:'ages 15–23' }], true);
+  } },
+
+good3: { url:'ads console · demographics', step:'FIND THE GAP', head:'The grid, used the other way', tint:true,
+  draw(g){
+    let y = CY0 - 4;
+    y = ctlGrid(g, y,
+      ['Top 10%','11–20%','21–30%','31–40%','41–50%','Lower 50%','Unknown'],
+      ['Metro','Suburban','Rural'],
+      (i,j)=> (i>=4 && j>=1) ? 1 : 0, true);
+    y = ctlMap(g, y-16, true);
+    label(g, CX0, y-16, 'The same dimensions. Pointed at who is missing, not who can pay.', 10, 600, INK);
+  } }
+
+};
+
+/* ---- the renderer: one frame, re-dressed ---- */
+let conKey = null;
+function renderConsole(key){
+  const sc = SCREENS[key];
+  if (!sc || conKey === key) return;
+  conKey = key;
+  conBody.selectAll('*').remove();
+  conUrl.text(sc.url);
+  conStep.text(sc.step).attr('fill', sc.tint ? TEAL_D : ALARM);
+  conHead.text(sc.head);
+  conShell.transition('tint').duration(FADE)
+    .attr('stroke', sc.tint ? TEAL : LINE);
+  conAcct.text(isNarrow() ? (sc.tint ? 'HEALTH DEPT' : 'MERIDIAN')
+                          : (sc.tint ? 'COUNTY HEALTH DEPARTMENT' : 'MERIDIAN LONGEVITY'));
+  sc.draw(conBody);
+  applyTypeScale();
+  wireChips(conBody);
+
+  if (REDUCE){
+    conBody.selectAll('path.rankbar,rect.rankbar').attr('width', function(){ return this.__w || +this.getAttribute('width'); });
+    conBody.selectAll('g.winner').attr('opacity',1);
+    conBody.selectAll('path.meter').attr('d', function(){
+      return this.__arc({ endAngle: -Math.PI*0.72 + Math.PI*1.44*this.__val });
+    });
+    return;
+  }
+  // entrance: the screen assembles, then the chosen control commits
+  conBody.attr('opacity',0).attr('transform','translate(0,10)')
+    .transition('screen').duration(420).ease(d3.easeCubicOut)
+    .attr('opacity',1).attr('transform','translate(0,0)');
+  conBody.selectAll('g.sel rect').attr('stroke-width',1.2)
+    .transition('commit').duration(420).delay(520).attr('stroke-width',1.8);
+  conBody.selectAll('g.sel circle.dot').attr('r',0)
+    .transition('commit').duration(380).delay(560).ease(d3.easeBackOut.overshoot(2)).attr('r',3.6);
+  conBody.selectAll('g.chip').attr('opacity',0)
+    .transition('commit').duration(300).delay((d,i)=>420+i*110).attr('opacity',1);
+  conBody.selectAll('g.slot').attr('opacity',0)
+    .transition('commit').duration(200).delay((d,i)=>380+i*38).attr('opacity',1);
+  // the strength meter arcs up
+  conBody.selectAll('path.meter').each(function(){
+    const node = this, arc = node.__arc, val = node.__val;
+    d3.select(node).transition('commit').duration(1100).delay(700).ease(VALUE_EASE)
+      .attrTween('d', () => t => arc({ endAngle: -Math.PI*0.72 + Math.PI*1.44*val*t }));
+  });
+  // ad rank bars fill, then the winner is stamped
+  conBody.selectAll('rect.rankbar').each(function(d,i){
+    const w = this.__w;
+    d3.select(this).transition('commit').duration(700).delay(500+i*110).ease(VALUE_EASE)
+      .attr('width', Math.max(8,w));
+  });
+  conBody.selectAll('g.winner')
+    .transition('commit').duration(320).delay(1500).attr('opacity',1);
+}
+
+
+/* =====================================================================
+   8. ACT II — THE FEED, THE FARM, THE FLYWHEEL
+   ===================================================================== */
+
+/* ---- the phone feed ---- */
+const feedPhone = gFeed.append('g');
+roundRect(feedPhone, PH.x, PH.y, PH.w, PH.h, 34, '#FFFFFF', '#DCD5C6', 1.6);
+roundRect(feedPhone, SCR.x, SCR.y, SCR.w, SCR.h, 22, '#F7F5F0');
+feedPhone.append('rect').attr('x',470).attr('y',PH.y+34).attr('width',60).attr('height',7)
+  .attr('rx',3.5).attr('fill','#E7E2D8');
+
+const postG = gFeed.append('g');
+(function(){
+  const x = SCR.x+14, w = SCR.w-28, y = PH.y+58;
+  roundRect(postG, x, y, w, 300, 14, '#FFFFFF', '#EAE6DD', 1.1);
+  // creator header
+  const head = postG.append('g');
+  head.append('circle').attr('cx',x+26).attr('cy',y+24).attr('r',14).attr('fill','#FBD6BE');
+  person(head.append('g').attr('transform','translate('+(x+26)+','+(y+30)+') scale(.62)'),
+         '#E8B48D', '#8FA9C4', '#7A6250');
+  label(postG, x+48, y+21, 'marcia.moves', 10, 700, INK);
+  label(postG, x+48, y+34, 'Phoenix, AZ · 62', 8.5, 400, MUTE);
+  // video body
+  roundRect(postG, x+10, y+48, w-20, 150, 10, '#EFEAE0');
+  const play = postG.append('g');
+  play.append('circle').attr('cx',x+w/2).attr('cy',y+123).attr('r',20).attr('fill','#FFFFFF').attr('opacity',.92);
+  play.append('path').attr('d','M '+(x+w/2-6)+' '+(y+114)+' l 14 9 l -14 9 Z').attr('fill',INK);
+  label(postG, x+20, y+220, '“Six weeks on the protocol and my shoulder', 10, 600, INK);
+  label(postG, x+20, y+236, 'finally stopped waking me up.”', 10, 600, INK);
+  // engagement
+  const eng = postG.append('g');
+  ['♥ 24.1k','↻ 3.2k','💬 861'].forEach((t,i)=> label(eng, x+20+i*84, y+266, t, 9, 400, MUTE));
+  roundRect(postG, x+20, y+278, 96, 16, 8, '#F7EFE7');
+  label(postG, x+30, y+290, 'not an ad', 8, 600, ALARM);
+})();
+
+// the reveal: she does not exist
+const notRealG = gFeed.append('g').attr('opacity',0);
+roundRect(notRealG, PH.x-14, PH.y+300, PH.w+28, 66, 12, '#FBEDE7', ALARM, 1.6)
+  .attr('stroke-dasharray','7 5');
+label(notRealG, 500, PH.y+326, 'This person does not exist.', 12.5, 700, ALARM, 'middle');
+label(notRealG, 500, PH.y+346, 'She was specified, generated and deployed.', 10, 400, '#5A4640', 'middle');
+
+/* ---- build-a-creator: the persona panel, drawn like a campaign screen ---- */
+const personaG = gFeed.append('g').attr('opacity',0);
+(function(){
+  const x = 120, y = 150, w = 300;
+  roundRect(personaG, x, y, w, 400, 14, '#FFFFFF', LINE, 1.4);
+  mono(personaG, x+18, y+28, 'NEW CREATOR', 8, ALARM);
+  label(personaG, x+18, y+52, 'Persona specification', 12, 700, INK);
+  const FIELDS = [
+    ['AGE','62'], ['LOCATION','Phoenix, AZ'], ['NICHE','recovery · midlife fitness'],
+    ['VOICE','warm, plain, sceptical-of-hype'], ['POSTING','2× daily'],
+    ['WARM-UP','14 days of scrolling first']
+  ];
+  FIELDS.forEach((f,i)=>{
+    const fy = y+76+i*52;
+    mono(personaG, x+18, fy, f[0], 7.5, MUTE);
+    roundRect(personaG, x+18, fy+8, w-36, 28, 7, '#FAF8F4', '#E3DFD6', 1.1);
+    label(personaG, x+30, fy+27, f[1], 10, 600, INK).attr('class','pval');
+  });
+  // the render pipeline, to the right
+  const rx = 470;
+  mono(personaG, rx, y+28, 'SCRIPT', 8, MUTE);
+  roundRect(personaG, rx, y+38, 330, 74, 10, '#FAF8F4', '#E3DFD6', 1.1);
+  ['“I tried everything for this shoulder.','Six weeks later I sleep through','the night. Link in bio.”'].forEach((ln,i)=>
+    label(personaG, rx+14, y+60+i*18, ln, 10, 400, '#3A4750'));
+  personaG.append('path').attr('class','pipe').attr('d','M '+(rx+165)+' '+(y+120)+' V '+(y+152))
+    .attr('stroke',INK).attr('stroke-width',1.4).attr('stroke-dasharray','5 4');
+  mono(personaG, rx, y+172, 'ACTOR — 300+ IN THE LIBRARY', 8, MUTE);
+  const roster = personaG.append('g');
+  for (let i=0;i<6;i++){
+    const fx = rx+i*54, on = i===2;
+    roundRect(roster, fx, y+182, 46, 56, 8, on?'#FBE3D2':'#F3F0E9', on?ALARM:'#EAE6DD', on?1.6:1);
+    person(roster.append('g').attr('transform','translate('+(fx+23)+','+(y+218)+') scale(.85)'),
+           ['#E8B48D','#C89B77','#8D6A50','#E8B48D','#C89B77','#8D6A50'][i],
+           ['#9FB8D0','#A8C6BE','#D9A79A','#C0B7D6','#8FA9C4','#E0C08C'][i], '#6B5847');
+  }
+  personaG.append('path').attr('class','pipe').attr('d','M '+(rx+165)+' '+(y+248)+' V '+(y+278))
+    .attr('stroke',INK).attr('stroke-width',1.4).attr('stroke-dasharray','5 4');
+  roundRect(personaG, rx, y+288, 330, 62, 10, '#E7F2F1', TEAL_D, 1.4);
+  label(personaG, rx+16, y+316, 'Testimonial rendered', 11, 700, TEAL_D);
+  label(personaG, rx+16, y+334, '≈2 minutes · from ~$110/month', 9.5, 400, '#3A4750');
+})();
+
+/* ---- the farm ---- */
+(function(){
+  const cols = 8, rows = 4, w = 62, h = 104, x0 = 180, y0 = 150;
+  for (let j=0;j<rows;j++) for (let i=0;i<cols;i++){
+    const x = x0+i*(w+18), y = y0+j*(h+22);
+    const dev = gRack.append('g').attr('class','dev');
+    roundRect(dev, x, y, w, h, 9, '#FFFFFF', '#DCD5C6', 1.2);
+    roundRect(dev, x+5, y+8, w-10, h-18, 5, '#F3F0E9');
+    // a faint feed inside each
+    for (let k=0;k<3;k++)
+      dev.append('rect').attr('x',x+10).attr('y',y+16+k*22).attr('width',w-20).attr('height',14)
+        .attr('rx',3).attr('fill','#E7E2D8');
+    dev.append('circle').attr('class','pip').attr('cx',x+w-11).attr('cy',y+h-8).attr('r',3.4)
+      .attr('fill', (i+j)%3===0 ? ALARM : TEAL);
+  }
+  mono(gRack, 500, y0-22, 'REAL PHONES · REAL US CARRIER · NOT EMULATORS', 8.5, MUTE, 'middle');
+  const price = gRack.append('g');
+  const py = y0+rows*(h+22)+16;
+  [['$150','self-hosted'],['$250','content agent'],['custom','managed']].forEach((p,i)=>{
+    const px = 300+i*150;
+    roundRect(price, px, py, 130, 52, 12, '#FFFFFF', LINE, 1.2);
+    label(price, px+65, py+24, p[0], 14, 700, ALARM, 'middle');
+    label(price, px+65, py+41, p[1], 9, 400, MUTE, 'middle');
+  });
+  label(gRack, 500, py+80, '“Replacing 30 person creator teams.”', 12, 700, INK, 'middle');
+})();
+
+/* ---- the flywheel: ONE component, two configurations ---- */
+const WHEEL_DARK = {
+  fill:'#FBE3D2', line:ALARM, ink:ALARM, centre:['Attention','engagement · CTR · ROAS'],
+  st:[
+    { t:'Generate', d:'Fifty variants of a proven idea, spun out in minutes from the winners of the last round.' },
+    { t:'Score',    d:'A model trained on millions of past ads predicts which will perform — before a dollar is spent.' },
+    { t:'Test',     d:'Everything ships. The market, not a strategist, decides which creative was right.' },
+    { t:'Amplify',  d:'Budget follows the winners automatically. Losers are cut inside a day.' },
+    { t:'Regenerate', d:'Winners become the seed for the next fifty. Fatigue burns an idea out in 2–3 weeks, so the loop never stops.' }
+  ]
+};
+const WHEEL_GOOD = {
+  fill:'#E7F2F1', line:TEAL_D, ink:TEAL_D, centre:['Comprehension','trust · recall · action'],
+  st:[
+    { t:'Listen',   d:'What is this population actually searching and asking, this week — not what a survey said two years ago.' },
+    { t:'Map belief', d:'Sort by what people believe about health, not by the demographic label they happen to carry.' },
+    { t:'Translate', d:'One evidence base, told differently per belief state, with the evidence attached.' },
+    { t:'Activate', d:'Clinicians and creators the audience already trusts — the messenger is the message.' },
+    { t:'Measure',  d:'Did they understand it, and did anything change? Publish the nulls as well as the wins.' }
+  ]
+};
+const WC = { x:500, y:348 };
+/* place a wheel's visual centre at (tx,ty) at scale k — scale() pivots on the
+   origin, so the translate has to absorb the centre's own displacement */
+function placeWheel(tx, ty, k){
+  return 'translate(' + (tx - WC.x*k) + ',' + (ty - WC.y*k) + ') scale(' + k + ')';
+}
+function makeWheel(cfg){
+  const g = gWheel.append('g').attr('opacity',0);
+  const R = 168, cx = WC.x, cy = WC.y;
+  const pts = cfg.st.map((s,i)=>{
+    const a = -Math.PI/2 + i*(Math.PI*2/cfg.st.length);
+    return { x:cx+Math.cos(a)*R, y:cy+Math.sin(a)*R, a:a, s:s, i:i };
+  });
+  // arcs between stations
+  pts.forEach((p,i)=>{
+    const q = pts[(i+1)%pts.length];
+    const mx = (p.x+q.x)/2, my = (p.y+q.y)/2;
+    const k = 1.22;
+    const c1x = cx+(mx-cx)*k, c1y = cy+(my-cy)*k;
+    g.append('path').attr('class','arc')
+      .attr('d','M '+p.x+' '+p.y+' Q '+c1x+' '+c1y+' '+q.x+' '+q.y)
+      .attr('fill','none').attr('stroke',cfg.line).attr('stroke-width',1.6).attr('opacity',.55);
+    // a head at the midpoint, so the loop reads as turning rather than sitting
+    const bx = .25*p.x + .5*c1x + .25*q.x, by = .25*p.y + .5*c1y + .25*q.y;
+    const ang = Math.atan2(q.y-p.y, q.x-p.x) * 180/Math.PI;
+    g.append('path').attr('class','head')
+      .attr('d','M -6 -5 L 6 0 L -6 5 Z')
+      .attr('transform','translate('+bx+','+by+') rotate('+ang+')')
+      .attr('fill',cfg.line).attr('opacity',.8);
+  });
+  // centre
+  g.append('circle').attr('cx',cx).attr('cy',cy).attr('r',62).attr('fill',cfg.fill);
+  label(g, cx, cy-2, cfg.centre[0], 12.5, 700, cfg.ink, 'middle');
+  label(g, cx, cy+16, cfg.centre[1], 8.5, 400, '#55606A', 'middle');
+  // stations
+  const nodes = [];
+  pts.forEach(p=>{
+    const sg = g.append('g').attr('class','stn').attr('transform','translate('+p.x+','+p.y+')').datum(p.s);
+    sg.append('circle').attr('r',40).attr('fill','#FFFFFF').attr('stroke',cfg.line).attr('stroke-width',1.8);
+    label(sg, 0, 4, p.s.t, 10.5, 700, INK, 'middle');
+    nodes.push(sg);
+  });
+  g.property('__pts', pts);
+  g.property('__cfg', cfg);
+  return g;
+}
+const wheelDark = makeWheel(WHEEL_DARK);
+const wheelGood = makeWheel(WHEEL_GOOD);
+const wheelCap = gWheel.append('text').attr('x',500).attr('y',600).attr('text-anchor','middle')
+  .attr('font-family',SANS).call(typed,11.5).attr('font-weight',600).attr('fill',MUTE).attr('opacity',0);
+const twinL = label(gWheel, 330, 528, 'Selling', 12, 700, ALARM, 'middle').attr('opacity',0);
+const twinR = label(gWheel, 670, 528, 'Public health', 12, 700, TEAL_D, 'middle').attr('opacity',0);
+const twinLs = label(gWheel, 330, 546, 'funded · fast · a checkout', 9.5, 400, MUTE, 'middle').attr('opacity',0);
+const twinRs = label(gWheel, 670, 546, 'underfunded · slow · an outcome', 9.5, 400, MUTE, 'middle').attr('opacity',0);
+
+/* spin: the loop is never at rest while it is on screen */
+let spinKey = null;
+function spinWheels(key, list){
+  if (REDUCE) return;
+  if (spinKey === key) return;
+  spinKey = key;
+  gWheel.selectAll('path.arc').interrupt('spin')
+    .attr('stroke-dashoffset',null).attr('stroke-dasharray',null);
+  if (!list || !list.length) return;
+  list.forEach((g, n) => {
+    const arcs = g.selectAll('path.arc');
+    // the health loop turns slower, because it is not being paid to hurry
+    const dur = g === wheelGood ? 3000 : 2000;
+    arcs.attr('stroke-dasharray','9 7');
+    (function step(){
+      if (spinKey !== key) return;
+      arcs.attr('stroke-dashoffset',0)
+        .transition('spin').duration(dur).ease(d3.easeLinear)
+        .attr('stroke-dashoffset',-32)
+        .on('end', function(){ if (this === arcs.node()) step(); });
+    })();
+  });
+}
+
+/* ---- what the loop measures (and what it never does) ---- */
+(function(){
+  const cols = [
+    { l:'Engagement rate', v:'7.4%', on:true }, { l:'Click-through', v:'3.1%', on:true },
+    { l:'Cost per action', v:'$74', on:true },  { l:'Return on spend', v:'4.2×', on:true },
+    { l:'Accuracy', on:false }, { l:'Comprehension', on:false },
+    { l:'Harm', on:false }, { l:'Health outcome', on:false }
+  ];
+  const w = 190, h = 84, x0 = 120, y0 = 190;
+  cols.forEach((c,i)=>{
+    const x = x0 + (i%4)*(w+16), y = y0 + Math.floor(i/4)*(h+22);
+    const cell = gDash.append('g').attr('class', c.on ? 'lit' : 'void');
+    roundRect(cell, x, y, w, h, 12, c.on ? '#FFFFFF' : 'none', c.on ? LINE : '#C9C3B6', c.on ? 1.2 : 1.4)
+      .attr('stroke-dasharray', c.on ? null : '7 6');
+    mono(cell, x+16, y+24, c.l.toUpperCase(), 7.5, c.on ? MUTE : '#B9B2A4');
+    if (c.on) label(cell, x+16, y+58, c.v, 20, 700, ALARM);
+    else label(cell, x+16, y+58, '—', 20, 700, '#CFC9BC');
+  });
+  label(gDash, 500, y0-26, 'Every signal the loop can see is about attention or money.', 12, 700, INK, 'middle');
+  label(gDash, 500, y0+2*(h+22)+16, 'Not one is a signal about whether the claim was true.', 11.5, 700, ALARM, 'middle');
+})();
+
+/* =====================================================================
+   9. THE LEDGERS — the case-walk grammar from the companion piece
+   ===================================================================== */
+
+const LEDGERS = {
+  feed6: { head:'The machine vs. health promotion', l:'THE SELLERS', r:'PUBLIC HEALTH',
+    rows:[
+      { t:'Money',        a:'$13.8bn promotion (10 firms, 2023)', b:'−53% proposed CDC budget', w:'US direct-to-consumer pharmaceutical advertising runs beyond $10bn a year, and skews toward drugs with low added therapeutic benefit. The FY2026 proposal cut CDC by about 53% against FY2024; 444 grants worth $5.78bn were terminated by May 2026.' },
+      { t:'Speed',        a:'2–3 week creative cycles', b:'budget-year campaign cycles', w:'Creative fatigue now burns an idea out in two to three weeks, so the commercial loop is built to keep spinning. Public-health campaign cycles are measured in appropriations.' },
+      { t:'Precision',    a:'per-query, per-person auction', b:'demographic mailers, generic PSAs', w:'Ad Rank is recalculated for every auction from bid, live quality signals and context. Most health promotion still buys by broad demographic.' },
+      { t:'Feedback',     a:'conversion telemetry within the hour', b:'evaluation published two years later', w:'The seller knows by lunchtime which creative worked. The health department finds out after the grant has closed.' },
+      { t:'Authenticity', a:'synthetic creators who look like a neighbour', b:'an institutional logo', w:'Specified personas, deployed on real devices, at $150–250/month — against a seal people already distrust.' },
+      { t:'Volume',       a:'20–50 creatives / month', b:'3–5, if funded', w:'Leading commercial teams test twenty to fifty creatives a month; most teams test three to five. Volume is how the loop learns.' }
+    ] },
+  good6: { head:'What it would take', l:'THE ASK', r:'THE EVIDENCE',
+    rows:[
+      { t:'Money', a:'fund counter-marketing', b:'~$1,076 per QALY', w:'The truth® campaign is credited with roughly 450,000 fewer youth smoking initiations 2000–2004 and about 2.5 million more 2015–2018, and with roughly 22% of a two-year decline in youth smoking — at about $1,076 per quality-adjusted life year, with billions in societal savings.', ok:true },
+      { t:'Rules', a:'limit health profiling', b:'EU DSA, already in force', w:'The Digital Services Act bans profiling-based advertising on special-category data including health, and bans profiled advertising to minors — with no consent override. The US has no equivalent. That is a policy choice.', ok:true },
+      { t:'Skills', a:'someone who can run the console', b:'$250m precedent (COVID)', w:'Google put $250 million of ad grants behind the WHO and 100+ government agencies during COVID-19. The capability exists; it took a pandemic to deploy it.', ok:true },
+      { t:'Evidence', a:'test at volume, publish the nulls', b:'effects real but variable', w:'The largest randomised trials of social-media health advertising reached nearly 18 million US and 11.5 million French users; systematic reviews find effects variable and often not significant. That is an argument for testing, not for silence.', ok:true }
+    ] }
+};
+
+let LX = 300, LY0 = 176, LDY = 62;
+function ledgMetrics(){
+  const nar = isNarrow();
+  LX  = nar ? 150 : 300;
+  LY0 = nar ? 190 : 176;
+  LDY = nar ? 88  : 62;
+}
+ledgMetrics();
+const ledgHead = label(gLedg, 500, 126, '', 13.5, 700, INK, 'middle');
+const ledgL = mono(gLedg, LX-30, 152, '', 8, ALARM, 'end');
+const ledgR = mono(gLedg, LX+40, 152, '', 8, MUTE);
+const ledgBody = gLedg.append('g');
+let ledgKey = null;
+function renderLedger(key){
+  const L = LEDGERS[key];
+  if (!L || ledgKey === key) return;
+  ledgKey = key;
+  ledgBody.selectAll('*').remove();
+  ledgHead.text(L.head);
+  ledgL.text(isNarrow() ? '' : L.l).attr('fill', key==='good6' ? TEAL_D : ALARM);
+  ledgR.text(isNarrow() ? '' : L.r);
+  const nar = isNarrow();
+  L.rows.forEach((r,i)=>{
+    const y = LY0 + i*LDY;
+    const row = ledgBody.append('g').attr('class','lrow').datum(r);
+    roundRect(row, 100, y-22, 800, LDY-10, 10, i%2 ? '#FFFFFF' : 'none', '#EFECE5', 1);
+    if (nar){
+      // stacked: the name, then each side on its own line
+      label(row, 128, y-2, r.t, 12.5, 700, INK);
+      const mark = row.append('g');
+      mark.append('circle').attr('cx',136).attr('cy',y+22).attr('r',8)
+        .attr('fill', r.ok ? TEAL_D : ALARM);
+      label(mark, 136, y+26, r.ok ? '✓' : '●', 8.5, 700, '#FFFFFF', 'middle');
+      label(row, 152, y+26, r.a, 10.5, 600, r.ok ? TEAL_D : ALARM);
+      label(row, 152, y+48, r.b, 10.5, 400, MUTE);
+    } else {
+      label(row, LX-30, y+4, r.t, 12.5, 700, INK, 'end');
+      const mark = row.append('g');
+      mark.append('circle').attr('cx',LX+4).attr('cy',y).attr('r',9)
+        .attr('fill', r.ok ? TEAL_D : ALARM);
+      label(mark, LX+4, y+4, r.ok ? '✓' : '●', 9, 700, '#FFFFFF', 'middle');
+      label(row, LX+24, y+4, r.a, 10.5, 600, r.ok ? TEAL_D : ALARM);
+      label(row, 884, y+4, r.b, 10.5, 400, MUTE, 'end');
+    }
+  });
+  applyTypeScale();
+  wireLedger();
+  if (!REDUCE){
+    ledgBody.selectAll('g.lrow').attr('opacity',0)
+      .attr('transform','translate(0,14)')
+      .transition('lrow').duration(520).delay((d,i)=>140+i*130).ease(d3.easeCubicOut)
+      .attr('opacity',1).attr('transform','translate(0,0)');
+  }
+}
+
+/* =====================================================================
+   10. THE CAPABILITY LADDER + THE REGISTER
+   ===================================================================== */
+(function(){
+  const T = [
+    { x:200, h:150, tint:'#EFEAE0', n:'Tier 1 · Information',
+      s:['What your population is searching','and believing, as intelligence.','Self-serve.'] },
+    { x:500, h:212, tint:'#DCEBF5', n:'Tier 2 · Training',
+      s:['Someone in the building who can','run the console. Done-for-you','first, train-the-trainer after.'] },
+    { x:800, h:274, tint:'#9FD8D4', n:'Tier 3 · Service',
+      s:['Campaign operations at','commercial tempo. Strategy','through execution.'] }
+  ];
+  const BASEY = 560;
+  T.forEach((t,i)=>{
+    const g = gTier.append('g').attr('class','tier').attr('data-x',t.x).attr('data-y',BASEY-t.h)
+      .attr('transform','translate('+t.x+','+(BASEY-t.h)+')');
+    roundRect(g, -125, 0, 250, t.h, 16, t.tint);
+    label(g, 0, 30, t.n, 13, 700, INK, 'middle');
+    t.s.forEach((ln,k)=> label(g, 0, 52+k*17, ln, 10.5, 400, '#333', 'middle'));
+  });
+  gTier.append('path').attr('class','ascent').attr('data-op',.8)
+    .attr('d','M 98 '+(BASEY-172)+' Q 350 '+(BASEY-262)+' 500 '+(BASEY-234)+' Q 660 '+(BASEY-308)+' 778 '+(BASEY-294))
+    .attr('fill','none').attr('stroke',TEAL_D).attr('stroke-width',1.6)
+    .attr('stroke-dasharray','6 5').attr('opacity',.8);
+  label(gTier, 500, BASEY+52, 'It starts as a report. It ends as a flywheel your team owns.', 12.5, 700, INK, 'middle');
+})();
+
+(function(){
+  const x = 190, y = 150, w = 620;
+  roundRect(gMeth, x, y, w, 400, 16, '#FFFFFF', LINE, 1.4);
+  mono(gMeth, x+30, y+40, 'THE REGISTER', 8.5, ALARM);
+  const ROWS = [
+    ['The vendor', 'Fictional. Meridian Longevity is invented.'],
+    ['The console', 'Stylised recreation. Field names from public docs; chrome drawn here.'],
+    ['Numbers on screen', 'Synthetic. Generated in this file as placeholders.'],
+    ['Numbers in the prose', 'Real, sourced beneath each scene, and dated.'],
+    ['Techniques shown', 'All documented in the platform’s own help pages.'],
+    ['What is moving', 'The FDA had not acted on the advisory vote at the time of writing.']
+  ];
+  ROWS.forEach((r,i)=>{
+    const ry = y+76+i*54;
+    gMeth.append('path').attr('d','M '+(x+30)+' '+(ry-16)+' H '+(x+w-30))
+      .attr('stroke','#EFECE5').attr('stroke-width',1);
+    label(gMeth, x+30, ry+4, r[0], 11, 700, INK);
+    label(gMeth, x+220, ry+4, r[1], 10, 400, '#55606A');
+  });
+})();
+
+/* =====================================================================
+   11. TOOLTIP + HOVERS
+   ===================================================================== */
+
+const tip = d3.select('#tip');
+const tipNode = tip.node();
+function placeTip(ev){
+  const pad = 14, b = tipNode.getBoundingClientRect();
+  let x = ev.clientX + pad, y = ev.clientY + pad;
+  if (x + b.width  > innerWidth  - 8) x = ev.clientX - b.width  - pad;
+  if (y + b.height > innerHeight - 8) y = ev.clientY - b.height - pad;
+  tip.style('left', Math.max(8,x)+'px').style('top', Math.max(8,y)+'px');
+}
+function placeTipAt(node){
+  const r = node.getBoundingClientRect(), b = tipNode.getBoundingClientRect();
+  let x = r.left + r.width/2 - b.width/2, y = r.bottom + 10;
+  if (y + b.height > innerHeight - 8) y = Math.max(8, r.top - b.height - 10);
+  tip.style('left', Math.min(Math.max(8,x), innerWidth - b.width - 8)+'px').style('top', y+'px');
+}
+function hideTip(){ tip.classed('on',false); }
+addEventListener('scroll', hideTip, { passive:true });
+
+function bindTip(sel, htmlFn, aria){
+  sel.style('cursor','pointer')
+    .attr('tabindex',-1).attr('role','button')
+    .attr('aria-label', function(d){ return aria ? aria(d) : null; })
+    .on('mousemove', function(ev,d){ tip.html(htmlFn(d)).classed('on',true); placeTip(ev); })
+    .on('mouseleave', hideTip)
+    .on('focus', function(ev,d){ tip.html(htmlFn(d)).classed('on',true); placeTipAt(this); })
+    .on('blur', hideTip);
+}
+function wireChips(g){
+  const chips = g.selectAll('g.chip').filter(d => d && d.w);
+  bindTip(chips, d => '<b>'+d.t+'</b><br>'+d.w, d => d.t + '. ' + d.w);
+}
+function wireLedger(){
+  bindTip(ledgBody.selectAll('g.lrow'), d => '<b>'+d.t+'</b><br>'+d.w, d => d.t + '. ' + d.w);
+}
+bindTip(gWheel.selectAll('g.stn'), d => '<b>'+d.t+'</b><br>'+d.d, d => d.t + '. ' + d.d);
+
+function setTabbing(sel, on){
+  sel.attr('tabindex', on ? 0 : -1).style('pointer-events', on ? 'all' : 'none');
+}
+
+/* =====================================================================
+   12. SCENE CONTROLLER
+   ===================================================================== */
+
+const TITLES = {
+  mach1:'Building the campaign', mach2:'Building the campaign', mach3:'Building the campaign',
+  mach4:'Building the campaign', mach5:'Building the campaign', mach6:'Building the campaign',
+  mach7:'Building the campaign', mach8:'Building the campaign', mach9:'Building the campaign',
+  mach10:'The auction',
+  feed1:'The feed', feed2:'Manufacturing a creator', feed3:'Manufacturing a creator',
+  feed4:'The loop', feed5:'What the loop measures', feed6:'The ledger',
+  flip:'The same console', good1:'The same console', good2:'The same console', good3:'The same console',
+  good4:'The loop, honestly', good5:'The capability ladder', good6:'The ledger',
+  reprise:'Two loops', methods:'The register'
+};
+
+const DARK_KEYS = ['open','results','thesis','close'];
+const CON_KEYS  = ['mach1','mach2','mach3','mach4','mach5','mach6','mach7','mach8','mach9','mach10',
+                   'flip','good1','good2','good3'];
+
+let current = null;
+const scroller = document.getElementById('scroller');
+
+function render(key){
+  if (key === current) return;
+  const prev = current; current = key;
+  const scene = SCENES.find(s => s.key === key);
+  if (!scene) return;
+
+  hideTip();
+
+  const frame = frameFor(scene.frame);
+  const prevTK = TK;
+  computeTK(frame);
+  if (TK !== prevTK) applyTypeScale();
+  placeStamp(frame);
+  svg.transition('frame').duration(CAMERA).ease(d3.easeCubicInOut).attr('viewBox', frame);
+
+  const dark = DARK_KEYS.includes(key);
+  scroller.classList.toggle('dark', dark);
+  stampTone(dark);
+
+  // the console and the ledger draw their own heads; a second one on top of
+  // them was just noise
+  const ownHead = CON_KEYS.includes(key) || key==='feed6' || key==='good6' || key==='methods';
+  setTitle(dark || ownHead ? '' : (TITLES[key] || ''));
+  show(gTitle, (dark || ownHead) ? 0 : 1);
+  show(gStamp, 1);
+
+  /* ---- Act 0 ---- */
+  show(gDark, dark ? 1 : 0);
+  typeQuery(key === 'open');
+  show(sugG, key === 'open' ? 1 : 0);
+  if (key === 'open' && prev !== 'open' && !REDUCE){
+    sugG.attr('opacity',0).transition('sug').duration(600).delay(2100).attr('opacity',1);
+  }
+  show(scaleG, key === 'open' ? 1 : 0);
+  if (key === 'open' && prev !== 'open') runCounter(true);
+  show(serpG, (key === 'results' || key === 'close') ? 1 : 0);
+  show(fixG,  key === 'close' ? 1 : 0);
+  if (key === 'results' && prev !== 'results' && !REDUCE){
+    adRow.attr('opacity',0).attr('transform',(d,i)=>'translate(0,'+(SERP_Y+i*74+10)+')')
+      .transition('serp').duration(460).delay((d,i)=>200+i*150).ease(d3.easeCubicOut)
+      .attr('opacity',1).attr('transform',(d,i)=>'translate(0,'+(SERP_Y+i*74)+')');
+    organicG.attr('opacity',0).transition('serp').duration(500).delay(900).attr('opacity',1);
+  } else if (key === 'results'){ adRow.attr('opacity',1); organicG.attr('opacity',1); }
+
+  /* ---- the console ---- */
+  const conOn = CON_KEYS.includes(key);
+  show(gCon, conOn ? 1 : 0);
+  if (conOn) renderConsole(key);
+
+  /* ---- the feed ---- */
+  const feedOn = key === 'feed1' || key === 'feed2';
+  show(gFeed, feedOn ? 1 : 0);
+  show(feedPhone, key === 'feed1' ? 1 : 0);
+  show(postG,     key === 'feed1' ? 1 : 0);
+  show(notRealG,  key === 'feed1' ? 1 : 0);
+  show(personaG,  key === 'feed2' ? 1 : 0);
+  if (key === 'feed1' && prev !== 'feed1' && !REDUCE){
+    notRealG.attr('opacity',0).transition('reveal').duration(600).delay(1100).attr('opacity',1);
+  }
+  if (key === 'feed2' && prev !== 'feed2' && !REDUCE){
+    personaG.selectAll('text.pval').attr('opacity',0)
+      .transition('spec').duration(280).delay((d,i)=>260+i*150).attr('opacity',1);
+    drawOn(personaG.selectAll('path.pipe'), 500, (d,i)=>900+i*260);
+  }
+
+  /* ---- the farm ---- */
+  show(gRack, key === 'feed3' ? 1 : 0);
+  if (key === 'feed3' && prev !== 'feed3' && !REDUCE){
+    gRack.selectAll('g.dev').attr('opacity',0)
+      .transition('dev').duration(280).delay((d,i)=>100+i*22).attr('opacity',1);
+    gRack.selectAll('circle.pip').attr('opacity',0)
+      .transition('dev').duration(300).delay((d,i)=>900+i*30).attr('opacity',1);
+  }
+
+  /* ---- the flywheels ---- */
+  const wheelOn = key === 'feed4' || key === 'feed5' || key === 'good4' || key === 'reprise';
+  show(gWheel, wheelOn ? 1 : 0);
+  const twin = key === 'reprise';
+  const darkWheelOn = key === 'feed4' || key === 'feed5' || twin;
+  const goodWheelOn = key === 'good4' || twin;
+  show(wheelDark, darkWheelOn ? (key==='feed5' ? .28 : 1) : 0);
+  show(wheelGood, goodWheelOn ? 1 : 0);
+  wheelDark.transition('twin').duration(REDUCE?1:700).ease(d3.easeCubicInOut)
+    .attr('transform', twin ? placeWheel(330, 356, .54) : placeWheel(WC.x, WC.y, 1));
+  wheelGood.transition('twin').duration(REDUCE?1:700).ease(d3.easeCubicInOut)
+    .attr('transform', twin ? placeWheel(670, 356, .54) : placeWheel(WC.x, WC.y, 1));
+  wheelCap.text(twin ? 'Same machinery. Same person in the middle.' : '')
+    .transition('twin').duration(FADE).attr('opacity', twin ? 1 : 0);
+  [twinL,twinR,twinLs,twinRs].forEach(t => t.transition('twin').duration(FADE)
+    .attr('opacity', twin ? 1 : 0));
+  spinWheels(key, key === 'feed4' ? [wheelDark]
+                : key === 'good4' ? [wheelGood]
+                : twin ? [wheelDark, wheelGood] : null);
+  setTabbing(gWheel.selectAll('g.stn'), key === 'feed4' || key === 'good4');
+
+  /* ---- the dashboard, the ledgers, the ladder, the register ---- */
+  show(gDash, key === 'feed5' ? 1 : 0);
+  if (key === 'feed5' && prev !== 'feed5' && !REDUCE){
+    gDash.selectAll('g.lit').attr('opacity',0)
+      .transition('dash').duration(340).delay((d,i)=>140+i*110).attr('opacity',1);
+    gDash.selectAll('g.void').attr('opacity',0)
+      .transition('dash').duration(500).delay((d,i)=>760+i*140).attr('opacity',1);
+  }
+  const ledgOn = key === 'feed6' || key === 'good6';
+  show(gLedg, ledgOn ? 1 : 0);
+  if (ledgOn) renderLedger(key);
+  setTabbing(ledgBody.selectAll('g.lrow'), ledgOn);
+
+  show(gTier, key === 'good5' ? 1 : 0);
+  if (key === 'good5' && prev !== 'good5' && !REDUCE){
+    gTier.selectAll('g.tier').interrupt('rise').attr('opacity',0)
+      .attr('transform',function(){ return 'translate('+this.getAttribute('data-x')+','+(+this.getAttribute('data-y')+26)+')'; })
+      .transition('rise').duration(640).delay((d,i)=>140+i*160).ease(d3.easeCubicOut)
+      .attr('opacity',1)
+      .attr('transform',function(){ return 'translate('+this.getAttribute('data-x')+','+this.getAttribute('data-y')+')'; });
+    gTier.selectAll('path.ascent').attr('opacity',0)
+      .transition('rise').duration(520).delay(760).attr('opacity',.8);
+  }
+  show(gMeth, key === 'methods' ? 1 : 0);
+
+  setTabbing(gCon.selectAll('g.chip'), key === 'mach6');
+}
+
+/* =====================================================================
+   13. OBSERVERS + BOOT
+   ===================================================================== */
+
+const activeSteps = new Set();
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => e.isIntersecting ? activeSteps.add(e.target) : activeSteps.delete(e.target));
+  if (!activeSteps.size) return;
+  const mid = innerHeight / 2;
+  let best = null, bestD = Infinity;
+  activeSteps.forEach(el => {
+    const r = el.getBoundingClientRect();
+    const d = Math.abs((r.top + r.bottom) / 2 - mid);
+    if (d < bestD){ bestD = d; best = el; }
+  });
+  if (best) render(best.dataset.key);
+}, { rootMargin:'-45% 0px -45% 0px', threshold:0 });
+document.querySelectorAll('.step').forEach(el => io.observe(el));
+
+if (!REDUCE){
+  document.documentElement.classList.add('reveal-ready');
+  const revealIO = new IntersectionObserver((entries, obs) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('in');
+      obs.unobserve(e.target);
+    });
+  }, { rootMargin:'0px 0px -22% 0px', threshold:0.1 });
+  document.querySelectorAll('.step-inner').forEach(el => revealIO.observe(el));
+}
+
+let resizeTimer = null;
+addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    const key = current;
+    if (!key) return;
+    const scene = SCENES.find(s => s.key === key);
+    if (!scene) return;
+    const frame = frameFor(scene.frame);
+    computeTK(frame);
+    applyTypeScale();
+    placeStamp(frame);
+    svg.attr('viewBox', frame);
+    // the console and the ledger are laid out per breakpoint, so they are
+    // rebuilt rather than rescaled
+    conMetrics(); drawConFrame(); conKey = null;
+    ledgMetrics(); ledgKey = null;
+    current = null;
+    render(key);
+  }, 180);
+}, { passive:true });
+
+addEventListener('beforeprint', () => {
+  document.querySelectorAll('.step-inner').forEach(el => el.classList.add('in'));
+});
+
+// hero portraits — the cast of this piece
+const hp = d3.select('#heroPortraits');
+[['#E8B48D','#9FB8D0','#6B5847'],['#C89B77','#A8C6BE','#3A2E27'],
+ ['#8D6A50','#D9A79A','#241C18'],['#E8B48D','#C0B7D6','#7A6250']].forEach(look=>{
+  const w = hp.append('span').attr('class','pwrap');
+  const s = w.append('svg').attr('width',76).attr('height',76).attr('viewBox','-50 -50 100 100')
+    .attr('aria-hidden','true');
+  s.append('circle').attr('r',44).attr('fill','#EFEAE0');
+  person(s.append('g').attr('transform','translate(0,10) scale(1.7)'), look[0], look[1], look[2]);
+});
+
+computeTK(frameFor('dark'));
+applyTypeScale();
+placeStamp(frameFor('dark'));
+svg.attr('viewBox', frameFor('dark'));
+render('open');
+
+</script>
+</body>
+</html>
