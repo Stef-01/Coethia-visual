@@ -6,14 +6,14 @@
 <title>Working With Coethia — An Engagement, Walked Through</title>
 <meta name="description" content="What a Coethia engagement actually looks like: the six-station loop in detail, the Google Ads machinery applied to public health with its real constraints, and a twelve-week walkthrough from brief to reported outcome.">
 <meta name="color-scheme" content="light">
-<meta name="theme-color" content="#F8F6F1">
+<meta name="theme-color" content="#271C16">
 <meta property="og:title" content="Working With Coethia">
 <meta property="og:description" content="The platform in detail, the ad machinery with its real constraints, and a twelve-week engagement walked through screen by screen.">
 <meta property="og:type" content="article">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='44' fill='%23F37940'/%3E%3Ccircle cx='50' cy='50' r='20' fill='%23F8F6F1'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@300;400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,300&family=Poppins:ital,wght@1,300;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <!-- D3 from the folder first so the piece runs with no network at all; the CDN
      is the fallback for when this file travels on its own. -->
 <script src="d3.v7.min.js"></script>
@@ -22,16 +22,22 @@ window.d3 || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs
 </script>
 <style>
 :root{
-  --bg:#F8F6F1;
-  --ink:#212E36;
-  --ink-body:#333333;
-  --ink-mute:#6F6F6F;
-  --accent:#F37940;
-  --teal:#7FCCC8;
+  --bg:#271C16;
+  --surface:#31241D;
+  --surface-2:#3A2B22;
+  --ink:#EFEEE7;
+  --ink-body:#DCD4CB;
+  --ink-mute:#A79C93;
+  --accent:#EBDDA8;
+  --amber:#E0A272;
+  --blue:#B8CAD6;
+  --forest:#72AC89;
+  --line:#4A382C;
 
-  --serif: Optima, "Gill Sans", "Gill Sans MT", Candara, "Libre Franklin", sans-serif;
-  --sans: "Libre Franklin", Helvetica, Arial, sans-serif;
+  --serif: "Work Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --sans: "Work Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --cap: "Poppins", Georgia, serif;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -43,30 +49,30 @@ body{
   font-kerning:normal;
 }
 strong{font-weight:700;color:var(--ink)}
-::selection{background:#F9C9B4;color:var(--ink)}
+::selection{background:#E0A272;color:var(--ink)}
 
 /* ---------- MASTHEAD + READING PROGRESS ---------- */
 .masthead{
-  background:#FFFFFF;border-bottom:1px solid #E9E5DC;
+  background:#31241D;border-bottom:1px solid #3F2E25;
   padding:20px 24px;display:flex;align-items:center;justify-content:space-between;
 }
 .masthead .wordmark{display:flex;align-items:center;gap:12px;text-decoration:none}
 .masthead .wordmark svg{display:block;transition:transform .3s cubic-bezier(.16,1,.3,1)}
 .masthead .wordmark:hover svg{transform:rotate(-8deg) scale(1.06)}
 .masthead .wordmark span{transition:color .2s ease;font-family:var(--serif);font-size:21px;color:var(--ink);letter-spacing:.01em}
-.masthead .wordmark:hover span{color:#B8492E}
+.masthead .wordmark:hover span{color:#E0A272}
 .masthead .wordmark:focus-visible{outline:3px solid var(--ink);outline-offset:4px}
 .masthead .tag{
   font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
-  color:#6F6F6F;
+  color:#A79C93;
 }
 .mastnav{display:flex;align-items:center;gap:22px}
 .mastnav a{
   font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
-  color:#6F6F6F;text-decoration:none;transition:color .18s ease;
+  color:#A79C93;text-decoration:none;transition:color .18s ease;
   display:inline-flex;align-items:center;gap:7px;
 }
-.mastnav a:hover{color:#B8492E}
+.mastnav a:hover{color:#E0A272}
 .mastnav a:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
 .mastnav .aro{display:inline-block;transition:transform .3s cubic-bezier(.16,1,.3,1);font-size:14px;line-height:1}
 .mastnav a:hover .aro.r{transform:translateX(4px)}
@@ -106,8 +112,8 @@ strong{font-weight:700;color:var(--ink)}
     animation-timeline:scroll(root);animation-range:0 140px;
   }
   @keyframes mastLift{
-    from{box-shadow:0 1px 0 rgba(33,46,54,0)}
-    to{box-shadow:0 2px 16px rgba(33,46,54,.09)}
+    from{box-shadow:0 1px 0 rgba(0,0,0,0)}
+    to{box-shadow:0 2px 16px rgba(0,0,0,.42)}
   }
 }
 
@@ -139,12 +145,12 @@ strong{font-weight:700;color:var(--ink)}
   border-bottom:1px solid var(--accent); padding-bottom:7px;
 }
 h1{
-  font-family:var(--serif); font-weight:400; font-size:clamp(38px,6vw,74px);
+  font-family:var(--serif); font-weight:200; font-size:clamp(38px,6vw,74px);
   line-height:1.07; color:var(--ink); margin:38px 0 22px; letter-spacing:-.01em;
   text-wrap:balance;
 }
 .deck{
-  font-family:var(--serif); font-weight:500; font-size:clamp(20px,2.4vw,30px);
+  font-family:var(--serif); font-weight:300; font-size:clamp(20px,2.4vw,30px);
   line-height:1.16; color:var(--ink); margin:0 auto 44px; max-width:700px; text-wrap:balance;
 }
 .portrait-row{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:48px}
@@ -153,7 +159,7 @@ h1{
 .hero p{max-width:640px;margin:0 auto 22px}
 .scrollcue{
   font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
-  color:#6F6F6F;margin:70px 0 30px
+  color:#A79C93;margin:70px 0 30px
 }
 .cue-arrow{display:inline-block}
 @media (prefers-reduced-motion: no-preference){
@@ -187,7 +193,7 @@ h1{
   .reveal-ready .step-inner.in > *:nth-child(5){transition-delay:.24s}
 }
 .step h2{
-  font-family:var(--serif); font-weight:500; font-size:26px; line-height:1.26;
+  font-family:var(--serif); font-weight:500; font-size:26px; line-height:1.3;
   color:var(--ink); margin:0 0 13px; text-wrap:balance;
 }
 .step hr{border:0;border-top:1px solid var(--ink);margin:0 0 20px}
@@ -200,12 +206,12 @@ h1{
   .reveal-ready .step-inner.in > hr{clip-path:inset(0 0 0 0)}
 }
 .step p{margin:0 0 18px;font-size:19px;line-height:1.76}
-.hint{font-size:15px;color:#B8492E;display:flex;gap:9px;align-items:flex-start;margin-top:26px;line-height:1.5}
+.hint{font-size:15px;color:#E0A272;display:flex;gap:9px;align-items:flex-start;margin-top:26px;line-height:1.5}
 .hint svg{flex:0 0 auto;margin-top:3px}
 .note{font-size:12px;line-height:1.55;opacity:.8;margin-top:22px}
 
 .chip{
-  background:var(--c); color:var(--t,#212E36); padding:1px 7px 2px;
+  background:var(--c); color:var(--t,#EFEEE7); padding:1px 7px 2px;
   font-weight:600; font-size:.93em; border-radius:2px; white-space:nowrap;
 }
 .creedlist{list-style:none;margin:0 0 18px;padding:0}
@@ -217,7 +223,7 @@ h1{
 .outro p{max-width:680px}
 .outro h2{font-family:var(--serif);font-weight:500;font-size:clamp(26px,3.2vw,38px);line-height:1.2;color:var(--ink);margin:0 0 10px}
 .outro hr{border:0;border-top:1px solid var(--ink);margin:0 0 26px}
-.cta{background:#FFFFFF;margin-top:70px;padding:78px 0}
+.cta{background:#31241D;margin-top:70px;padding:78px 0}
 .cta-inner{
   max-width:1000px;margin:0 auto;padding:0 24px;
   display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;
@@ -226,7 +232,7 @@ h1{
 .cta .lead{font-size:17px;line-height:1.75;margin:0 0 26px}
 .btn{
   display:inline-block;font-family:var(--sans);font-size:15px;font-weight:600;
-  color:#FFFFFF;background:#B8492E;padding:14px 28px;text-decoration:none;
+  color:#31241D;background:#E0A272;padding:14px 28px;text-decoration:none;
   border-radius:999px;transition:background .18s ease,transform .18s ease;
 }
 .btn:hover{background:var(--ink)}
@@ -235,8 +241,8 @@ h1{
 .btn:hover .arrow{transform:translateX(5px)}
 .btn:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
 .btn[aria-disabled="true"]{opacity:.55;cursor:not-allowed}
-.btn[aria-disabled="true"]:hover{background:#B8492E}
-.cta-note{font-size:13px;color:#6F6F6F;margin-top:14px}
+.btn[aria-disabled="true"]:hover{background:#E0A272}
+.cta-note{font-size:13px;color:#A79C93;margin-top:14px}
 @media (max-width:760px){
   .cta-inner{grid-template-columns:1fr;gap:26px}
 }
@@ -255,7 +261,7 @@ h1{
   padding:9px 12px;max-width:250px;z-index:99;font-family:var(--sans);
   transform:translateY(7px) scale(.97);transform-origin:top left;
   transition:opacity .15s ease, transform .3s cubic-bezier(.16,1,.3,1);
-  box-shadow:0 8px 26px rgba(33,46,54,.20);
+  box-shadow:0 8px 26px rgba(0,0,0,.55);
 }
 #tip.on{opacity:1;transform:none}
 #tip b{font-weight:600}
@@ -312,16 +318,16 @@ h1{
 /* ---------- engagement-specific chrome ---------- */
 .actmark{
   font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
-  color:#3E8E89;border-top:1px solid #3E8E89;padding-top:9px;margin-bottom:26px;
+  color:#72AC89;border-top:1px solid #72AC89;padding-top:9px;margin-bottom:26px;
 }
 .step .src{
   font-size:12px;line-height:1.6;opacity:.72;margin-top:20px;
-  padding-left:12px;border-left:2px solid #DCD5C6;
+  padding-left:12px;border-left:2px solid #4A382C;
 }
 .step .src b{font-weight:600;opacity:.9}
-.step .src a{color:#B8492E;text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
-.step .src a:hover{color:#212E36}
-#viz [tabindex]:focus-visible{outline:2.5px solid #212E36;outline-offset:3px;border-radius:4px}
+.step .src a{color:#E0A272;text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
+.step .src a:hover{color:#EFEEE7}
+#viz [tabindex]:focus-visible{outline:2.5px solid #EFEEE7;outline-offset:3px;border-radius:4px}
 #viz [tabindex]:focus:not(:focus-visible){outline:none}
 .wordmark svg circle{
   transition:transform .5s cubic-bezier(.16,1,.3,1);
@@ -336,6 +342,44 @@ h1{
   .wordmark svg circle{transition:none}
   .wordmark:hover svg circle{transform:none}
 }
+
+/* ---------- Coethia brand: the piece runs on the espresso ground ---------- */
+body{background:var(--bg);color:var(--ink-body)}
+strong{color:var(--ink)}
+::selection{background:#4A3524;color:var(--ink)}
+.masthead{background:#1F1611;border-bottom:1px solid var(--line)}
+.masthead .wordmark span{color:var(--ink)}
+.masthead .wordmark:hover span{color:var(--blue)}
+.mastnav a{color:var(--ink-mute)}
+.mastnav a:hover{color:var(--blue)}
+.progress{background:var(--accent)}
+/* the grain reads as light dust on a dark ground */
+.grain{opacity:.07;mix-blend-mode:screen}
+.kicker{color:var(--blue);border-bottom-color:var(--accent)}
+h1,.deck,.step h2,.outro h2,.cta .t{color:var(--ink)}
+.step hr,.outro hr{border-top-color:var(--line)}
+.hint{color:var(--accent)}
+.note{color:var(--ink-mute);font-family:var(--cap);font-style:italic}
+.step .src{border-left-color:var(--line);color:var(--ink-mute);font-family:var(--cap);font-style:italic}
+.step .src a{color:var(--blue);text-decoration-color:rgba(184,202,214,.5)}
+.step .src a:hover{color:var(--ink)}
+.actmark{color:var(--forest);border-top-color:var(--forest)}
+.scroll-scenes{border-left-color:var(--line)}
+.scrollcue{color:var(--ink-mute)}
+.graphic{background:var(--bg)}
+@media (max-width:960px){.graphic{background:var(--bg);border-bottom-color:var(--line)}}
+.cta{background:#1F1611}
+.cta .lead,.methods .col p{color:var(--ink-body)}
+.btn{background:var(--forest);color:#16221A}
+.btn:hover{background:var(--blue);color:#1E2A31}
+.cta-note{color:var(--ink-mute)}
+.methods h3{color:var(--blue)}
+.methods .col p{opacity:.92}
+#tip{background:#1A120E;color:var(--ink);box-shadow:0 10px 30px rgba(0,0,0,.6);border:1px solid var(--line)}
+@media print{
+  body{background:#fff;color:#000}
+  .masthead,.cta{background:none}
+}
 </style>
 </head>
 <body id="top">
@@ -346,11 +390,11 @@ h1{
 <header class="masthead">
   <a class="wordmark" href="index.html" aria-label="The Reachable — home">
     <svg width="30" height="30" viewBox="-50 -50 100 100" aria-hidden="true">
-      <circle cx="-16" cy="-12" r="15" fill="#C3DCEB"/>
-      <circle cx="18" cy="-18" r="11" fill="#FFD733"/>
-      <circle cx="24" cy="14" r="14" fill="#F37940"/>
-      <circle cx="-10" cy="24" r="10" fill="#E74D4E"/>
-      <circle cx="4" cy="-2" r="7" fill="#7FCCC8"/>
+      <circle cx="-16" cy="-12" r="15" fill="#B8CAD6"/>
+      <circle cx="18" cy="-18" r="11" fill="#EBDDA8"/>
+      <circle cx="24" cy="14" r="14" fill="#EBDDA8"/>
+      <circle cx="-10" cy="24" r="10" fill="#C97B5A"/>
+      <circle cx="4" cy="-2" r="7" fill="#72AC89"/>
     </svg>
     <span>The Reachable</span>
   </a>
@@ -418,7 +462,7 @@ window.addEventListener('DOMContentLoaded', function(){
   if (typeof d3 !== 'undefined') return;
   var s = document.querySelector('.scroller');
   if (s) s.insertAdjacentHTML('beforebegin',
-    '<div class="measure" style="border:1px solid #212E36;padding:18px 22px;margin:30px auto;font-size:15px">' +
+    '<div class="measure" style="border:1px solid #EFEEE7;padding:18px 22px;margin:30px auto;font-size:15px">' +
     'The interactive graphics could not load (the D3 library needs a network connection). The narration below is still readable.</div>');
 });
 </script>
@@ -581,7 +625,7 @@ SCENES.forEach(sc => {
 </script>
 <script>
 const svg = d3.select('#viz');
-const SANS = 'Libre Franklin, Helvetica, Arial, sans-serif';
+const SANS = 'Work Sans, Helvetica Neue, Helvetica, Arial, sans-serif';
 const MONO = 'IBM Plex Mono, monospace';
 
 const REDUCE  = typeof matchMedia === 'function'
@@ -590,9 +634,9 @@ const FADE    = REDUCE ? 1 : 500;
 const CAMERA  = REDUCE ? 1 : 900;
 const VALUE_EASE = REDUCE ? d3.easeLinear : d3.easeCubicOut;
 
-const INK='#212E36', PAPER='#F8F6F1', MUTE='#6F6F6F', ALARM='#B8492E',
-      RED='#E74D4E', TEAL='#7FCCC8', TEAL_D='#3E8E89', BLUE='#C3DCEB',
-      GOLD='#FFD733', ACCENT='#F37940', LINE='#DCD5C6';
+const INK='#EFEEE7', PAPER='#271C16', MUTE='#A79C93', ALARM='#E0A272',
+      RED='#C97B5A', TEAL='#72AC89', TEAL_D='#72AC89', BLUE='#B8CAD6',
+      GOLD='#EBDDA8', ACCENT='#EBDDA8', LINE='#4A382C';
 
 function show(sel, v, dur){ sel.transition('vis').duration(dur || FADE).attr('opacity', v); }
 
@@ -677,7 +721,7 @@ function srcLink(g, x, y, txt, href, anchor){
     .attr('rel','noopener').style('cursor','pointer');
   a.append('text').attr('x',x).attr('y',y).attr('text-anchor',anchor||'middle')
     .attr('font-family',MONO).call(typed,7).attr('letter-spacing','.12em')
-    .attr('fill','#8A8474').attr('text-decoration','underline')
+    .attr('fill','#A79C93').attr('text-decoration','underline')
     .text(txt + ' ↗');
   return a;
 }
@@ -786,7 +830,8 @@ let conShell, conRailG, conHead, conStep, conAcct, conCrumb;
 function drawConFrame(){
   conFrame.selectAll('*').remove();
   // the sheet
-  conShell = roundRect(conFrame, CON.x, CON.y, CON.w, CON.h, 10, '#FFFFFF', GBORD, 1.2);
+  conShell = roundRect(conFrame, CON.x, CON.y, CON.w, CON.h, 10, '#FFFFFF', GBORD, 1.2)
+    .attr('filter','drop-shadow(0 10px 30px rgba(0,0,0,.55))');
   // app bar
   conFrame.append('path').attr('d','M '+CON.x+' '+(CON.y+44)+' H '+(CON.x+CON.w))
     .attr('stroke',GBORD).attr('stroke-width',1);
@@ -1967,7 +2012,7 @@ const LAYERS = [
 ];
 
 const CASES = [
-  { id:'A', tint:'#DCEBF5', real:true,
+  { id:'A', tint:'#2E3A42', real:true,
     t:'HIV testing awareness',
     who:'A state health department campaign, agency-produced',
     teaches:['behav','ctx'],
@@ -1989,7 +2034,7 @@ const CASES = [
               'Add placement targeting against the channels already answering those questions, and run the same creative as pre-roll.',
               'Falsifies if: cost per completed testing-locator session does not fall below the campaign\u2019s existing cost per site visit within eight weeks.'] } },
 
-  { id:'B', tint:'#E7F2F1', real:false,
+  { id:'B', tint:'#26382E', real:false,
     t:'Childhood MMR uptake',
     who:'County health department, composite',
     teaches:['psycho','remkt'],
@@ -2011,7 +2056,7 @@ const CASES = [
               'Follow up compliantly \u2014 lists built from engagement with general health content, never from a visit to a vaccine information page, which is prohibited.',
               'Falsifies if: comprehension in post-exposure survey does not separate the treated group from control by eight points within one quarter.'] } },
 
-  { id:'C', tint:'#FBE3D2', real:false,
+  { id:'C', tint:'#4A3524', real:false,
     t:'Naloxone availability',
     who:'Regional overdose-prevention programme, composite',
     teaches:['prog'],
@@ -2068,21 +2113,21 @@ function drawRig(g, x, y, w, opts){
     const chH = isNarrow() ? 30 : 54;
     padHit(cell, lx, y, cw, chH, 6);
     roundRect(cell, lx, y, cw, chH, 8,
-      on ? (l.base ? '#EFEAE0' : '#E7F2F1') : 'none',
-      on ? (l.base ? '#B9B2A4' : TEAL_D) : '#C9C3B6', on ? 1.5 : 1.2)
+      on ? (l.base ? '#3A2B22' : '#26382E') : 'none',
+      on ? (l.base ? '#A79C93' : TEAL_D) : '#8A7768', on ? 1.5 : 1.2)
       .attr('stroke-dasharray', on ? null : '5 4');
     // a filled pip when lit, hollow when dark
     cell.append('circle').attr('cx',lx+cw/2).attr('cy',y+(isNarrow()?15:17)).attr('r',6)
-      .attr('fill', on ? (l.base ? '#8A8474' : TEAL_D) : 'none')
-      .attr('stroke', on ? 'none' : '#C9C3B6').attr('stroke-width',1.4);
+      .attr('fill', on ? (l.base ? '#A79C93' : TEAL_D) : 'none')
+      .attr('stroke', on ? 'none' : '#8A7768').attr('stroke-width',1.4);
     if (on) cell.append('path')
       .attr('d','M '+(lx+cw/2-3)+' '+(y+(isNarrow()?15:17))+' l 2 2.4 l 4 -4.6')
-      .attr('stroke','#FFFFFF').attr('stroke-width',1.5).attr('fill','none')
+      .attr('stroke','#31241D').attr('stroke-width',1.5).attr('fill','none')
       .attr('stroke-linecap','round').attr('stroke-linejoin','round');
     if (!isNarrow()){
       const words = l.n.split(' ');
       label(cell, lx+cw/2, y+38, words[0], 8.6, on?700:400, on ? INK : '#9A948A', 'middle');
-      if (l.case && !on) mono(cell, lx+cw/2, y+50, 'CASE '+l.case, 6, '#B9B2A4', 'middle');
+      if (l.case && !on) mono(cell, lx+cw/2, y+50, 'CASE '+l.case, 6, '#A79C93', 'middle');
     }
   });
   bindTip(rig.selectAll('g.rigcell'),
@@ -2108,17 +2153,17 @@ function drawRigScene(){
         .attr('aria-label', l.n + '. ' + l.what + ' Enabled by: ' + l.how + ' Cost: ' + l.cost)
         .style('cursor','pointer');
       padHit(cell, 250, y, 500, 78, 4);
-      roundRect(cell, 250, y, 500, 78, 10, on ? '#EFEAE0' : '#FFFFFF',
-        on ? '#B9B2A4' : '#C9C3B6', 1.3).attr('stroke-dasharray', on ? null : '5 4');
+      roundRect(cell, 250, y, 500, 78, 10, on ? '#3A2B22' : '#31241D',
+        on ? '#A79C93' : '#8A7768', 1.3).attr('stroke-dasharray', on ? null : '5 4');
       cell.append('circle').attr('cx',282).attr('cy',y+26).attr('r',9)
-        .attr('fill', on ? '#8A8474' : 'none').attr('stroke', on ? 'none' : '#C9C3B6').attr('stroke-width',1.4);
+        .attr('fill', on ? '#A79C93' : 'none').attr('stroke', on ? 'none' : '#8A7768').attr('stroke-width',1.4);
       if (on) cell.append('path').attr('d','M 277 '+(y+26)+' l 3 3.4 l 6 -6.6')
-        .attr('stroke','#FFFFFF').attr('stroke-width',1.8).attr('fill','none')
+        .attr('stroke','#31241D').attr('stroke-width',1.8).attr('fill','none')
         .attr('stroke-linecap','round').attr('stroke-linejoin','round');
       label(cell, 302, y+30, l.n, 12, 700, INK);
       label(cell, 302, y+50, l.what, 9.3, 400, MUTE);
       mono(cell, 302, y+68, on ? 'BOUGHT BY DEFAULT' : 'USUALLY LEFT ON THE TABLE', 6.6,
-        on ? '#8A8474' : ALARM);
+        on ? '#A79C93' : ALARM);
     });
     bindTip(gRig.selectAll('g.rigcell'),
       d => '<b>'+d.n+'</b><br>'+d.what+'<br><br><b>Enabled by:</b> '+d.how+'<br><br><b>Costs:</b> '+d.cost,
@@ -2135,16 +2180,16 @@ function drawRigScene(){
       .attr('aria-label', l.n + '. ' + l.what + ' Enabled by: ' + l.how + ' Cost: ' + l.cost)
       .style('cursor','pointer');
     padHit(cell, x, y, cw, 250, 4);
-    roundRect(cell, x, y, cw, 250, 12, on ? '#EFEAE0' : '#FFFFFF',
-      on ? '#B9B2A4' : '#C9C3B6', 1.3).attr('stroke-dasharray', on ? null : '5 4');
-    mono(cell, x+cw/2, y+26, '0'+(i+1), 7, on ? '#8A8474' : '#B9B2A4', 'middle');
+    roundRect(cell, x, y, cw, 250, 12, on ? '#3A2B22' : '#31241D',
+      on ? '#A79C93' : '#8A7768', 1.3).attr('stroke-dasharray', on ? null : '5 4');
+    mono(cell, x+cw/2, y+26, '0'+(i+1), 7, on ? '#A79C93' : '#A79C93', 'middle');
     cell.append('circle').attr('cx',x+cw/2).attr('cy',y+56).attr('r',13)
-      .attr('fill', on ? '#8A8474' : 'none').attr('stroke', on ? 'none' : '#C9C3B6').attr('stroke-width',1.5);
+      .attr('fill', on ? '#A79C93' : 'none').attr('stroke', on ? 'none' : '#8A7768').attr('stroke-width',1.5);
     if (on) cell.append('path').attr('d','M '+(x+cw/2-6)+' '+(y+56)+' l 4.4 5 l 8 -9.6')
-      .attr('stroke','#FFFFFF').attr('stroke-width',2).attr('fill','none')
+      .attr('stroke','#31241D').attr('stroke-width',2).attr('fill','none')
       .attr('stroke-linecap','round').attr('stroke-linejoin','round');
     const nm = l.n.length > 12 ? l.n.slice(0,11)+'\u2026' : l.n;
-    label(cell, x+cw/2, y+94, nm, 10.5, 700, on ? INK : '#55606A', 'middle');
+    label(cell, x+cw/2, y+94, nm, 10.5, 700, on ? INK : '#A79C93', 'middle');
     // the what, wrapped narrow
     const words = l.what.split(' ');
     let lines = [''], li = 0;
@@ -2154,7 +2199,7 @@ function drawRigScene(){
     });
     lines.slice(0,5).forEach((ln,k)=> label(cell, x+cw/2, y+118+k*14, ln, 8.3, 400, MUTE, 'middle'));
     roundRect(cell, x+10, y+212, cw-20, 26, 13, on ? '#E7E2D8' : '#FBEDE7');
-    label(cell, x+cw/2, y+229, on ? 'bought' : 'left', 8.6, 700, on ? '#8A8474' : ALARM, 'middle');
+    label(cell, x+cw/2, y+229, on ? 'bought' : 'left', 8.6, 700, on ? '#A79C93' : ALARM, 'middle');
   });
   bindTip(gRig.selectAll('g.rigcell'),
     d => '<b>'+d.n+'</b><br>'+d.what+'<br><br><b>Enabled by:</b> '+d.how+'<br><br><b>Costs:</b> '+d.cost,
@@ -2182,18 +2227,18 @@ function drawCaseHub(){
       .attr('aria-label','Walk the ' + c.t + ' case study')
       .style('cursor','pointer');
     padHit(card, x-w/2, y, w, h, 6);
-    roundRect(card, x-w/2, y, w, h, 14, c.tint, 'rgba(33,46,54,.14)', 1.2);
+    roundRect(card, x-w/2, y, w, h, 14, c.tint, 'rgba(239,238,231,.18)', 1.2);
     mono(card, x-w/2+18, y+28, c.real ? 'CASE ' + c.id + ' \u00b7 REAL, CITED' : 'CASE ' + c.id + ' \u00b7 COMPOSITE',
-      6.8, c.real ? ALARM : '#8A6A55');
+      6.8, c.real ? ALARM : '#EBDDA8');
     label(card, x-w/2+18, y+52, c.t, 12.5, 700, INK);
-    label(card, x-w/2+18, y+70, c.who, 8.8, 400, MUTE);
+    label(card, x-w/2+18, y+70, c.who, 8.8, 400, '#BDB4AC');
     // which layers this case lights
-    mono(card, x-w/2+18, y+(nar?96:108), 'LIGHTS', 6.6, MUTE);
+    mono(card, x-w/2+18, y+(nar?96:108), 'LIGHTS', 6.6, '#BDB4AC');
     c.teaches.forEach((lid,k)=>{
       const L = LAYERS.find(l=>l.id===lid);
       const px = x-w/2+18 + k*104, py = y+(nar?104:116);
-      roundRect(card, px, py, 96, 22, 11, done ? '#E7F2F1' : '#FFFFFF', done ? TEAL_D : '#C9C3B6', 1.1);
-      label(card, px+48, py+15, L.n, 8.3, 600, done ? TEAL_D : '#55606A', 'middle');
+      roundRect(card, px, py, 96, 22, 11, done ? '#26382E' : '#31241D', done ? TEAL_D : '#8A7768', 1.1);
+      label(card, px+48, py+15, L.n, 8.3, 600, done ? TEAL_D : '#A79C93', 'middle');
     });
     if (!nar){
       label(card, x-w/2+18, y+h-22, done ? 'walked \u2713 \u2014 open again' : 'walk this campaign \u203a',
@@ -2202,7 +2247,7 @@ function drawCaseHub(){
     if (done){
       card.append('circle').attr('cx',x+w/2-18).attr('cy',y+22).attr('r',8).attr('fill',TEAL_D);
       card.append('path').attr('d','M '+(x+w/2-22)+' '+(y+22)+' l 2.8 3 l 5 -5.6')
-        .attr('stroke','#FFFFFF').attr('stroke-width',1.7).attr('fill','none')
+        .attr('stroke','#31241D').attr('stroke-width',1.7).attr('fill','none')
         .attr('stroke-linecap','round').attr('stroke-linejoin','round');
     }
   });
@@ -2223,11 +2268,11 @@ function drawCasePanel(){
   const c = CASES.find(x=>x.id===caseOpen);
   const px = nar ? 240 : 130, pw = nar ? 520 : 740;
   const py = nar ? 200 : 200, ph = nar ? 470 : 330;
-  roundRect(casePanel, px, py, pw, ph, 16, '#FFFFFF', c.tint === '#FBE3D2' ? ALARM : TEAL_D, 1.6);
+  roundRect(casePanel, px, py, pw, ph, 16, '#31241D', c.tint === '#4A3524' ? ALARM : TEAL_D, 1.6);
 
   // header: which case, and the way back
   mono(casePanel, px+22, py+28, (c.real ? 'CASE ' + c.id + ' \u00b7 REAL, CITED' : 'CASE ' + c.id + ' \u00b7 COMPOSITE'),
-    6.8, c.real ? ALARM : '#8A6A55');
+    6.8, c.real ? ALARM : '#EBDDA8');
   label(casePanel, px+22, py+52, c.t, 13.5, 700, INK);
   const back = casePanel.append('g').attr('class','caseback')
     .attr('tabindex',0).attr('role','button').attr('aria-label','Back to all three campaigns')
@@ -2246,9 +2291,9 @@ function drawCasePanel(){
       .style('cursor','pointer');
     padHit(st, sx, py+66, (pw-44)/3 - 10, 26, 4);
     roundRect(st, sx, py+66, (pw-44)/3 - 10, 26, 13,
-      on ? INK : (past ? '#E7F2F1' : '#F7F5F0'), on ? INK : '#DCD5C6', 1.1);
+      on ? INK : (past ? '#26382E' : '#31241D'), on ? INK : '#4A382C', 1.1);
     label(st, sx + ((pw-44)/3 - 10)/2, py+83, (i+1) + ' \u00b7 ' + sn, 9,
-      on ? 700 : 600, on ? '#F8F6F1' : (past ? TEAL_D : MUTE), 'middle');
+      on ? 700 : 600, on ? '#271C16' : (past ? TEAL_D : MUTE), 'middle');
   });
 
   const beat = [c.before, c.miss, c.after][caseStep];
@@ -2256,9 +2301,9 @@ function drawCasePanel(){
   if (beat.chip){
     const cw2 = beat.chip.length*5.2 + 20;
     roundRect(casePanel, px+pw-22-cw2, py+110, cw2, 20, 10,
-      beat.chip === 'OBSERVED' ? '#E7F2F1' : '#EFEAE0');
+      beat.chip === 'OBSERVED' ? '#26382E' : '#3A2B22');
     mono(casePanel, px+pw-22-cw2/2, py+124, beat.chip, 6.4,
-      beat.chip === 'OBSERVED' ? TEAL_D : '#8A8474', 'middle');
+      beat.chip === 'OBSERVED' ? TEAL_D : '#A79C93', 'middle');
   }
   beat.lines.forEach((ln,k)=>{
     const words = ln.split(' ');
@@ -2271,7 +2316,7 @@ function drawCasePanel(){
     casePanel.append('circle').attr('cx',px+30).attr('cy',yBase-4).attr('r',3.5)
       .attr('fill', caseStep===1 ? ALARM : TEAL_D);
     lines.slice(0,3).forEach((l2,m)=>
-      label(casePanel, px+44, yBase + m*15, l2, 9.8, 400, '#3A4750'));
+      label(casePanel, px+44, yBase + m*15, l2, 9.8, 400, '#DCD4CB'));
   });
 
   // the layers this beat is teaching
@@ -2282,8 +2327,8 @@ function drawCasePanel(){
       const L = LAYERS.find(l=>l.id===lid);
       const bx = px+22 + k*128;
       roundRect(casePanel, bx, ly+8, 120, 22, 11,
-        caseStep===2 ? '#E7F2F1' : '#FFFFFF', caseStep===2 ? TEAL_D : '#C9C3B6', 1.1);
-      label(casePanel, bx+60, ly+23, L.n, 8.4, 600, caseStep===2 ? TEAL_D : '#55606A', 'middle');
+        caseStep===2 ? '#26382E' : '#31241D', caseStep===2 ? TEAL_D : '#8A7768', 1.1);
+      label(casePanel, bx+60, ly+23, L.n, 8.4, 600, caseStep===2 ? TEAL_D : '#A79C93', 'middle');
     });
   }
 
@@ -2300,11 +2345,11 @@ function drawCasePanel(){
   // the real case carries what could not be seen from outside
   if (c.real && caseStep === 1){
     const wy = py + ph + 14;
-    roundRect(casePanel, px, wy, pw, 54, 12, '#F7F5F0', '#DCD5C6', 1.1);
+    roundRect(casePanel, px, wy, pw, 54, 12, '#31241D', '#4A382C', 1.1);
     mono(casePanel, px+18, wy+20, 'WHAT WE COULD NOT SEE', 6.6, MUTE);
     label(casePanel, px+18, wy+38,
       'The brief, the procurement ceiling, the approvals. A critique from outside stops at the wall of the record.',
-      9.2, 400, '#55606A');
+      9.2, 400, '#A79C93');
   }
 
   if (!REDUCE){
@@ -2547,7 +2592,7 @@ const hp = d3.select('#heroPortraits');
   const w = hp.append('span').attr('class','pwrap');
   const sv = w.append('svg').attr('width',76).attr('height',76).attr('viewBox','-50 -50 100 100')
     .attr('aria-hidden','true');
-  sv.append('circle').attr('r',44).attr('fill','#EFEAE0');
+  sv.append('circle').attr('r',44).attr('fill','#3A2B22');
   person(sv.append('g').attr('transform','translate(0,10) scale(1.7)'), look[0], look[1], look[2]);
 });
 
