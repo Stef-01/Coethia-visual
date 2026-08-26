@@ -26,13 +26,14 @@ window.d3 || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs
   --surface:#31241D;
   --surface-2:#3A2B22;
   --ink:#EFEEE7;
-  --ink-body:#DCD4CB;
-  --ink-mute:#A79C93;
+  --ink-body:#DBD1C8;
+  --ink-mute:#A69C94;
   --accent:#EBDDA8;
-  --amber:#E0A272;
+  --amber:#E5B693;
   --blue:#B8CAD6;
-  --forest:#72AC89;
-  --line:#4A382C;
+  --blue-strong:#A8CDE5;
+  --forest:#6C9C7F;
+  --line:#483930;
 
   --serif: "Work Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --sans: "Work Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -49,7 +50,7 @@ body{
   font-kerning:normal;
 }
 strong{font-weight:700;color:var(--ink)}
-::selection{background:#E0A272;color:var(--ink)}
+::selection{background:#E5B693;color:var(--ink)}
 
 /* ---------- MASTHEAD + READING PROGRESS ---------- */
 .masthead{
@@ -60,19 +61,19 @@ strong{font-weight:700;color:var(--ink)}
 .masthead .wordmark svg{display:block;transition:transform .3s cubic-bezier(.16,1,.3,1)}
 .masthead .wordmark:hover svg{transform:rotate(-8deg) scale(1.06)}
 .masthead .wordmark span{transition:color .2s ease;font-family:var(--serif);font-size:21px;color:var(--ink);letter-spacing:.01em}
-.masthead .wordmark:hover span{color:#E0A272}
+.masthead .wordmark:hover span{color:#E5B693}
 .masthead .wordmark:focus-visible{outline:3px solid var(--ink);outline-offset:4px}
 .masthead .tag{
   font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
-  color:#A79C93;
+  color:#A69C94;
 }
 .mastnav{display:flex;align-items:center;gap:22px}
 .mastnav a{
   font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
-  color:#A79C93;text-decoration:none;transition:color .18s ease;
+  color:#A69C94;text-decoration:none;transition:color .18s ease;
   display:inline-flex;align-items:center;gap:7px;
 }
-.mastnav a:hover{color:#E0A272}
+.mastnav a:hover{color:#E5B693}
 .mastnav a:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
 .mastnav .aro{display:inline-block;transition:transform .3s cubic-bezier(.16,1,.3,1);font-size:14px;line-height:1}
 .mastnav a:hover .aro.r{transform:translateX(4px)}
@@ -159,7 +160,7 @@ h1{
 .hero p{max-width:640px;margin:0 auto 22px}
 .scrollcue{
   font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
-  color:#A79C93;margin:70px 0 30px
+  color:#A69C94;margin:70px 0 30px
 }
 .cue-arrow{display:inline-block}
 @media (prefers-reduced-motion: no-preference){
@@ -206,7 +207,7 @@ h1{
   .reveal-ready .step-inner.in > hr{clip-path:inset(0 0 0 0)}
 }
 .step p{margin:0 0 18px;font-size:19px;line-height:1.76}
-.hint{font-size:15px;color:#E0A272;display:flex;gap:9px;align-items:flex-start;margin-top:26px;line-height:1.5}
+.hint{font-size:15px;color:#E5B693;display:flex;gap:9px;align-items:flex-start;margin-top:26px;line-height:1.5}
 .hint svg{flex:0 0 auto;margin-top:3px}
 .note{font-size:12px;line-height:1.55;opacity:.8;margin-top:22px}
 
@@ -232,7 +233,7 @@ h1{
 .cta .lead{font-size:17px;line-height:1.75;margin:0 0 26px}
 .btn{
   display:inline-block;font-family:var(--sans);font-size:15px;font-weight:600;
-  color:#31241D;background:#E0A272;padding:14px 28px;text-decoration:none;
+  color:#31241D;background:#E5B693;padding:14px 28px;text-decoration:none;
   border-radius:999px;transition:background .18s ease,transform .18s ease;
 }
 .btn:hover{background:var(--ink)}
@@ -241,8 +242,8 @@ h1{
 .btn:hover .arrow{transform:translateX(5px)}
 .btn:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
 .btn[aria-disabled="true"]{opacity:.55;cursor:not-allowed}
-.btn[aria-disabled="true"]:hover{background:#E0A272}
-.cta-note{font-size:13px;color:#A79C93;margin-top:14px}
+.btn[aria-disabled="true"]:hover{background:#E5B693}
+.cta-note{font-size:13px;color:#A69C94;margin-top:14px}
 @media (max-width:760px){
   .cta-inner{grid-template-columns:1fr;gap:26px}
 }
@@ -318,14 +319,14 @@ h1{
 /* ---------- engagement-specific chrome ---------- */
 .actmark{
   font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
-  color:#72AC89;border-top:1px solid #72AC89;padding-top:9px;margin-bottom:26px;
+  color:#6C9C7F;border-top:1px solid #6C9C7F;padding-top:9px;margin-bottom:26px;
 }
 .step .src{
   font-size:12px;line-height:1.6;opacity:.72;margin-top:20px;
-  padding-left:12px;border-left:2px solid #4A382C;
+  padding-left:12px;border-left:2px solid #483930;
 }
 .step .src b{font-weight:600;opacity:.9}
-.step .src a{color:#E0A272;text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
+.step .src a{color:#E5B693;text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
 .step .src a:hover{color:#EFEEE7}
 #viz [tabindex]:focus-visible{outline:2.5px solid #EFEEE7;outline-offset:3px;border-radius:4px}
 #viz [tabindex]:focus:not(:focus-visible){outline:none}
@@ -346,22 +347,22 @@ h1{
 /* ---------- Coethia brand: the piece runs on the espresso ground ---------- */
 body{background:var(--bg);color:var(--ink-body)}
 strong{color:var(--ink)}
-::selection{background:#4A3524;color:var(--ink)}
+::selection{background:#423327;color:var(--ink)}
 .masthead{background:#1F1611;border-bottom:1px solid var(--line)}
 .masthead .wordmark span{color:var(--ink)}
-.masthead .wordmark:hover span{color:var(--blue)}
+.masthead .wordmark:hover span{color:var(--blue-strong)}
 .mastnav a{color:var(--ink-mute)}
-.mastnav a:hover{color:var(--blue)}
+.mastnav a:hover{color:var(--blue-strong)}
 .progress{background:var(--accent)}
 /* the grain reads as light dust on a dark ground */
 .grain{opacity:.07;mix-blend-mode:screen}
-.kicker{color:var(--blue);border-bottom-color:var(--accent)}
+.kicker{color:var(--blue-strong);border-bottom-color:var(--accent)}
 h1,.deck,.step h2,.outro h2,.cta .t{color:var(--ink)}
 .step hr,.outro hr{border-top-color:var(--line)}
 .hint{color:var(--accent)}
 .note{color:var(--ink-mute);font-family:var(--cap);font-style:italic}
 .step .src{border-left-color:var(--line);color:var(--ink-mute);font-family:var(--cap);font-style:italic}
-.step .src a{color:var(--blue);text-decoration-color:rgba(184,202,214,.5)}
+.step .src a{color:var(--blue-strong);text-decoration-color:rgba(184,202,214,.5)}
 .step .src a:hover{color:var(--ink)}
 .actmark{color:var(--forest);border-top-color:var(--forest)}
 .scroll-scenes{border-left-color:var(--line)}
@@ -394,7 +395,7 @@ h1,.deck,.step h2,.outro h2,.cta .t{color:var(--ink)}
       <circle cx="18" cy="-18" r="11" fill="#EBDDA8"/>
       <circle cx="24" cy="14" r="14" fill="#EBDDA8"/>
       <circle cx="-10" cy="24" r="10" fill="#C97B5A"/>
-      <circle cx="4" cy="-2" r="7" fill="#72AC89"/>
+      <circle cx="4" cy="-2" r="7" fill="#6C9C7F"/>
     </svg>
     <span>The Reachable</span>
   </a>
@@ -634,9 +635,9 @@ const FADE    = REDUCE ? 1 : 500;
 const CAMERA  = REDUCE ? 1 : 900;
 const VALUE_EASE = REDUCE ? d3.easeLinear : d3.easeCubicOut;
 
-const INK='#EFEEE7', PAPER='#271C16', MUTE='#A79C93', ALARM='#E0A272',
-      RED='#C97B5A', TEAL='#72AC89', TEAL_D='#72AC89', BLUE='#B8CAD6',
-      GOLD='#EBDDA8', ACCENT='#EBDDA8', LINE='#4A382C';
+const INK='#EFEEE7', PAPER='#271C16', MUTE='#A69C94', ALARM='#E5B693',
+      RED='#C97B5A', TEAL='#6C9C7F', TEAL_D='#6C9C7F', BLUE='#B8CAD6',
+      GOLD='#EBDDA8', ACCENT='#EBDDA8', LINE='#483930';
 
 function show(sel, v, dur){ sel.transition('vis').duration(dur || FADE).attr('opacity', v); }
 
@@ -721,7 +722,7 @@ function srcLink(g, x, y, txt, href, anchor){
     .attr('rel','noopener').style('cursor','pointer');
   a.append('text').attr('x',x).attr('y',y).attr('text-anchor',anchor||'middle')
     .attr('font-family',MONO).call(typed,7).attr('letter-spacing','.12em')
-    .attr('fill','#A79C93').attr('text-decoration','underline')
+    .attr('fill','#A69C94').attr('text-decoration','underline')
     .text(txt + ' ↗');
   return a;
 }
@@ -1160,8 +1161,8 @@ function mAdPreview(g, x, y, w){
 
 (function(){
   const x = 250, y = 120, w = 500;
-  roundRect(gDoc, x, y, w, 440, 6, '#FFFFFF', LINE, 1.3)
-    .attr('filter','drop-shadow(0 6px 20px rgba(33,46,54,.10))');
+  roundRect(gDoc, x, y, w, 440, 6, '#31241D', LINE, 1.3)
+    .attr('filter','drop-shadow(0 6px 20px rgba(0,0,0,.45))');
   mono(gDoc, x+40, y+52, 'MARION COUNTY PUBLIC HEALTH', 8, ALARM);
   label(gDoc, x+40, y+86, 'Communications brief', 15, 700, INK);
   gDoc.append('path').attr('d','M '+(x+40)+' '+(y+104)+' H '+(x+w-40))
@@ -1179,7 +1180,7 @@ function mAdPreview(g, x, y, w){
     mono(gDoc, x+40, ry, r[0], 7.4, MUTE);
     label(gDoc, x+40, ry+20, r[1], 11.5, 500, INK).attr('class','docrow');
   });
-  roundRect(gDoc, x+40, y+400, w-80, 30, 15, '#FBE3D2');
+  roundRect(gDoc, x+40, y+400, w-80, 30, 15, '#423327');
   label(gDoc, x+w/2, y+420, 'One message, four different jobs', 10.5, 700, ALARM, 'middle');
 })();
 
@@ -1192,10 +1193,10 @@ function mAdPreview(g, x, y, w){
   CH.forEach((c,i)=>{
     const g = gTried.append('g').attr('class','trycard').attr('data-x',c.x)
       .attr('transform','translate('+c.x+',150)');
-    roundRect(g, -125, 0, 250, 250, 14, '#FFFFFF', LINE, 1.2);
+    roundRect(g, -125, 0, 250, 250, 14, '#31241D', LINE, 1.2);
     // a drawn emblem per channel, not a label in a box
     const em = g.append('g').attr('transform','translate(0,62)');
-    em.append('circle').attr('r',30).attr('fill','#EFEAE0');
+    em.append('circle').attr('r',30).attr('fill','#3A2B22');
     if (i === 0){
       em.append('path').attr('d','M -14 -9 h 28 v 18 h -28 Z M -14 -9 l 14 11 l 14 -11')
         .attr('fill','none').attr('stroke',INK).attr('stroke-width',1.7).attr('stroke-linejoin','round');
@@ -1215,8 +1216,8 @@ function mAdPreview(g, x, y, w){
     label(g, 0, 122, c.t, 12.5, 700, INK, 'middle');
     label(g, 0, 142, c.s, 9.5, 400, MUTE, 'middle');
     mono(g, 0, 176, 'ACTION RATE', 7, MUTE, 'middle');
-    label(g, 0, 200, c.r, 17, 700, '#8A8474', 'middle');
-    roundRect(g, -105, 214, 210, 26, 13, '#F7EFE7');
+    label(g, 0, 200, c.r, 17, 700, '#A69C94', 'middle');
+    roundRect(g, -105, 214, 210, 26, 13, '#3A2B22');
     label(g, 0, 231, c.n, 8.6, 600, ALARM, 'middle');
   });
   label(gTried, 500, 452, 'None of it was wrong. All of it was aimed at everyone.', 12.5, 700, INK, 'middle');
@@ -1295,7 +1296,7 @@ loopPts.forEach((p,i)=>{
     .attr('transform','translate('+bx+','+by+') rotate('+ang+')')
     .attr('fill',TEAL_D).attr('opacity',.75);
 });
-gWheel.append('circle').attr('cx',wheelCx).attr('cy',wheelCy).attr('r',60).attr('fill','#E7F2F1');
+gWheel.append('circle').attr('cx',wheelCx).attr('cy',wheelCy).attr('r',60).attr('fill','#293C31');
 label(gWheel, wheelCx, wheelCy-4, 'ONE EVIDENCE', 10, 700, TEAL_D, 'middle');
 label(gWheel, wheelCx, wheelCy+12, 'BASE', 10, 700, TEAL_D, 'middle');
 label(gWheel, wheelCx, wheelCy+30, 'trusted voices at every edge', 8, 400, MUTE, 'middle');
@@ -1307,7 +1308,7 @@ loopPts.forEach(p=>{
     .attr('aria-label', p.l.t + '. ' + p.l.d)
     .style('cursor','pointer');
   padHit(g, -40, -40, 80, 80, 4);
-  g.append('circle').attr('class','lc').attr('r',38).attr('fill','#FFFFFF')
+  g.append('circle').attr('class','lc').attr('r',38).attr('fill','#31241D')
     .attr('stroke',TEAL_D).attr('stroke-width',1.8);
   stationGlyph(g, p.l.id, INK).attr('transform','translate(0,-6)');
   label(g, 0, 22, p.l.t, 10, 700, INK, 'middle');
@@ -1323,9 +1324,9 @@ function drawLoopPanel(){
     label(loopPanel, 500, py+50, 'Click a station to see what it delivers.', 11, 400, MUTE, 'middle');
     return;
   }
-  roundRect(loopPanel, px, py, pw, ph, 14, '#FFFFFF', TEAL_D, 1.4);
+  roundRect(loopPanel, px, py, pw, ph, 14, '#31241D', TEAL_D, 1.4);
   const gl = loopPanel.append('g').attr('transform','translate('+(px+48)+','+(py+48)+')');
-  gl.append('circle').attr('r',26).attr('fill','#E7F2F1');
+  gl.append('circle').attr('r',26).attr('fill','#293C31');
   stationGlyph(gl, l.id, TEAL_D);
   label(loopPanel, px+92, py+30, l.t, 12.5, 700, INK);
   const words = l.d.split(' ');
@@ -1334,7 +1335,7 @@ function drawLoopPanel(){
     if ((lines[li]+' '+w).trim().length > maxc){ li++; lines[li]=w; }
     else lines[li] = (lines[li]+' '+w).trim();
   });
-  lines.slice(0,3).forEach((ln,k)=> label(loopPanel, px+92, py+50+k*15, ln, 9.5, 400, '#3A4750'));
+  lines.slice(0,3).forEach((ln,k)=> label(loopPanel, px+92, py+50+k*15, ln, 9.5, 400, '#DBD1C8'));
   if (!REDUCE){
     loopPanel.attr('opacity',0).attr('transform','translate(0,8)')
       .transition('lp').duration(300).ease(d3.easeCubicOut)
@@ -1344,7 +1345,7 @@ function drawLoopPanel(){
 function setLoop(id){
   loopOpen = loopOpen === id ? null : id;
   loopNodes.selectAll('g.lstn').select('circle.lc')
-    .attr('fill', d => d.id === loopOpen ? '#E7F2F1' : '#FFFFFF')
+    .attr('fill', d => d.id === loopOpen ? '#293C31' : '#31241D')
     .attr('stroke-width', d => d.id === loopOpen ? 2.6 : 1.8);
   drawLoopPanel(); applyTypeScale();
 }
@@ -1360,10 +1361,10 @@ drawLoopPanel();
    ===================================================================== */
 
 const QUAD = [
-  { t:'Sovereign Optimizer', c:'#E74D4E', need:'Absolute benefits and harms, uncertainty stated, decision left with them.' },
-  { t:'Guided Optimizer',    c:'#C3DCEB', need:'The same evidence, delivered by a clinician they already trust.' },
-  { t:'Natural Autonomist',  c:'#7FCCC8', need:'Adjudication: what is known, what is not, and why the claims disagree.' },
-  { t:'Therapeutic Minimalist', c:'#FFD733', need:'The recommendation welded to a clinic, a cost and a route to get there.' }
+  { t:'Sovereign Optimizer', c:'#C97B5A', need:'Absolute benefits and harms, uncertainty stated, decision left with them.' },
+  { t:'Guided Optimizer',    c:'#B8CAD6', need:'The same evidence, delivered by a clinician they already trust.' },
+  { t:'Natural Autonomist',  c:'#6C9C7F', need:'Adjudication: what is known, what is not, and why the claims disagree.' },
+  { t:'Therapeutic Minimalist', c:'#EBDDA8', need:'The recommendation welded to a clinic, a cost and a route to get there.' }
 ];
 (function(){
   const x0 = 250, y0 = 130, w = 500;
@@ -1398,22 +1399,22 @@ bindTipQ = null;
    ===================================================================== */
 
 const ROUTES = [
-  { x:250, y:330, t:'Autonomy-oriented', tint:'#DCEBF5',
+  { x:250, y:330, t:'Autonomy-oriented', tint:'#283944',
     l1:'Absolute benefits and harms.', l2:'Uncertainty stated. Choice kept.',
     w:'Persuasion reads as control; complete information reads as respect. The clinician-reviewed presentation with numbers, not adjectives.' },
-  { x:750, y:330, t:'Clinician-trusting', tint:'#E7F2F1',
+  { x:750, y:330, t:'Clinician-trusting', tint:'#293C31',
     l1:'The same evidence, delivered', l2:'by a physician, on camera.',
     w:'The messenger is the variable, not the message. Identical content lands differently in a white coat.' },
-  { x:250, y:492, t:'Overwhelmed', tint:'#FBE3D2',
+  { x:250, y:492, t:'Overwhelmed', tint:'#423327',
     l1:'What is known, what is not,', l2:'and why the claims disagree.',
     w:'Drowning in contradictory claims. This audience needs adjudication, not another claim added to the pile.' },
-  { x:750, y:492, t:'Low-access', tint:'#EFEAE0',
+  { x:750, y:492, t:'Low-access', tint:'#3A2B22',
     l1:'The clinic, the cost, the', l2:'eligibility, the route there.',
     w:'The barrier is logistics, not belief. No amount of framing substitutes for a Saturday appointment and a bus route.' }
 ];
 (function(){
   const p = gRoute.append('g').attr('class','ebase');
-  roundRect(p, 355, 120, 290, 70, 35, '#FFFFFF', INK, 1.7);
+  roundRect(p, 355, 120, 290, 70, 35, '#31241D', INK, 1.7);
   label(p, 500, 150, 'ONE EVIDENCE BASE', 12, 700, INK, 'middle');
   label(p, 500, 170, 'benefits \u00b7 harms \u00b7 uncertainty', 9.3, 400, MUTE, 'middle');
   ROUTES.forEach(c=>{
@@ -1421,7 +1422,7 @@ const ROUTES = [
     gRoute.append('path').attr('class','rlead')
       .attr('d', lower ? 'M 500 192 Q 500 '+((192+c.y)/2+50)+' '+c.x+' '+(c.y-58)
                        : 'M 500 192 Q '+(500+(c.x-500)*.45)+' '+((192+c.y)/2)+' '+c.x+' '+(c.y-58))
-      .attr('fill','none').attr('stroke','#B9B2A4').attr('stroke-width',1.4).attr('stroke-dasharray','5 4');
+      .attr('fill','none').attr('stroke','#A69C94').attr('stroke-width',1.4).attr('stroke-dasharray','5 4');
     const g = gRoute.append('g').attr('class','rcard').datum(c)
       .attr('data-x',c.x).attr('data-y',c.y)
       .attr('transform','translate('+c.x+','+c.y+')')
@@ -1430,8 +1431,8 @@ const ROUTES = [
     padHit(g, -170, -56, 340, 112, 4);
     roundRect(g, -170, -56, 340, 112, 14, c.tint);
     label(g, 0, -26, c.t, 12.5, 700, INK, 'middle');
-    label(g, 0, -2, c.l1, 9.8, 400, '#3A4750', 'middle');
-    label(g, 0, 16, c.l2, 9.8, 400, '#3A4750', 'middle');
+    label(g, 0, -2, c.l1, 9.8, 400, '#DBD1C8', 'middle');
+    label(g, 0, 16, c.l2, 9.8, 400, '#DBD1C8', 'middle');
     label(g, 0, 42, 'same evidence \u00b7 different route', 8, 600, MUTE, 'middle');
   });
 })();
@@ -1466,10 +1467,10 @@ function layoutRoutes(){
   const w = 250, h = 84, x0 = 130, y0 = 210;
   CELLS.forEach((c,i)=>{
     const cell = gDash.append('g').attr('class','dcell').attr('data-i',i);
-    roundRect(cell, 0, 0, w, h, 12, c.on ? '#FFFFFF' : 'none', c.on ? TEAL_D : '#C9C3B6', c.on ? 1.4 : 1.2)
+    roundRect(cell, 0, 0, w, h, 12, c.on ? '#31241D' : 'none', c.on ? TEAL_D : '#8A7767', c.on ? 1.4 : 1.2)
       .attr('stroke-dasharray', c.on ? null : '7 6');
-    mono(cell, 16, 26, c.l.toUpperCase(), 7.2, c.on ? MUTE : '#B9B2A4');
-    label(cell, 16, c.on ? 60 : 56, c.v, c.on ? 21 : 10, 700, c.on ? TEAL_D : '#B9B2A4');
+    mono(cell, 16, 26, c.l.toUpperCase(), 7.2, c.on ? MUTE : '#A69C94');
+    label(cell, 16, c.on ? 60 : 56, c.v, c.on ? 21 : 10, 700, c.on ? TEAL_D : '#A69C94');
   });
   label(gDash, 500, 170, 'What a Coethia report leads with \u2014 and what it does not.', 12, 700, INK, 'middle')
     .attr('class','dhead');
@@ -1495,23 +1496,23 @@ layoutDash();
    ===================================================================== */
 
 const PHASES = [
-  { id:'p1', w:'Weeks 1\u20132', t:'Listen + set up', tint:'#DCEBF5',
+  { id:'p1', w:'Weeks 1\u20132', t:'Listen + set up', tint:'#283944',
     d:['Demand map: what your population searches, by term and ZIP',
        'Ad Grants (or paid) account structured and policy-checked',
        'Server-side measurement stood up before a single ad runs'] },
-  { id:'p2', w:'Weeks 3\u20136', t:'Map + build', tint:'#E7F2F1',
+  { id:'p2', w:'Weeks 3\u20136', t:'Map + build', tint:'#293C31',
     d:['Belief map with the four addressable groups and their barriers',
        'Creative library built per barrier, tagged for testing',
        'Compliant custom segments assembled from search terms'] },
-  { id:'p3', w:'Week 7', t:'Go live', tint:'#FBE3D2',
+  { id:'p3', w:'Week 7', t:'Go live', tint:'#423327',
     d:['Search interception live at the moment of intent',
        'Contextual placements running in front of the ecosystem',
        'Quality-score tuning to pull cost per click down'] },
-  { id:'p4', w:'Weeks 8\u201311', t:'Optimise', tint:'#EFEAE0',
+  { id:'p4', w:'Weeks 8\u201311', t:'Optimise', tint:'#3A2B22',
     d:['Weekly creative testing at commercial tempo, losers cut inside a day',
        'Segment and bid refinement against cost per action',
        'Comprehension checks in-field, not just click metrics'] },
-  { id:'p5', w:'Week 12', t:'Report + hand over', tint:'#F7EFE7',
+  { id:'p5', w:'Week 12', t:'Report + handover', tint:'#3A2B22',
     d:['What worked, what did not, and the cost of each action',
        'The tested map and creative library, yours to keep',
        'Runbook and training so your team can turn the loop'] }
@@ -1529,7 +1530,7 @@ function drawGantt(){
   for (let k=0;k<=12;k+=2){
     mono(gantt, x0+k*unit, 118, String(k), 7, MUTE, 'middle');
     gantt.append('path').attr('d','M '+(x0+k*unit)+' 126 V '+(nar?520:430))
-      .attr('stroke','#EFECE5').attr('stroke-width',1);
+      .attr('stroke','#483930').attr('stroke-width',1);
   }
   PHASES.forEach((p,i)=>{
     const y = 140 + i*(nar?74:58);
@@ -1540,12 +1541,12 @@ function drawGantt(){
       .attr('aria-label', p.w + ': ' + p.t + '. ' + p.d.join('; '))
       .attr('aria-pressed', on ? 'true' : 'false')
       .style('cursor','pointer');
-    padHit(g, sx, y, Math.max(ex-sx, 60), 40, 6);
-    roundRect(g, sx, y, Math.max(ex-sx, 60), 40, 8, on ? INK : p.tint,
-              on ? INK : 'rgba(33,46,54,.12)', 1.2);
-    label(g, sx+12, y+18, p.w, 9, 700, on ? '#F9C9B4' : '#8A6A55');
-    label(g, sx+12, y+32, p.t, 10.5, 700, on ? '#F8F6F1' : INK);
-    if (!on && !nar) label(g, ex+12, y+26, 'open \u203a', 8.5, 600, MUTE);
+    padHit(g, sx, y, Math.max(ex-sx, 122), 40, 6);
+    roundRect(g, sx, y, Math.max(ex-sx, 122), 40, 8, on ? INK : p.tint,
+              on ? INK : 'rgba(239,238,231,.16)', 1.2);
+    label(g, sx+12, y+18, p.w, 9, 700, on ? '#E5B693' : '#EBDDA8');
+    label(g, sx+12, y+32, p.t, 10.5, 700, on ? '#271C16' : INK);
+    if (!on && !nar) label(g, Math.max(ex, sx+122)+12, y+26, 'open \u203a', 8.5, 600, MUTE);
   });
 }
 function drawGanttPanel(){
@@ -1558,15 +1559,15 @@ function drawGanttPanel(){
     label(ganttPanel, 500, py+40, 'Click a phase to see what lands on your desk in it.', 11, 400, MUTE, 'middle');
     return;
   }
-  roundRect(ganttPanel, px, py, pw, 118, 14, '#FFFFFF', TEAL_D, 1.4);
+  roundRect(ganttPanel, px, py, pw, 118, 14, '#31241D', TEAL_D, 1.4);
   mono(ganttPanel, px+22, py+28, p.w.toUpperCase() + ' \u00b7 DELIVERABLES', 7.4, TEAL_D);
   p.d.forEach((d,k)=>{
     const dy = py+52+k*22;
-    ganttPanel.append('circle').attr('cx',px+28).attr('cy',dy-4).attr('r',7).attr('fill','#E7F2F1');
+    ganttPanel.append('circle').attr('cx',px+28).attr('cy',dy-4).attr('r',7).attr('fill','#293C31');
     ganttPanel.append('path').attr('d','M '+(px+24.5)+' '+(dy-4)+' l 2.4 2.6 l 4.4 -5')
       .attr('stroke',TEAL_D).attr('stroke-width',1.6).attr('fill','none')
       .attr('stroke-linecap','round').attr('stroke-linejoin','round');
-    label(ganttPanel, px+44, dy, d, 10, 400, '#3A4750');
+    label(ganttPanel, px+44, dy, d, 10, 400, '#DBD1C8');
   });
   if (!REDUCE){
     ganttPanel.attr('opacity',0).attr('transform','translate(0,8)')
@@ -1593,11 +1594,11 @@ drawGantt(); drawGanttPanel(); wireGantt();
 
 (function(){
   const T = [
-    { x:200, h:150, tint:'#EFEAE0', n:'Tier 1 \u00b7 Information',
+    { x:200, h:150, tint:'#3A2B22', n:'Tier 1 \u00b7 Information',
       s:['The listening intake and the','belief map, as intelligence.','No campaign attached.'] },
-    { x:500, h:212, tint:'#DCEBF5', n:'Tier 2 \u00b7 Training',
+    { x:500, h:212, tint:'#283944', n:'Tier 2 \u00b7 Training',
       s:['Your team learns the console:','structure, compliant segments,','testing, privacy-safe measurement.'] },
-    { x:800, h:274, tint:'#9FD8D4', n:'Tier 3 \u00b7 Service',
+    { x:800, h:274, tint:'#6C9C7F', n:'Tier 3 \u00b7 Service',
       s:['Campaign operations at','commercial tempo. Strategy','through execution.'] }
   ];
   const BASEY = 560;
@@ -1624,9 +1625,9 @@ drawGantt(); drawGanttPanel(); wireGantt();
   D.forEach((d,i)=>{
     const g = gFit.append('g').attr('class','fitcard').attr('data-i',i)
       .attr('transform','translate(500,'+(160+i*140)+')');
-    roundRect(g, -300, 0, 600, 116, 14, '#FFFFFF', '#DCD5C6', 1.3);
+    roundRect(g, -300, 0, 600, 116, 14, '#31241D', '#483930', 1.3);
     const em = g.append('g').attr('transform','translate(-250,58)');
-    em.append('circle').attr('r',24).attr('fill','#F7EFE7');
+    em.append('circle').attr('r',24).attr('fill','#3A2B22');
     em.append('path').attr('d','M -9 -9 l 18 18 M 9 -9 l -18 18')
       .attr('stroke',ALARM).attr('stroke-width',2.2).attr('stroke-linecap','round');
     label(g, -212, 40, d.t, 12.5, 700, INK);
@@ -2012,7 +2013,7 @@ const LAYERS = [
 ];
 
 const CASES = [
-  { id:'A', tint:'#2E3A42', real:true,
+  { id:'A', tint:'#283944', real:true,
     t:'HIV testing awareness',
     who:'A state health department campaign, agency-produced',
     teaches:['behav','ctx'],
@@ -2034,7 +2035,7 @@ const CASES = [
               'Add placement targeting against the channels already answering those questions, and run the same creative as pre-roll.',
               'Falsifies if: cost per completed testing-locator session does not fall below the campaign\u2019s existing cost per site visit within eight weeks.'] } },
 
-  { id:'B', tint:'#26382E', real:false,
+  { id:'B', tint:'#293C31', real:false,
     t:'Childhood MMR uptake',
     who:'County health department, composite',
     teaches:['psycho','remkt'],
@@ -2056,7 +2057,7 @@ const CASES = [
               'Follow up compliantly \u2014 lists built from engagement with general health content, never from a visit to a vaccine information page, which is prohibited.',
               'Falsifies if: comprehension in post-exposure survey does not separate the treated group from control by eight points within one quarter.'] } },
 
-  { id:'C', tint:'#4A3524', real:false,
+  { id:'C', tint:'#423327', real:false,
     t:'Naloxone availability',
     who:'Regional overdose-prevention programme, composite',
     teaches:['prog'],
@@ -2113,13 +2114,13 @@ function drawRig(g, x, y, w, opts){
     const chH = isNarrow() ? 30 : 54;
     padHit(cell, lx, y, cw, chH, 6);
     roundRect(cell, lx, y, cw, chH, 8,
-      on ? (l.base ? '#3A2B22' : '#26382E') : 'none',
-      on ? (l.base ? '#A79C93' : TEAL_D) : '#8A7768', on ? 1.5 : 1.2)
+      on ? (l.base ? '#3A2B22' : '#293C31') : 'none',
+      on ? (l.base ? '#A69C94' : TEAL_D) : '#8A7767', on ? 1.5 : 1.2)
       .attr('stroke-dasharray', on ? null : '5 4');
     // a filled pip when lit, hollow when dark
     cell.append('circle').attr('cx',lx+cw/2).attr('cy',y+(isNarrow()?15:17)).attr('r',6)
-      .attr('fill', on ? (l.base ? '#A79C93' : TEAL_D) : 'none')
-      .attr('stroke', on ? 'none' : '#8A7768').attr('stroke-width',1.4);
+      .attr('fill', on ? (l.base ? '#A69C94' : TEAL_D) : 'none')
+      .attr('stroke', on ? 'none' : '#8A7767').attr('stroke-width',1.4);
     if (on) cell.append('path')
       .attr('d','M '+(lx+cw/2-3)+' '+(y+(isNarrow()?15:17))+' l 2 2.4 l 4 -4.6')
       .attr('stroke','#31241D').attr('stroke-width',1.5).attr('fill','none')
@@ -2127,7 +2128,7 @@ function drawRig(g, x, y, w, opts){
     if (!isNarrow()){
       const words = l.n.split(' ');
       label(cell, lx+cw/2, y+38, words[0], 8.6, on?700:400, on ? INK : '#9A948A', 'middle');
-      if (l.case && !on) mono(cell, lx+cw/2, y+50, 'CASE '+l.case, 6, '#A79C93', 'middle');
+      if (l.case && !on) mono(cell, lx+cw/2, y+50, 'CASE '+l.case, 6, '#A69C94', 'middle');
     }
   });
   bindTip(rig.selectAll('g.rigcell'),
@@ -2154,16 +2155,16 @@ function drawRigScene(){
         .style('cursor','pointer');
       padHit(cell, 250, y, 500, 78, 4);
       roundRect(cell, 250, y, 500, 78, 10, on ? '#3A2B22' : '#31241D',
-        on ? '#A79C93' : '#8A7768', 1.3).attr('stroke-dasharray', on ? null : '5 4');
+        on ? '#A69C94' : '#8A7767', 1.3).attr('stroke-dasharray', on ? null : '5 4');
       cell.append('circle').attr('cx',282).attr('cy',y+26).attr('r',9)
-        .attr('fill', on ? '#A79C93' : 'none').attr('stroke', on ? 'none' : '#8A7768').attr('stroke-width',1.4);
+        .attr('fill', on ? '#A69C94' : 'none').attr('stroke', on ? 'none' : '#8A7767').attr('stroke-width',1.4);
       if (on) cell.append('path').attr('d','M 277 '+(y+26)+' l 3 3.4 l 6 -6.6')
         .attr('stroke','#31241D').attr('stroke-width',1.8).attr('fill','none')
         .attr('stroke-linecap','round').attr('stroke-linejoin','round');
       label(cell, 302, y+30, l.n, 12, 700, INK);
       label(cell, 302, y+50, l.what, 9.3, 400, MUTE);
       mono(cell, 302, y+68, on ? 'BOUGHT BY DEFAULT' : 'USUALLY LEFT ON THE TABLE', 6.6,
-        on ? '#A79C93' : ALARM);
+        on ? '#A69C94' : ALARM);
     });
     bindTip(gRig.selectAll('g.rigcell'),
       d => '<b>'+d.n+'</b><br>'+d.what+'<br><br><b>Enabled by:</b> '+d.how+'<br><br><b>Costs:</b> '+d.cost,
@@ -2181,15 +2182,15 @@ function drawRigScene(){
       .style('cursor','pointer');
     padHit(cell, x, y, cw, 250, 4);
     roundRect(cell, x, y, cw, 250, 12, on ? '#3A2B22' : '#31241D',
-      on ? '#A79C93' : '#8A7768', 1.3).attr('stroke-dasharray', on ? null : '5 4');
-    mono(cell, x+cw/2, y+26, '0'+(i+1), 7, on ? '#A79C93' : '#A79C93', 'middle');
+      on ? '#A69C94' : '#8A7767', 1.3).attr('stroke-dasharray', on ? null : '5 4');
+    mono(cell, x+cw/2, y+26, '0'+(i+1), 7, on ? '#A69C94' : '#A69C94', 'middle');
     cell.append('circle').attr('cx',x+cw/2).attr('cy',y+56).attr('r',13)
-      .attr('fill', on ? '#A79C93' : 'none').attr('stroke', on ? 'none' : '#8A7768').attr('stroke-width',1.5);
+      .attr('fill', on ? '#A69C94' : 'none').attr('stroke', on ? 'none' : '#8A7767').attr('stroke-width',1.5);
     if (on) cell.append('path').attr('d','M '+(x+cw/2-6)+' '+(y+56)+' l 4.4 5 l 8 -9.6')
       .attr('stroke','#31241D').attr('stroke-width',2).attr('fill','none')
       .attr('stroke-linecap','round').attr('stroke-linejoin','round');
     const nm = l.n.length > 12 ? l.n.slice(0,11)+'\u2026' : l.n;
-    label(cell, x+cw/2, y+94, nm, 10.5, 700, on ? INK : '#A79C93', 'middle');
+    label(cell, x+cw/2, y+94, nm, 10.5, 700, on ? INK : '#A69C94', 'middle');
     // the what, wrapped narrow
     const words = l.what.split(' ');
     let lines = [''], li = 0;
@@ -2198,8 +2199,8 @@ function drawRigScene(){
       else lines[li] = (lines[li]+' '+w).trim();
     });
     lines.slice(0,5).forEach((ln,k)=> label(cell, x+cw/2, y+118+k*14, ln, 8.3, 400, MUTE, 'middle'));
-    roundRect(cell, x+10, y+212, cw-20, 26, 13, on ? '#E7E2D8' : '#FBEDE7');
-    label(cell, x+cw/2, y+229, on ? 'bought' : 'left', 8.6, 700, on ? '#A79C93' : ALARM, 'middle');
+    roundRect(cell, x+10, y+212, cw-20, 26, 13, on ? '#443328' : '#4A3327');
+    label(cell, x+cw/2, y+229, on ? 'bought' : 'left', 8.6, 700, on ? '#A69C94' : ALARM, 'middle');
   });
   bindTip(gRig.selectAll('g.rigcell'),
     d => '<b>'+d.n+'</b><br>'+d.what+'<br><br><b>Enabled by:</b> '+d.how+'<br><br><b>Costs:</b> '+d.cost,
@@ -2231,14 +2232,14 @@ function drawCaseHub(){
     mono(card, x-w/2+18, y+28, c.real ? 'CASE ' + c.id + ' \u00b7 REAL, CITED' : 'CASE ' + c.id + ' \u00b7 COMPOSITE',
       6.8, c.real ? ALARM : '#EBDDA8');
     label(card, x-w/2+18, y+52, c.t, 12.5, 700, INK);
-    label(card, x-w/2+18, y+70, c.who, 8.8, 400, '#BDB4AC');
+    label(card, x-w/2+18, y+70, c.who, 8.8, 400, '#C0B6AE');
     // which layers this case lights
-    mono(card, x-w/2+18, y+(nar?96:108), 'LIGHTS', 6.6, '#BDB4AC');
+    mono(card, x-w/2+18, y+(nar?96:108), 'LIGHTS', 6.6, '#C0B6AE');
     c.teaches.forEach((lid,k)=>{
       const L = LAYERS.find(l=>l.id===lid);
       const px = x-w/2+18 + k*104, py = y+(nar?104:116);
-      roundRect(card, px, py, 96, 22, 11, done ? '#26382E' : '#31241D', done ? TEAL_D : '#8A7768', 1.1);
-      label(card, px+48, py+15, L.n, 8.3, 600, done ? TEAL_D : '#A79C93', 'middle');
+      roundRect(card, px, py, 96, 22, 11, done ? '#293C31' : '#31241D', done ? TEAL_D : '#8A7767', 1.1);
+      label(card, px+48, py+15, L.n, 8.3, 600, done ? TEAL_D : '#A69C94', 'middle');
     });
     if (!nar){
       label(card, x-w/2+18, y+h-22, done ? 'walked \u2713 \u2014 open again' : 'walk this campaign \u203a',
@@ -2268,7 +2269,7 @@ function drawCasePanel(){
   const c = CASES.find(x=>x.id===caseOpen);
   const px = nar ? 240 : 130, pw = nar ? 520 : 740;
   const py = nar ? 200 : 200, ph = nar ? 470 : 330;
-  roundRect(casePanel, px, py, pw, ph, 16, '#31241D', c.tint === '#4A3524' ? ALARM : TEAL_D, 1.6);
+  roundRect(casePanel, px, py, pw, ph, 16, '#31241D', c.tint === '#423327' ? ALARM : TEAL_D, 1.6);
 
   // header: which case, and the way back
   mono(casePanel, px+22, py+28, (c.real ? 'CASE ' + c.id + ' \u00b7 REAL, CITED' : 'CASE ' + c.id + ' \u00b7 COMPOSITE'),
@@ -2291,7 +2292,7 @@ function drawCasePanel(){
       .style('cursor','pointer');
     padHit(st, sx, py+66, (pw-44)/3 - 10, 26, 4);
     roundRect(st, sx, py+66, (pw-44)/3 - 10, 26, 13,
-      on ? INK : (past ? '#26382E' : '#31241D'), on ? INK : '#4A382C', 1.1);
+      on ? INK : (past ? '#293C31' : '#31241D'), on ? INK : '#483930', 1.1);
     label(st, sx + ((pw-44)/3 - 10)/2, py+83, (i+1) + ' \u00b7 ' + sn, 9,
       on ? 700 : 600, on ? '#271C16' : (past ? TEAL_D : MUTE), 'middle');
   });
@@ -2301,9 +2302,9 @@ function drawCasePanel(){
   if (beat.chip){
     const cw2 = beat.chip.length*5.2 + 20;
     roundRect(casePanel, px+pw-22-cw2, py+110, cw2, 20, 10,
-      beat.chip === 'OBSERVED' ? '#26382E' : '#3A2B22');
+      beat.chip === 'OBSERVED' ? '#293C31' : '#3A2B22');
     mono(casePanel, px+pw-22-cw2/2, py+124, beat.chip, 6.4,
-      beat.chip === 'OBSERVED' ? TEAL_D : '#A79C93', 'middle');
+      beat.chip === 'OBSERVED' ? TEAL_D : '#A69C94', 'middle');
   }
   beat.lines.forEach((ln,k)=>{
     const words = ln.split(' ');
@@ -2316,7 +2317,7 @@ function drawCasePanel(){
     casePanel.append('circle').attr('cx',px+30).attr('cy',yBase-4).attr('r',3.5)
       .attr('fill', caseStep===1 ? ALARM : TEAL_D);
     lines.slice(0,3).forEach((l2,m)=>
-      label(casePanel, px+44, yBase + m*15, l2, 9.8, 400, '#DCD4CB'));
+      label(casePanel, px+44, yBase + m*15, l2, 9.8, 400, '#DBD1C8'));
   });
 
   // the layers this beat is teaching
@@ -2327,8 +2328,8 @@ function drawCasePanel(){
       const L = LAYERS.find(l=>l.id===lid);
       const bx = px+22 + k*128;
       roundRect(casePanel, bx, ly+8, 120, 22, 11,
-        caseStep===2 ? '#26382E' : '#31241D', caseStep===2 ? TEAL_D : '#8A7768', 1.1);
-      label(casePanel, bx+60, ly+23, L.n, 8.4, 600, caseStep===2 ? TEAL_D : '#A79C93', 'middle');
+        caseStep===2 ? '#293C31' : '#31241D', caseStep===2 ? TEAL_D : '#8A7767', 1.1);
+      label(casePanel, bx+60, ly+23, L.n, 8.4, 600, caseStep===2 ? TEAL_D : '#A69C94', 'middle');
     });
   }
 
@@ -2345,11 +2346,11 @@ function drawCasePanel(){
   // the real case carries what could not be seen from outside
   if (c.real && caseStep === 1){
     const wy = py + ph + 14;
-    roundRect(casePanel, px, wy, pw, 54, 12, '#31241D', '#4A382C', 1.1);
+    roundRect(casePanel, px, wy, pw, 54, 12, '#31241D', '#483930', 1.1);
     mono(casePanel, px+18, wy+20, 'WHAT WE COULD NOT SEE', 6.6, MUTE);
     label(casePanel, px+18, wy+38,
       'The brief, the procurement ceiling, the approvals. A critique from outside stops at the wall of the record.',
-      9.2, 400, '#A79C93');
+      9.2, 400, '#A69C94');
   }
 
   if (!REDUCE){

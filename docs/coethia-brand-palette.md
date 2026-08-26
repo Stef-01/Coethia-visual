@@ -72,3 +72,92 @@ information should be shown as the interface people really navigate.
 The console keeps Google's own tokens (`#1a73e8`, `#202124`, `#5f6368`,
 `#dadce0`, `#f8f9fa`, `#d93025`, `#188038`). Only the account avatar
 takes the brand green, as an account avatar would.
+
+---
+
+# Recursive optimisation — three rounds in OKLCH
+
+The first application was contrast-correct but not *theory*-correct. Three
+further rounds assessed the palette in OKLCH (perceptually uniform, so a
+lightness step means the same thing at every hue) and corrected it.
+
+## Round 1 — assessment
+
+| Check | Result |
+|---|---|
+| Hue harmony | **Sound.** Ground 50°; amber +8° (analogous), wheat +45°, forest +107° (triadic-ish), blue −173° (split-complement). A warm base with a cool complement and a triadic third — a coherent structure, kept. |
+| Chroma balance | **Failed.** Accents spanned 3.76× (amber C=0.097 vs dusty blue C=0.026). The brand blue — the *heading* accent — was the visually weakest, inverting the hierarchy. |
+| Surface ladder | **Sound.** Steps 0.036 / 0.030 / 0.033, spread 0.005. |
+| Text ladder | **Failed.** Steps 0.076 / 0.099 / 0.074 — the body→bone jump was a third larger than its neighbours. Hue also drifted 62°→100° up the ramp. |
+| Tint cards | **Failed.** L spread 0.027, C spread 0.020 — the brown card was both lightest and most chromatic, so it dominated two cards meant to be its equals. |
+
+## Round 2 — corrections
+
+- **Text ramp** rebuilt on even 0.083 steps at a settled hue (63°): `#A69C94` →
+  `#C0B6AE` → `#DBD1C8` → `#EFEEE7`. Spread 0.025 → **0.002**.
+- **Tint cards** equalised to L=0.335, C=0.030, hues kept: `#283944`,
+  `#293C31`, `#423327`. L spread 0.027 → **0.002**.
+- **Derived accents pulled into the deck's band** — the deck's own colours set
+  it, so wheat and dusty blue were left alone and forest/amber came down to
+  meet them. Spread 3.76× → **2.79×**.
+- **`--blue-strong` `#A8CDE5`** added for small text and links: same hue and
+  lightness as the brand blue, chroma 0.026 → 0.052. A tonal sibling, not a new
+  brand colour — it fixes the hierarchy inversion without altering the blue.
+
+## Round 3 — colour-vision deficiency
+
+Simulated protanopia, deuteranopia and tritanopia (Viénot) and measured OKLab
+ΔE for every pair that carries meaning.
+
+| Pair | Normal | Worst CVD | Verdict |
+|---|---|---|---|
+| forest (good) vs amber (caution) | 0.126 | 0.031 | **Real defect** — semantically opposed, easily confused |
+| tint green vs tint brown | 0.046 | 0.020 | Not a defect — see below |
+| tint blue vs tint green | 0.038 | 0.018 | Not a defect — see below |
+
+**Fixed:** forest and amber were separated in *lightness* as well as hue —
+`#6C9C7F` (L=0.65) and `#E5B693` (L=0.81), ΔL 0.160. Worst-case CVD ΔE
+0.031 → **0.114**, clear of the ~0.08 confusion threshold. Both still pass
+contrast (5.30:1 and 9.05:1).
+
+**Deliberately not fixed:** the tint cards. Their hue is decorative — each card
+is identified by its heading, case label and layer chips, and nothing depends on
+telling the tints apart. The round-2 equalisation that caused the low ΔE is
+exactly what makes the three read as equals. Over-correcting here would trade a
+real design gain for an imaginary accessibility one.
+
+## WCAG 1.4.1 — no meaning rests on colour alone
+
+Audited every state in the piece:
+
+| State | Non-colour signals |
+|---|---|
+| Layer lit / unlit | dashed vs solid border, check glyph, filled vs hollow pip |
+| Case walked | check badge, label changes to "walked ✓ — open again" |
+| Banner good / caution | ✓ vs ! glyph |
+| Evidence class | the literal words OBSERVED / INFERRED / COMPOSITE |
+
+## Final token set
+
+| Role | Hex | L | C | vs ground |
+|---|---|---|---|---|
+| Ground | `#271C16` | 0.238 | 0.021 | — |
+| Surface 1 / 2 / 3 | `#31241D` `#3A2B22` `#443328` | 0.273–0.337 | — | 1.11–1.38 |
+| Tints (blue/green/brown) | `#283944` `#293C31` `#423327` | 0.335 | 0.030 | ~1.39 |
+| Bone / body / card-2nd / mute | `#EFEEE7` `#DBD1C8` `#C0B6AE` `#A69C94` | 0.948→0.699 | ~0.016 | 14.28→6.17 |
+| Wheat | `#EBDDA8` | 0.896 | 0.070 | 12.22 |
+| Dusty blue | `#B8CAD6` | 0.829 | 0.026 | 9.86 |
+| Blue-strong | `#A8CDE5` | 0.829 | 0.052 | 9.91 |
+| Forest | `#6C9C7F` | 0.650 | 0.068 | 5.30 |
+| Amber | `#E5B693` | 0.810 | 0.072 | 9.05 |
+| Stroke / hairline | `#8A7767` `#483930` | — | — | 3.89 / 1.51 |
+
+## A bug the dark pass exposed
+
+The first region split cut at `const GBLUE`, but the lifted Material kit sits
+*before* the scene art in this file — so every later scene was swept into the
+"console" region and its hardcoded light colours were never remapped. The
+console is really **two islands** (the kit and the screens) with page art on
+both sides. Repairing the split recoloured 46 further literals. It also
+surfaced a latent layout bug: short Gantt bars whose titles overflowed, now
+given a minimum width.
