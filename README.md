@@ -1,6 +1,6 @@
 # Coethia Visuals
 
-Two scrollytelling explainers in one shared design system. Open either file in a
+Three scrollytelling explainers in one shared design system. Open any file in a
 browser — no build step, no server required.
 
 **[political-health-personas.html](political-health-personas.html)** —
@@ -14,6 +14,31 @@ failure of label-targeting to a two-axis belief map, then — only at the end �
 the argument with the system it implies: Coethia's listen–map–translate–activate–
 measure–learn loop, presented as the imagined optimal solution rather than the
 premise. The brand deliberately appears nowhere before the reprise.
+
+**[faster-than-the-rumour.html](faster-than-the-rumour.html)** —
+*Why Public Health Lost the Feed.* Fifty-nine scenes written from a county health
+officer's chair. Opens in a hospital room in Lubbock in February 2025, establishes
+measles as a mathematical object with a coverage cliff at ninety-five percent,
+renders what a hesitant parent actually sees on a phone, times a creator's post
+against a department's approval chain, inventories what an officer actually holds
+in mandate, money and staff, sorts the unvaccinated population into five reasons
+and shows why demographic targeting cannot see any of them — and only then names
+the operating model, the advertising machinery, and Coethia. The brand first
+appears in act six.
+
+Its epidemiology, coverage, cost and workforce figures are real and cited beneath
+the scenes that use them; only the recreated Google Ads console carries synthetic
+numbers, and it says so. Two verification tools sit beside it: `audit.js` walks
+every scene at two widths reporting console errors, empty stages, NaN geometry,
+frame overflow, text collisions and sub-pixel type; `measure.js` fits each scene's
+camera to its painted content and to the stage's aspect, so scenes fill the stage
+instead of letterboxing. Run `node audit.js --shots` and `node measure.js`.
+
+**One standing rule, adopted 2026-08-25:** no rounded rectangle may be the primary
+carrier of an idea. Every unit of meaning gets a drawn thing — a glyph, a
+mechanism, an instrument, a real product UI, or a figure. A box is allowed only as
+the chrome of an interface being recreated, never as a substitute for an
+illustration.
 
 ---
 

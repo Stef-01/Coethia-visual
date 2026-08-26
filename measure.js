@@ -28,7 +28,11 @@ const MEASURE = () => {
   const svg = document.querySelector('#viz');
   const r = svg.getBoundingClientRect();
   let minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9, n = 0;
-  const vis = [...svg.children].filter(g => g.tagName === 'g' && +(g.getAttribute('opacity') ?? 1) > 0.05);
+  // the provenance stamp is chrome positioned FROM the frame, so measuring it
+  // would make the fit circular
+  const stamp = svg.querySelector('g[pointer-events="none"]');
+  const vis = [...svg.children].filter(g => g.tagName === 'g' && g !== stamp
+    && +(g.getAttribute('opacity') ?? 1) > 0.05);
   for (const g of vis) {
     if (g === document.querySelector('#viz > g:last-child')) { /* stamp still counts */ }
     for (const el of g.querySelectorAll('*')) {
