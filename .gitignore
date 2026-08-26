@@ -2,3 +2,5 @@
 .env*
 .gstack/
 CLAUDE.md
+.shots/
+node_modules/
