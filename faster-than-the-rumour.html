@@ -944,10 +944,43 @@ function computeTK(frame){
   TK = Math.max(1, Math.min(3.0, MIN_LABEL_PX / (BASE_LABEL * sc)));
 }
 const MOBILE = () => TK > 1.3;
-function typed(sel, base){ return sel.attr('data-fs', base).attr('font-size', base * TK); }
+/* The ad console is a recreation of a desktop product, and its layout is the
+   product's own -- six wizard steps, comparison cards, dense tables. The type
+   scale exists to keep a 6px annotation legible on a phone, but applying it at
+   full strength inside the console paints desktop-density UI at three times
+   size and every row collides with the next. Inside the console the floor is
+   relaxed, so the sheet reads as what it is: a desktop tool, seen small. */
+let INCON = false;
+/* 0.74, not a rounder number, because it is the floor the arithmetic allows.
+   The smallest console glyph is MIN_MONO (7.2) painted at TK, and TK is pinned
+   at 3 on a phone. The console scenes fit a 752-unit frame into a 375px stage,
+   so sc is 0.499 and that glyph lands at 7.2 * 3 * CON_TK * 0.499 = 10.8 *
+   CON_TK px. The widest console frame is privacy's 852 (sc 0.440, 9.5 * CON_TK).
+   Anything below ~0.74 drops privacy under the 7px floor; anything above it
+   gives back the room this is here to buy. 0.52 was tried first and put every
+   console screen under the floor -- clean layout, unreadable text. */
+const CON_TK = 0.84;
+/* Console geometry is sized from the type scale too -- chip widths, row
+   heights, column widths. If the text shrinks by CON_TK but the boxes around
+   it do not, the sheet fills with half-empty pills. */
+function ctk(){ return TK * (INCON ? CON_TK : 1); }
+function typed(sel, base){
+  const k = INCON ? CON_TK : 1;
+  return sel.attr('data-fs', base).attr('data-tk', k).attr('font-size', base * TK * k);
+}
 function applyTypeScale(){
   svg.selectAll('text[data-fs],tspan[data-fs]')
-     .attr('font-size', function(){ return +this.getAttribute('data-fs') * TK; });
+     .attr('font-size', function(){
+       return +this.getAttribute('data-fs') * TK * (+this.getAttribute('data-tk') || 1);
+     });
+  // wrapped lines carry their anchor and unscaled leading, so their stacking
+  // follows TK instead of whatever it happened to be when they were drawn
+  svg.selectAll('text[data-wl]')
+     .attr('y', function(){
+       const i = +this.getAttribute('data-wl');
+       return +this.getAttribute('data-y0')
+            + i * (+this.getAttribute('data-wlead')) * TK * (+this.getAttribute('data-tk') || 1);
+     });
 }
 
 const FRAMES = {
@@ -1082,16 +1115,16 @@ const FIT_M = {
   air:'84 -281 832 1126',
   daisy:'84 -281 832 1126',
   afterwords:'-39 -386 955 1292',
-  r0:'-39 -136 739 999',
+  r0:'-39 -132 733 991',
   cliff:'-40 -176 866 1171',
-  descent:'123 -147 755 1021',
+  descent:'150 -77 656 887',
   k280:'-39 -316 1028 1390',
   states:'199 -16 602 815',
   sequelae:'234 -50 532 720',
   parent:'-39 -305 885 1198',
   reel:'-39 -226 787 1065',
   swipe:'-39 -275 961 1300',
-  comments:'-39 -406 1034 1399',
+  comments:'-39 -405 1033 1398',
   anatomy:'-39 -323 969 1311',
   counterpost:'-39 -306 996 1348',
   trap:'-39 -245 982 1328',
@@ -1100,16 +1133,16 @@ const FIT_M = {
   chain:'-39 -215 949 1284',
   gate:'-39 -232 977 1321',
   decided:'-11 -318 1087 1470',
-  law:'227 40 556 753',
+  law:'227 40 556 752',
   desk:'-39 -349 955 1292',
-  mandate:'65 -147 874 1183',
-  money:'117 -124 765 1035',
-  people:'-39 -328 1006 1361',
-  ledger:'-40 -112 1009 1366',
-  arithmetic:'-40 -69 1009 1366',
+  mandate:'94 -84 812 1099',
+  money:'94 -84 812 1099',
+  people:'-39 -228 978 1324',
+  ledger:'-40 -111 1009 1365',
+  arithmetic:'-40 -69 1009 1365',
   gaps:'-39 -210 961 1300',
   notone:'-39 -134 972 1315',
-  five:'-70 -183 986 1334',
+  five:'-70 -182 982 1328',
   facets:'-44 -183 987 1336',
   crosstab:'-46 -163 959 1297',
   axes:'-39 -303 1013 1370',
@@ -1120,22 +1153,22 @@ const FIT_M = {
   loop:'-81 -260 839 1135',
   coethia:'-81 -260 839 1135',
   stations:'-81 -260 839 1135',
-  listen:'160 -70 706 956',
+  listen:'124 -71 752 1018',
   map:'12 -279 992 1342',
   translate:'-224 -561 926 1253',
-  lenses:'-39 -103 1013 1370',
-  grants:'160 -314 1063 1439',
-  segments:'160 -168 850 1150',
-  subsidy:'67 -283 1018 1378',
-  placement:'160 -205 904 1224',
-  privacy:'160 -319 1071 1449',
+  lenses:'-39 -103 1012 1370',
+  grants:'124 -71 752 1018',
+  segments:'124 -71 752 1018',
+  subsidy:'122 -73 756 1023',
+  placement:'124 -71 752 1018',
+  privacy:'124 -75 758 1025',
   measure:'-26 -220 942 1275',
-  cases:'-39 -256 946 1280',
-  weeks:'179 -190 790 1069',
-  tiers:'-273 -473 1162 1572',
-  fit:'-326 -509 1227 1661',
+  cases:'-39 -113 938 1269',
+  weeks:'181 -188 787 1065',
+  tiers:'-410 -471 1299 1757',
+  fit:'-326 -419 1227 1661',
   week12:'84 -232 832 1126',
-  backtotheroom:'84 -530 1291 1747',
+  backtotheroom:'84 -530 1292 1748',
   close:'-81 -260 839 1135'
 };
 const frameFor = name => (isNarrow() ? FRAMES_MOBILE : FRAMES)[name];
@@ -1186,10 +1219,13 @@ const MIN_SANS = 8.0, MIN_MONO = 7.2;
    The budget is derived rather than guessed: with a tight frame the rendered
    size of a glyph is about size * 1.07 CSS px, an average glyph is ~0.52 em,
    and the usable stage is ~340px, so ~600/size characters fit on a line. */
-function wrapFor(txt, size, anchor){
-  if (anchor !== 'middle' || !isNarrow()) return null;
-  if (typeof txt !== 'string') return null;
-  const cap = Math.max(16, Math.min(60, Math.round(600 / Math.max(6, size || 11))));
+function wrapFor(txt, size, anchor, force){
+  if (INCON) return null;
+  if (!isNarrow() || typeof txt !== 'string') return null;
+  // centred captions wrap on their own; anything else has to ask, because only
+  // the caller knows how wide its container is
+  if (!force && anchor !== 'middle') return null;
+  const cap = force || Math.max(16, Math.min(60, Math.round(600 / Math.max(6, size || 11))));
   if (txt.length <= cap) return null;
   const out = []; let cur = '';
   for (const w of txt.split(' ')){
@@ -1205,11 +1241,11 @@ function wrapFor(txt, size, anchor){
    clear -- but only when it would actually overlap, so a centred label further
    down the stage is never dragged around. Reset per scene in render(). */
 let FLOW = { x: null, bottom: -1e9 };
-function label(g, x, y, txt, size, weight, fill, anchor){
+function label(g, x, y, txt, size, weight, fill, anchor, wrapCap){
   const mk = (ty, t) => g.append('text').attr('x',x).attr('y',ty).attr('text-anchor',anchor||'start')
     .attr('font-family',SANS).call(typed, Math.max(MIN_SANS, size||11)).attr('font-weight',weight||400)
     .attr('fill',fill||INK).text(t);
-  const lines = wrapFor(txt, size, anchor);
+  const lines = wrapFor(txt, size, anchor, wrapCap);
   // typed() paints at size * TK, so the leading has to be in the same units --
   // using the authored size here stacks the lines on top of each other at any
   // scale above 1, which on a phone is always
@@ -1220,16 +1256,20 @@ function label(g, x, y, txt, size, weight, fill, anchor){
   // set only by blocks that actually wrapped (or were themselves pushed), which
   // keeps every scene that has no wrapping completely untouched.
   let pushed = false;
-  if (anchor === 'middle' && isNarrow()){
+  if (anchor === 'middle' && isNarrow() && !INCON){
     if (FLOW.x !== null && Math.abs(x - FLOW.x) < 40 && y - lead * 0.8 < FLOW.bottom){
       y = FLOW.bottom + lead * 0.8; pushed = true;
     }
     if (lines || pushed) FLOW = { x: x, bottom: y + ((lines ? lines.length : 1) - 1) * lead + lead * 0.15 };
   }
   if (!lines) return mk(y, txt);
-  // returned as one selection so callers that chain .attr('opacity',0) or
-  // .attr('class', ...) still address every line, not just the last one
-  return d3.selectAll(lines.map((t, i) => mk(y + i * lead, t).node()));
+  // Scenes built inside a load-time IIFE are drawn before computeTK() has ever
+  // run, so TK is still 1 and the leading comes out a third of what it needs to
+  // be. Record the anchor and the unscaled leading on each line so
+  // applyTypeScale() can re-lay them out against the real TK.
+  const base = Math.max(MIN_SANS, size || 11);
+  return d3.selectAll(lines.map((t, i) => mk(y + i * lead, t)
+    .attr('data-wl', i).attr('data-y0', y).attr('data-wlead', base * 1.32).node()));
 }
 function mono(g, x, y, txt, size, fill, anchor){
   const mk = (ty, t) => g.append('text').attr('x',x).attr('y',ty).attr('text-anchor',anchor||'start')
@@ -1238,7 +1278,7 @@ function mono(g, x, y, txt, size, fill, anchor){
   // A mono glyph carries .14em of tracking, so it eats about 0.72em against the
   // sans face's 0.52em -- the budget is scaled to match. Card eyebrows are
   // left-aligned, so they wrap from their own x and disturb nothing else.
-  if (!isNarrow() || typeof txt !== 'string') return mk(y, txt);
+  if (INCON || !isNarrow() || typeof txt !== 'string') return mk(y, txt);
   const base = Math.max(MIN_MONO, size || 8);
   const cap = Math.max(14, Math.min(46, Math.round(600 * 0.72 / base)));
   if (txt.length <= cap) return mk(y, txt);
@@ -1250,7 +1290,8 @@ function mono(g, x, y, txt, size, fill, anchor){
   if (cur) out.push(cur);
   if (out.length < 2) return mk(y, txt);
   const lead = base * TK * 1.28;
-  return d3.selectAll(out.map((t, i) => mk(y + i * lead, t).node()));
+  return d3.selectAll(out.map((t, i) => mk(y + i * lead, t)
+    .attr('data-wl', i).attr('data-y0', y).attr('data-wlead', base * 1.28).node()));
 }
 // a person, drawn the way the whole series draws people
 function person(g, skin, cloth, hair){
@@ -1306,7 +1347,8 @@ const stampText = gStamp.append('text')
   .text('Composite client \u00b7 synthetic console figures \u00b7 platform mechanics documented');
 function placeStamp(frame){
   const vb = (frame || svg.attr('viewBox') || '0 0 1000 700').split(/[\s,]+/).map(Number);
-  stampText.attr('data-fs', 10.5).attr('font-size', 10.5 * TK)
+  const sk = isNarrow() ? 0.55 : 1;
+  stampText.attr('data-fs', 10.5).attr('data-tk', sk).attr('font-size', 10.5 * TK * sk)
     .attr('x', vb[0] + 4).attr('y', vb[1] + vb[3] - 6);
 }
 
@@ -1330,14 +1372,15 @@ const GBLUE='#1a73e8', GBLUED='#174ea6', GTEXT='#202124', GSUB='#5f6368',
 let CON, CX0, CY0, CW, RAIL;
 function conMetrics(){
   if (isNarrow()){
-    CON = { x:186, y:104, w:628, h:608 };
+    CON = { x:150, y:104, w:700, h:668 };
     RAIL = 0;
   } else {
     CON = { x:64, y:98, w:872, h:534 };
     RAIL = 168;
   }
   CX0 = CON.x + RAIL + 28;
-  CY0 = CON.y + 132;
+  // the title takes two lines at narrow, so the body starts lower
+  CY0 = CON.y + (isNarrow() ? 176 : 132);
   CW  = CON.w - RAIL - 56;
 }
 conMetrics();
@@ -1348,6 +1391,7 @@ const conFrame = gCon.append('g');
 const conBody  = gCon.append('g');     // redrawn per screen
 let conShell, conRailG, conHead, conStep, conAcct, conCrumb;
 function drawConFrame(){
+  const wasCon = INCON; INCON = isNarrow();
   conFrame.selectAll('*').remove();
   // the sheet
   conShell = roundRect(conFrame, CON.x, CON.y, CON.w, CON.h, 10, '#FFFFFF', GBORD, 1.2)
@@ -1372,8 +1416,11 @@ function drawConFrame(){
   avatarG.append('circle').attr('class','avatar').attr('cx',rx-40).attr('cy',CON.y+22).attr('r',11);
   conAcct = label(avatarG, rx-40, CON.y+26, '', 9, 700, '#FFFFFF', 'middle');
   // title row
-  conHead = label(conFrame, CX0 - (RAIL ? 0 : 2), CON.y+78, '', 15.5, 500, GTEXT);
-  conStep = mono(conFrame, rx-28, CON.y+78, '', 7.5, GERR, 'end');
+  const nrw = isNarrow();
+  conHead = label(conFrame, CX0 - (RAIL ? 0 : 2), CON.y + (nrw ? 96 : 78), '',
+                  nrw ? 12 : 15.5, 500, GTEXT);
+  conStep = mono(conFrame, nrw ? CX0 - 2 : rx-28, CON.y + (nrw ? 66 : 78), '', 7.5, GERR,
+                 nrw ? 'start' : 'end');
   // stepper rail (desktop only)
   conRailG = conFrame.append('g');
   if (RAIL){
@@ -1381,6 +1428,7 @@ function drawConFrame(){
       .attr('d','M '+(CON.x+RAIL)+' '+(CON.y+44)+' V '+(CON.y+CON.h))
       .attr('stroke',GBORD).attr('stroke-width',1);
   }
+  INCON = wasCon;
 }
 drawConFrame();
 
@@ -1433,7 +1481,7 @@ function mCheck(g, x, y, state){ // 1 on · 0 off · 2 disabled
     .attr('stroke-linecap','round').attr('stroke-linejoin','round');
 }
 function mBtn(g, x, y, txt, primary){
-  const w = txt.length*6.4*TK + 34;
+  const w = txt.length*6.4*ctk() + 34;
   roundRect(g, x, y, w, 30, 15, primary ? GBLUE : '#FFFFFF', primary ? null : GBORD, 1.1);
   label(g, x+w/2, y+19.5, txt, 10.5, 600, primary ? '#FFFFFF' : GBLUE, 'middle');
   return w;
@@ -1442,7 +1490,7 @@ function mField(g, x, y, w, lab, val, opts){
   opts = opts || {};
   roundRect(g, x, y, w, 42, 5, '#FFFFFF', opts.active ? GBLUE : GBORD, opts.active ? 1.8 : 1.1);
   // floating label notches the outline
-  const lw = lab.length*5.1*TK + 8;
+  const lw = lab.length*5.1*ctk() + 8;
   g.append('rect').attr('x',x+12).attr('y',y-5).attr('width',lw).attr('height',10).attr('fill','#FFFFFF');
   label(g, x+16, y+3, lab, 8, 400, opts.active ? GBLUE : GSUB);
   label(g, x+16, y+27, val, 10.5, 400, opts.err ? GERR : GTEXT);
@@ -1473,18 +1521,18 @@ function mTabs(g, x, y, tabs, active){
 /* the term chips — kept as g.chip with datum for the tooltip system */
 function mChips(g, x, y, w, items, opts){
   opts = opts || {};
-  const pad = 10*TK, gap = 8, h = 18 + 8*TK;
+  const pad = 10*ctk(), gap = 8, h = 18 + 8*ctk();
   let cx = x, row = 0;
   items.forEach(it=>{
     const t = it.t || it;
-    const cw = Math.max(50, t.length*5.4*TK + pad*2 + (opts.x ? 14 : 0));
+    const cw = Math.max(50, t.length*5.4*ctk() + pad*2 + (opts.x ? 14 : 0));
     if (cx + cw > x + w){ cx = x; row++; }
     const cy = y + row*(h+gap);
     const cg = g.append('g').attr('class','chip').datum(it);
     roundRect(cg, cx, cy, cw, h, h/2, opts.dead ? GSURF : GCHIPBG,
               opts.dead ? GBORD : (opts.err ? GERR : '#aecbfa'), 1.1)
       .attr('stroke-dasharray', opts.err ? '4 3' : null);
-    label(cg, cx + pad, cy + h/2 + 3.4*TK, t, 9.3, 500,
+    label(cg, cx + pad, cy + h/2 + 3.4*ctk(), t, 9.3, 500,
           opts.dead ? GSUB : (opts.err ? GERR : GBLUED));
     if (opts.x){
       const xx = cx + cw - 13;
@@ -1601,8 +1649,8 @@ function mMap(g, y, teal){
 
 /* the demographics table, drawn the way the real screen draws it */
 function mDemoTable(g, y, cols, rows, cells, teal){
-  const lw = 60 + 20*TK;
-  const cw = (CW - lw - 4)/cols.length, ch = 19 + 6*TK;
+  const lw = 60 + 20*ctk();
+  const cw = (CW - lw - 4)/cols.length, ch = 19 + 6*ctk();
   cols.forEach((c,i)=> label(g, CX0+lw+i*cw+cw/2, y-5, c, 8.3, 500, GSUB, 'middle'));
   rows.forEach((r,j)=>{
     label(g, CX0+lw-10, y+13+j*ch, r, 9.3, 400, GTEXT, 'end');
@@ -1625,7 +1673,7 @@ function mSlots(g, y, x, w, labels, filled, counts){
     const on = i < filled;
     const sg = g.append('g').attr('class','slot');
     roundRect(sg, x, sy, w, h, 5, '#FFFFFF', GBORD, 1.05);
-    const lw2 = lb.length*5.1*TK + 8;
+    const lw2 = lb.length*5.1*ctk() + 8;
     sg.append('rect').attr('x',x+10).attr('y',sy-4).attr('width',lw2).attr('height',9).attr('fill','#FFFFFF');
     label(sg, x+14, sy+3, lb, 7.6, 400, GSUB);
     if (on){
@@ -2043,18 +2091,25 @@ drawGantt(); drawGanttPanel(); wireGantt();
       s:['Campaign operations at','commercial tempo. Strategy','through execution.'] }
   ];
   const BASEY = 560;
-  T.forEach(t=>{
-    const g = gTier.append('g').attr('class','tier').attr('data-x',t.x).attr('data-y',BASEY-t.h)
-      .attr('transform','translate('+t.x+','+(BASEY-t.h)+')');
-    roundRect(g, -125, 0, 250, t.h, 16, t.tint);
-    label(g, 0, 30, t.n, 13, 700, INK, 'middle');
-    t.s.forEach((ln,k)=> label(g, 0, 52+k*17, ln, 10.5, 400, '#333', 'middle'));
+  const nar = isNarrow();
+  T.forEach((t,i)=>{
+    const cx = nar ? 500 : t.x;
+    const cy = nar ? 108 + i*214 : BASEY - t.h;
+    const hw = nar ? 384 : 125;
+    const chh = nar ? 190 : t.h;
+    const lead = nar ? 40 : 17;
+    const g = gTier.append('g').attr('class','tier').attr('data-x',cx).attr('data-y',cy)
+      .attr('transform','translate('+cx+','+cy+')');
+    roundRect(g, -hw, 0, hw*2, chh, 16, t.tint);
+    label(g, 0, nar ? 46 : 30, t.n, 13, 700, INK, 'middle');
+    t.s.forEach((ln,k)=> label(g, 0, (nar ? 88 : 52)+k*lead, ln, 10.5, 400, '#333', 'middle'));
   });
-  gTier.append('path').attr('class','ascent')
+  // the ascent line reads as a rise across a horizontal row; stacked, it does not
+  if (!nar) gTier.append('path').attr('class','ascent')
     .attr('d','M 98 '+(BASEY-172)+' Q 350 '+(BASEY-262)+' 500 '+(BASEY-234)+' Q 660 '+(BASEY-308)+' 778 '+(BASEY-294))
     .attr('fill','none').attr('stroke',TEAL_D).attr('stroke-width',1.6)
     .attr('stroke-dasharray','6 5').attr('opacity',.8);
-  label(gTier, 500, BASEY+52, 'It starts as a report. It ends as a flywheel your team owns.', 12.5, 700, INK, 'middle');
+  label(gTier, 500, nar ? 760 : BASEY+52, 'It starts as a report. It ends as a flywheel your team owns.', 12.5, 700, INK, 'middle');
 })();
 
 (function(){
@@ -2220,7 +2275,8 @@ segments: { crumb:'Audience segments \u00b7 custom segment', step:'THE NUANCE', 
       .attr('stroke',GBORD).attr('stroke-width',1);
     mono(modal, px+14, my+196, 'CONDITION TARGETED', 6.6, GSUB);
     label(modal, px+pw-14, my+197, 'never', 11, 700, TEAL_D, 'end');
-    mBanner(modal, mx+22, my+214, mw*0.55, 'err', 'Restricted \u2014 and it applies to you too',
+    mBanner(modal, mx+22, isNarrow() ? CON.y + CON.h - 148 : my+214, mw*0.55, 'err',
+      'Restricted \u2014 and it applies to you too',
       ['Audiences built on a sensitive health condition, or on activity',
        'implying one, may not be used. Search terms may.']);
     const btn = modal.append('g');
@@ -2241,7 +2297,7 @@ subsidy: { crumb:'Auction insights', step:'THE MATH', head:'Ad Rank \u2014 why r
         label(card, c[0]+16, y+42, c[5], 8.6, 400, GSUB);
         mono(card, c[0]+16, y+66, 'QUALITY SCORE', 6.8, GSUB);
         label(card, c[0]+16, y+92, c[2] + ' / 10', 16, 700, c[4]);
-        mono(card, c[0]+cw2-16, y+66, 'BID FOR EQUAL RANK', 6.8, GSUB, 'end');
+        mono(card, c[0]+cw2-16, y+66, isNarrow() ? 'EQUAL-RANK BID' : 'BID FOR EQUAL RANK', 6.8, GSUB, 'end');
         label(card, c[0]+cw2-16, y+92, c[3], 16, 700, c[4], 'end');
         label(card, c[0]+16, y+114, 'Ad Rank = bid \u00d7 quality', 8.6, 400, GSUB);
       });
@@ -2266,7 +2322,8 @@ subsidy: { crumb:'Auction insights', step:'THE MATH', head:'Ad Rank \u2014 why r
 placement: { crumb:'Placements \u00b7 YouTube', step:'STATION 4', head:'Buying the fifteen seconds before', rail:2, tint:true,
   draw(g){
     let y = CY0 - 8;
-    const lw = CW*0.5;
+    const nar = isNarrow();
+    const lw = nar ? CW : CW*0.5;
     mono(g, CX0, y, 'TARGETED PLACEMENTS \u00b7 INVENTORY PURCHASED', 7, GSUB);
     [['Natural Family Wellness','486k subs'],['The Informed Parent','1.2m subs'],
      ['Raw Living Collective','230k subs'],['Ancient Remedies Daily','640k subs']]
@@ -2279,17 +2336,18 @@ placement: { crumb:'Placements \u00b7 YouTube', step:'STATION 4', head:'Buying t
         label(row, CX0+lw-12, ry+18, ch[1], 8.3, 400, GSUB, 'end');
       });
     label(g, CX0, y+14+4*34+22, 'The channel is untouched. The slot in front of it is bought.', 9.3, 400, GSUB);
-    const px = CX0 + CW*0.55, pw = CW*0.45;
+    const px = nar ? CX0 : CX0 + CW*0.55, pw = nar ? CW : CW*0.45;
+    const py = nar ? y + 14 + 4*34 + 44 : CY0 - 8;
     const player = g.append('g');
-    roundRect(player, px, CY0-8, pw, 150, 10, '#202124');
-    roundRect(player, px+12, CY0+2, 96, 22, 4, '#FFFFFF');
-    label(player, px+20, CY0+17, 'Ad \u00b7 0:15', 8.6, 600, GTEXT);
-    label(player, px+pw/2, CY0+62, 'CLINICIAN, ON CAMERA', 10, 700, '#FFFFFF', 'middle');
-    label(player, px+pw/2, CY0+80, 'built for this barrier, not generic', 8.3, 400, '#bdc1c6', 'middle');
-    roundRect(player, px+pw-104, CY0+112, 92, 22, 4, '#3c4043');
-    label(player, px+pw-58, CY0+127, 'Skip in 15s', 8.3, 400, '#9aa0a6', 'middle');
-    label(g, px, CY0+164, 'Runs before the video doing the convincing', 9.3, 500, GTEXT);
-    mBanner(g, CX0, CY0+206, CW*0.9, 'err', 'Only works if the creative is built for the barrier',
+    roundRect(player, px, py, pw, 150, 10, '#202124');
+    roundRect(player, px+12, py+10, 96, 22, 4, '#FFFFFF');
+    label(player, px+20, py+25, 'Ad \u00b7 0:15', 8.6, 600, GTEXT);
+    label(player, px+pw/2, py+70, 'CLINICIAN, ON CAMERA', 10, 700, '#FFFFFF', 'middle');
+    label(player, px+pw/2, py+88, 'built for this barrier, not generic', 8.3, 400, '#bdc1c6', 'middle');
+    roundRect(player, px+pw-104, py+120, 92, 22, 4, '#3c4043');
+    label(player, px+pw-58, py+135, 'Skip in 15s', 8.3, 400, '#9aa0a6', 'middle');
+    label(g, px, py+172, 'Runs before the video doing the convincing', 9.3, 500, GTEXT);
+    mBanner(g, CX0, nar ? py+196 : CY0+206, CW*0.9, 'err', 'Only works if the creative is built for the barrier',
       ['A generic establishment spot in this slot does not persuade.',
        'It entrenches. This is the step that cannot be skipped.']);
   } },
@@ -2297,27 +2355,37 @@ placement: { crumb:'Placements \u00b7 YouTube', step:'STATION 4', head:'Buying t
 privacy: { crumb:'Measurement \u00b7 server-side', step:'THE CONSTRAINT', head:'Optimisation without shipping health data', rail:3, tint:true,
   draw(g){
     let y = CY0 + 6;
-    const bw = CW*0.28, gap = (CW - 3*bw)/2;
+    const nar = isNarrow();
+    const bw = nar ? CW : CW*0.28, gap = nar ? 26 : (CW - 3*bw)/2;
+    const ch = nar ? 104 : 150;
     [['1 \u00b7 THE BROWSER','Constituent submits a screening form.','No third-party pixels. Data stays first-party.','#FFFFFF'],
      ['2 \u00b7 YOUR SERVER','Your infrastructure strips all identifying detail.','PII and health status never leave.','#E7F2F1'],
      ['3 \u00b7 THE PLATFORM','Receives an anonymous conversion ping.','Enough to optimise bidding. Nothing more.','#DCEBF5']]
       .forEach((c,i)=>{
-        const x = CX0 + i*(bw+gap);
+        const x = nar ? CX0 : CX0 + i*(bw+gap);
+        const cy = nar ? y + i*(ch+gap) : y;
         const card = g.append('g');
-        mCard(card, x, y, bw, 150);
+        mCard(card, x, cy, bw, ch);
         card.select('rect').attr('fill', c[3]);
-        mono(card, x+16, y+26, c[0], 7, i===1 ? TEAL_D : GSUB);
-        label(card, x+16, y+52, c[1], 9.5, 600, GTEXT).attr('class','pw1');
-        label(card, x+16, y+74, c[2], 9, 400, GSUB);
+        mono(card, x+16, cy+26, c[0], 7, i===1 ? TEAL_D : GSUB);
+        label(card, x+16, cy+52, c[1], 9.5, 600, GTEXT).attr('class','pw1');
+        label(card, x+16, cy+74, c[2], 9, 400, GSUB);
         if (i < 2){
-          g.append('path').attr('d','M '+(x+bw+8)+' '+(y+75)+' h '+(gap-16))
+          // the flow runs left-to-right on a desk and top-to-bottom on a phone
+          const ax = nar ? x + bw/2 : x + bw + 8, ay = nar ? cy + ch + 4 : cy + 75;
+          g.append('path')
+            .attr('d', nar ? 'M '+ax+' '+ay+' v '+(gap-8) : 'M '+ax+' '+ay+' h '+(gap-16))
             .attr('stroke',GSUB).attr('stroke-width',1.4).attr('stroke-dasharray','4 4');
-          g.append('path').attr('d','M '+(x+bw+gap-14)+' '+(y+70)+' l 6 5 l -6 5')
+          g.append('path')
+            .attr('d', nar ? 'M '+(ax-5)+' '+(ay+gap-14)+' l 5 6 l 5 -6'
+                           : 'M '+(x+bw+gap-14)+' '+(cy+70)+' l 6 5 l -6 5')
             .attr('fill','none').attr('stroke',GSUB).attr('stroke-width',1.4)
             .attr('stroke-linecap','round').attr('stroke-linejoin','round');
         }
       });
-    mBanner(g, CX0, y+176, CW*0.9, 'ok', 'The disqualifying question for any vendor',
+    // the banner sat below a single 150-tall row; stacked, the flow is 3 cards deep
+    mBanner(g, CX0, nar ? y + 3*(ch+gap) + 16 : y+176, nar ? CW : CW*0.9, 'ok',
+      'The disqualifying question for any vendor',
       ['If they cannot explain how they handle this, do not hire them.']);
   } }
 
@@ -2329,12 +2397,12 @@ function drawSegChips(){
   if (segG.empty()) return;
   const geo = segG.property('__geom');
   segG.selectAll('*').remove();
-  const pad = 10*TK, gap = 8, h = 18 + 8*TK;
+  const pad = 10*ctk(), gap = 8, h = 18 + 8*ctk();
   let cx = geo.x, row = 0;
   SEG_TERMS.forEach((it,i)=>{
     const on = segOn.has(i);
     const txt = on ? it.t : '+ ' + it.t;
-    const cw = Math.max(50, txt.length*5.4*TK + pad*2 + 14);
+    const cw = Math.max(50, txt.length*5.4*ctk() + pad*2 + 14);
     if (cx + cw > geo.x + geo.w){ cx = geo.x; row++; }
     const cy = geo.y + row*(h+gap);
     const cg = segG.append('g').attr('class','chip segpick').datum(it)
@@ -2342,7 +2410,7 @@ function drawSegChips(){
     padHit(cg, cx, cy, cw, h, 14);
     roundRect(cg, cx, cy, cw, h, h/2, on ? '#E7F2F1' : '#FFFFFF',
               on ? TEAL_D : GBORD, 1.2).attr('stroke-dasharray', on ? null : '4 3');
-    label(cg, cx + pad, cy + h/2 + 3.4*TK, txt, 9.3, on ? 600 : 400, on ? TEAL_D : GSUB);
+    label(cg, cx + pad, cy + h/2 + 3.4*ctk(), txt, 9.3, on ? 600 : 400, on ? TEAL_D : GSUB);
     if (on){
       const xx = cx + cw - 13;
       cg.append('path').attr('d','M '+(xx-3.2)+' '+(cy+h/2-3.2)+' l 6.4 6.4 M '+(xx+3.2)+' '+(cy+h/2-3.2)+' l -6.4 6.4')
@@ -2382,13 +2450,31 @@ function renderConsole(key){
   if (!sc || conKey === key) return;
   conKey = key;
   conBody.selectAll('*').remove();
+  const wasCon2 = INCON; INCON = isNarrow();
   conCrumb.text(sc.crumb);
   conStep.text(sc.step).attr('fill', TEAL_D);
-  conHead.text(sc.head);
+  if (isNarrow()){
+    // two tspans rather than two <text> nodes, so the fade transition in
+    // setTitle-style swaps still addresses a single element
+    conHead.text(null);
+    const cap = 26, words = sc.head.split(' ');
+    const ln = []; let cur = '';
+    for (const w of words){
+      if (cur && (cur + ' ' + w).length > cap){ ln.push(cur); cur = w; }
+      else cur = cur ? cur + ' ' + w : w;
+    }
+    if (cur) ln.push(cur);
+    const fs = +(conHead.attr('data-fs') || 12) * TK * (+conHead.attr('data-tk') || 1);
+    ln.forEach((t,i)=> conHead.append('tspan')
+      .attr('x', CX0 - 2).attr('dy', i ? fs * 1.25 : 0).text(t));
+  } else {
+    conHead.text(sc.head);
+  }
   conFrame.select('circle.avatar').attr('fill', TEAL_D);
   conAcct.text('MC');   // an avatar carries initials, not the whole account name
   drawRail(sc.rail || 0, false);
   sc.draw(conBody);
+  INCON = wasCon2;
   applyTypeScale();
 
   if (REDUCE){
@@ -2549,8 +2635,8 @@ function drawCaseHub(){
   if (caseOpen) return;
   CASES.forEach((c,i)=>{
     const x = nar ? 500 : 230 + i*270;
-    const y = nar ? 210 + i*168 : 230;
-    const w = nar ? 520 : 240, h = nar ? 150 : 250;
+    const y = nar ? 210 + i*258 : 230;
+    const w = nar ? 520 : 240, h = nar ? 238 : 250;
     const done = caseDone.has(c.id);
     const card = caseHub.append('g').attr('class','ccard').datum(c)
       .attr('tabindex',-1).attr('role','button')
@@ -2560,15 +2646,16 @@ function drawCaseHub(){
     roundRect(card, x-w/2, y, w, h, 14, c.tint, 'rgba(239,238,231,.18)', 1.2);
     mono(card, x-w/2+18, y+28, c.real ? 'CASE ' + c.id + ' \u00b7 REAL, CITED' : 'CASE ' + c.id + ' \u00b7 COMPOSITE',
       6.8, c.real ? ALARM : '#8D5D1C');
-    label(card, x-w/2+18, y+52, c.t, 12.5, 700, INK);
-    label(card, x-w/2+18, y+70, c.who, 8.8, 400, '#55606A');
+    label(card, x-w/2+18, y+(nar?56:52), c.t, 12.5, 700, INK);
+    label(card, x-w/2+18, y+(nar?92:70), c.who, 8.8, 400, '#55606A', 'start', nar ? 34 : 0);
     // which layers this case lights
-    mono(card, x-w/2+18, y+(nar?96:108), 'LIGHTS', 6.6, '#55606A');
+    mono(card, x-w/2+18, y+(nar?166:108), 'LIGHTS', 6.6, '#55606A');
+    const chw = nar ? 170 : 96, chg = nar ? 178 : 104, chh2 = nar ? 34 : 22;
     c.teaches.forEach((lid,k)=>{
       const L = LAYERS.find(l=>l.id===lid);
-      const px = x-w/2+18 + k*104, py = y+(nar?104:116);
-      roundRect(card, px, py, 96, 22, 11, done ? '#E7F2F1' : '#FFFFFF', done ? TEAL_D : '#8A8474', 1.1);
-      label(card, px+48, py+15, L.n, 8.3, 600, done ? TEAL_D : '#6F6F6F', 'middle');
+      const px = x-w/2+18 + k*chg, py = y+(nar?182:116);
+      roundRect(card, px, py, chw, chh2, chh2/2, done ? '#E7F2F1' : '#FFFFFF', done ? TEAL_D : '#8A8474', 1.1);
+      label(card, px+chw/2, py+(nar?22:15), L.n, 8.3, 600, done ? TEAL_D : '#6F6F6F', 'middle');
     });
     if (!nar){
       label(card, x-w/2+18, y+h-22, done ? 'walked \u2713 \u2014 open again' : 'walk this campaign \u203a',
@@ -2582,7 +2669,7 @@ function drawCaseHub(){
     }
   });
   const remaining = CASES.filter(c=>!caseDone.has(c.id)).length;
-  label(caseHub, 500, nar ? 730 : 540,
+  label(caseHub, 500, nar ? 1006 : 540,
     remaining === 0
       ? 'All seven layers lit. That is the whole instrument \u2014 and the argument for using it.'
       : 'Each campaign lights different layers. ' + remaining + ' of 3 still to walk.',
@@ -4419,9 +4506,11 @@ function drawDeskScene(key){
   }
 
   /* ---- the opened documents ---- */
-  const px = nar ? 220 : 190, pw = nar ? 560 : 620, py = 130;
-  roundRect(gDesk, px, py, pw, 440, 4, '#FFFFFF', '#8A8474', 1.6);
-  ln(gDesk, px+34, py+58, px+pw-34, py+58, '#DCD5C6', 1.2);
+  const px = nar ? 120 : 190, pw = nar ? 760 : 620, py = 130;
+  const ph2 = nar ? 580 : 440;
+  roundRect(gDesk, px, py, pw, ph2, 4, '#FFFFFF', '#8A8474', 1.6);
+  // the eyebrow wraps to two lines at narrow, so the rule under it drops too
+  ln(gDesk, px+34, py+(nar?88:58), px+pw-34, py+(nar?88:58), '#DCD5C6', 1.2);
 
   if (key === 'mandate'){
     mono(gDesk, px+34, py+40, 'COUNTY HEALTH CODE · DUTIES OF THE LOCAL HEALTH AUTHORITY', 6.6, MUTE);
@@ -4434,15 +4523,16 @@ function drawDeskScene(key){
       ['§ 6', 'Provide public information', 'no funding · no competency · no measure']
     ];
     rows.forEach((r,i)=>{
-      const y = py + 96 + i*(nar ? 66 : 54), last = i === rows.length-1;
+      const y = py + (nar ? 128 : 96) + i*(nar ? 70 : 54), last = i === rows.length-1;
+      const tx = px + (nar ? 96 : 70);
       mono(gDesk, px+34, y, r[0], 6.6, last?WARN:MUTE);
-      label(gDesk, px+70, y+2, r[1], last?12.5:11.5, last?700:400, last?WARN:'#3A4750');
-      mono(gDesk, px+70, y + (nar ? 28 : 20), r[2].toUpperCase(), 5.8, last?WARN:'#2E6B2B');
+      label(gDesk, tx, y+2, r[1], last?12.5:11.5, last?700:400, last?WARN:'#3A4750');
+      mono(gDesk, tx, y + (nar ? 30 : 20), r[2].toUpperCase(), 5.8, last?WARN:'#2E6B2B');
       if (last){
-        pth(gDesk, 'M '+(px+62)+' '+(y-16)+' q 150 -14 300 4 q -140 26 -300 -4 Z', WARN, 1.8);
+        pth(gDesk, 'M '+(px+(nar?88:62))+' '+(y-16)+' q 150 -14 300 4 q -140 26 -300 -4 Z', WARN, 1.8);
       }
     });
-    label(gDesk, 500, nar ? 700 : 612, 'Every other function here is a profession. This one is a chore appended to five professions.',
+    label(gDesk, 500, nar ? 754 : 612, 'Every other function here is a profession. This one is a chore appended to five professions.',
           12.5, 700, INK, 'middle');
   }
 
@@ -4461,7 +4551,7 @@ function drawDeskScene(key){
       // a stack being sliced, drawn at the end of each bar
       if (i===2) pth(gDesk, 'M '+(px+34+w)+' '+(y+4)+' l 40 36', '#E74D4E', 2.4);
     });
-    label(gDesk, 500, 612, 'This is the room in which somebody says the word “campaign”.', 12.5, 700, INK, 'middle');
+    label(gDesk, 500, nar ? 754 : 612, 'This is the room in which somebody says the word “campaign”.', 12.5, 700, INK, 'middle');
   }
 
   if (key === 'people'){
@@ -4471,22 +4561,23 @@ function drawDeskScene(key){
       ['Environmental health', 4, false], ['Public health nursing', 4, true],
       ['Outreach and education', 3, true], ['Disease intervention', 2, true]
     ];
-    let yy = py + 92;
+    let yy = py + (nar ? 132 : 92);
+    const gx = px + (nar ? 430 : 300);
     ROLES.forEach((r,i)=>{
       label(gDesk, px+34, yy+10, r[0], 10, r[2]?700:400, r[2]?WARN:'#3A4750');
       for (let k = 0; k < r[1]; k++){
-        const p = gDesk.append('g').attr('transform','translate('+(px+300+k*40)+','+yy+') scale(0.62)');
+        const p = gDesk.append('g').attr('transform','translate('+(gx+k*40)+','+yy+') scale(0.62)');
         person(p, r[2]?SKIN.b:SKIN.e, r[2]?WARN:CLOTH.navy, HAIR.dark);
         if (r[2] && !REDUCE) p.transition().delay(1200 + i*260 + k*140).duration(700)
-          .attr('opacity',.12).attr('transform','translate('+(px+300+k*40)+','+(yy-16)+') scale(0.62)');
+          .attr('opacity',.12).attr('transform','translate('+(gx+k*40)+','+(yy-16)+') scale(0.62)');
         else if (r[2]) p.attr('opacity',.12);
       }
       if (r[2]) mono(gDesk, px+pw-40, yy+4, 'CUT FIRST', 5.8, WARN, 'end');
-      yy += 50;
+      yy += (nar ? 56 : 50);
     });
-    label(gDesk, 500, nar ? 588 : 596, 'The outreach and education staff are the only people whose job was this.',
+    label(gDesk, 500, nar ? 754 : 596, 'The outreach and education staff are the only people whose job was this.',
           12.5, 700, INK, 'middle');
-    label(gDesk, 500, nar ? 626 : 620, 'No measurement → no defensible budget line → first to be cut → still no measurement.',
+    label(gDesk, 500, nar ? 800 : 620, 'No measurement → no defensible budget line → first to be cut → still no measurement.',
           10, 400, WARN, 'middle');
   }
   applyTypeScale();

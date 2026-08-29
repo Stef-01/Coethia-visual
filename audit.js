@@ -52,8 +52,13 @@ const VIEWS = [
         const box = { x: vb[0], y: vb[1], w: vb[2], h: vb[3] };
         let nodes = 0, texts = 0, tiny = 0, nan = 0;
         let minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9;
+        // The provenance stamp is chrome positioned FROM the camera frame, so it
+        // sits on the frame edge by construction. measure.js already excludes it
+        // for that reason; counting it here reported a phantom frame-overflow on
+        // every scene that shows it (the six console screens, cases, measure).
+        const stamp = svg.querySelector('g[pointer-events="none"]');
         const vis = [...svg.children].filter(g =>
-          g.tagName === 'g' && +(g.getAttribute('opacity') ?? 1) > 0.05);
+          g.tagName === 'g' && g !== stamp && +(g.getAttribute('opacity') ?? 1) > 0.05);
         for (const g of vis) {
           const all = g.querySelectorAll('*');
           for (const n of all) {
