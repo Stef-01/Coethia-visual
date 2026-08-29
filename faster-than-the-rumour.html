@@ -1136,9 +1136,9 @@ const FIT_M = {
   reel:'268 23 464 640',
   swipe:'251 23 498 686',
   comments:'281 23 438 604',
-  anatomy:'241 2 517 712',
+  anatomy:'240 0 520 716',
   counterpost:'235 -10 577 795',
-  trap:'201 20 597 823',
+  trap:'201 19 598 824',
   reach:'192 116 617 849',
   twoclocks:'36 -295 983 1355',
   chain:'205 44 591 814',
@@ -1147,7 +1147,7 @@ const FIT_M = {
   law:'185 8 588 810',
   desk:'76 -283 848 1168',
   mandate:'86 -103 828 1141',
-  money:'15 -197 970 1337',
+  money:'15 -197 970 1336',
   people:'86 -71 828 1141',
   ledger:'140 116 698 962',
   arithmetic:'139 116 723 996',
@@ -1157,22 +1157,22 @@ const FIT_M = {
   facets:'113 24 774 1067',
   crosstab:'91 29 766 1055',
   axes:'35 -199 946 1304',
-  quadrants:'61 -112 998 1376',
+  quadrants:'61 -113 999 1376',
   middle:'81 -136 834 1149',
   oldnew:'133 29 734 1012',
   laws:'200 53 528 728',
   loop:'283 87 435 599',
   coethia:'283 87 435 599',
   stations:'283 87 435 599',
-  listen:'116 -91 768 1058',
+  listen:'116 35 768 1058',
   map:'4 -293 1008 1389',
   translate:'118 86 764 1052',
-  lenses:'19 -192 963 1326',
-  grants:'116 -244 989 1363',
-  segments:'116 -95 773 1065',
-  subsidy:'3 -248 995 1370',
-  placement:'116 -77 768 1058',
-  privacy:'116 -77 768 1058',
+  lenses:'18 -192 963 1327',
+  grants:'116 -12 837 1153',
+  segments:'116 35 768 1058',
+  subsidy:'3 -122 995 1370',
+  placement:'116 35 768 1058',
+  privacy:'116 35 768 1058',
   measure:'76 53 848 1169',
   cases:'91 33 819 1128',
   weeks:'211 42 583 803',
@@ -1231,7 +1231,11 @@ const MIN_SANS = 8.0, MIN_MONO = 7.2;
    size of a glyph is about size * 1.07 CSS px, an average glyph is ~0.52 em,
    and the usable stage is ~340px, so ~600/size characters fit on a line. */
 function wrapFor(txt, size, anchor, force){
-  if (INCON) return null;
+  /* The console is fixed-flow, so nothing wraps there BY DEFAULT -- but an
+     explicit wrapCap is a caller saying it knows its own container width, and
+     mBanner does. Blanket-refusing it silently dropped the banner's caps and let
+     a 62-character line run out of a 365-unit card into the panel beside it. */
+  if (INCON && !force) return null;
   if (!isNarrow() || typeof txt !== 'string') return null;
   // centred captions wrap on their own; anything else has to ask, because only
   // the caller knows how wide its container is
@@ -1417,7 +1421,7 @@ const GBLUE='#1a73e8', GBLUED='#174ea6', GTEXT='#202124', GSUB='#5f6368',
 let CON, CX0, CY0, CW, RAIL;
 function conMetrics(){
   if (isNarrow()){
-    CON = { x:150, y:104, w:700, h:668 };
+    CON = { x:150, y:104, w:700, h:920 };
     RAIL = 0;
   } else {
     CON = { x:64, y:98, w:872, h:534 };
@@ -1565,16 +1569,21 @@ function mBanner(g, x, y, w, kind, title, lines){
   const inner = w - 40*k - 14;
   const cap = sz => k > 1 ? Math.max(12, Math.floor(inner / (sz * ctk() * 0.52))) : 0;
   const tcap = cap(10.5), bcap = cap(9.3);
-  const tLines = (tcap && title.length > tcap) ? 2 : 1;
+  const nLines = (t, c) => (c && t.length > c) ? Math.ceil(t.length / c) : 1;
+  const tLines = nLines(title, tcap);
+  const bLines = lines.reduce((n, ln) => n + nLines(ln, bcap), 0);
   const bodyTop = 35 + (tLines - 1) * 15;
-  const h = (bodyTop + lines.length*15 + 8) * k;
+  const h = (bodyTop + bLines*15 + 8) * k;
   const box = g.append('g').attr('class','ntc');
   roundRect(box, x, y, w, h, 8 * k, err ? GERRBG : '#e6f4ea', err ? GERR : GGRN, 1.1);
   box.append('circle').attr('cx',x+21*k).attr('cy',y+21*k).attr('r',8.5*k).attr('fill', err ? GERR : GGRN);
   label(box, x+21*k, y+25*k, err ? '!' : '✓', 10, 700, '#FFFFFF', 'middle');
   label(box, x+40*k, y+18*k, title, 10.5, 600, err ? GERR : GGRN, 'start', tcap);
-  lines.forEach((ln,i2)=> label(box, x+40*k, y+(bodyTop + i2*15)*k, ln, 9.3, 400, '#3c4043',
-                                'start', bcap));
+  let row = 0;
+  lines.forEach(ln => {
+    label(box, x+40*k, y+(bodyTop + row*15)*k, ln, 9.3, 400, '#3c4043', 'start', bcap);
+    row += nLines(ln, bcap);
+  });
   return y + h + 14 * k;
 }
 function mTabs(g, x, y, tabs, active){
@@ -2391,13 +2400,14 @@ segments: { crumb:'Audience segments \u00b7 custom segment', step:'THE NUANCE', 
        holding roughly twice their height. pk is 1 at desktop, where every offset
        below evaluates to its original literal. */
     const pk = isNarrow() ? ctk() : 1;
-    mCard(modal, px, my+52, pw, 150 * pk);
+    mCard(modal, px, my+52, pw, (isNarrow() ? 178 : 150) * pk);
     label(modal, px+14, my+74, 'Audience size', 9.8, 600, GTEXT);
     const az = label(modal, px+14, my+52+50*pk, segOn.size ? '' : '\u2014', 17, 500, TEAL_D);
     az.attr('class','azn');
     let tot = 0; segOn.forEach(i => tot += SEG_TERMS[i].v);
     az.property('__v', tot);
-    mono(modal, px+14, isNarrow() ? my+52+67*pk : my+118, 'WEEKLY IMPRESSIONS, EST.', 6.6, GSUB);
+    mono(modal, px+14, isNarrow() ? my+52+67*pk : my+118,
+         isNarrow() ? 'WEEKLY IMPRESSIONS' : 'WEEKLY IMPRESSIONS, EST.', 6.6, GSUB);
     [['Search', .74],['YouTube', .52],['Display', .40]].forEach((sfc,i)=>{
       const by = my+52+(78+i*15)*pk;
       label(modal, px+14, by+8, sfc[0], 8.2, 400, GSUB);
@@ -2417,7 +2427,7 @@ segments: { crumb:'Audience segments \u00b7 custom segment', step:'THE NUANCE', 
        my+214 (420), i.e. inside the chip column. Dropped below the chips. It
        spans x 272..639 while the Create button sits at x 810..918, so sharing
        that band costs nothing, and 591 still clears the modal's 610 bottom. */
-    mBanner(modal, mx+22, isNarrow() ? CON.y + CON.h - 148 : my+340, mw*0.55, 'err',
+    mBanner(modal, mx+22, isNarrow() ? 660 : my+340, mw*0.55, 'err',
       'Restricted \u2014 and it applies to you too',
       ['Audiences built on a sensitive health condition, or on activity',
        'implying one, may not be used. Search terms may.']);
