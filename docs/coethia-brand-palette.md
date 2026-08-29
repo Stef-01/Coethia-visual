@@ -1,9 +1,34 @@
 # Coethia brand palette — analysis and application
 
+> **Status: the dark application was reverted.** The colour analysis below is
+> still the record of what the deck actually uses, and the OKLCH and CVD work
+> is still worth keeping. What no longer holds is the *application*: the third
+> explainer ran on the espresso ground for two commits and, next to the two
+> light pieces and the index, read as a different website. `index.html`
+> promises "one shared design system" and the piece's own credits claimed to
+> share the other two's palette; neither was true while the dark skin was on.
+>
+> `faster-than-the-rumour.html` is now back on The Reachable's light system.
+> Two islands were kept, for the same reason the console was always exempt —
+> you draw the object, not a diagram of it:
+>
+> | Island | Why it stays as it is |
+> |---|---|
+> | The recreated Google Ads console | a real ad console is a white Material UI |
+> | The phone, the 3am bedroom, the profile cards, the comment sheet | a phone at three in the morning is a bright screen in a dark room |
+>
+> One token had no light twin. The deck's wheat `#EBDDA8` is the *brightest*
+> accent on espresso (12.22:1); on paper a wheat yellow is the dimmest thing
+> available (1.29:1). `GOLD` is therefore re-cut as an ochre `#8D5D1C`
+> (5.23:1) rather than mapped to a yellow that would disappear.
+>
+> If the deck brand is ever wanted on the web again, the right move is to take
+> **all three** pieces and the index dark together, not one of them.
+
 Source: `AHACoethia.pdf` (14pp). Colours extracted from the deck's actual vector
 fills and text runs, not eyeballed; typography from the embedded font names.
-Applied to `coethia-engagement.html` only — the other two pieces keep The
-Reachable's light system.
+Was applied to `coethia-engagement.html` only (a file since replaced by
+`faster-than-the-rumour.html`); see the status note above.
 
 ## What the deck actually uses
 

@@ -3,12 +3,12 @@
    scene that contains it and matches the stage's own aspect — so scenes fill the
    stage instead of letterboxing. Writes the FIT / FIT_M maps back into the file.
    Run: node measure.js                                                         */
-const { chromium } = require('C:/Users/stefa/Menu-app/node_modules/playwright');
+const { chromium } = require('playwright');
 const path = require('path'), fs = require('fs');
 const FILE = path.resolve(__dirname, 'faster-than-the-rumour.html');
 const URL = 'file:///' + FILE.replace(/\\/g, '/');
 
-const PAD = 26;          // breathing room around the composition
+const PAD = 34;   // a little margin so a stage a few px off the measured one does not clip          // breathing room around the composition
 const SETTLE = 1500;     // let entrance transitions land before measuring
 
 /* scenes whose interactions move content outward — measured in their widest state */
@@ -25,6 +25,36 @@ const POKE = {
 };
 
 const MEASURE = () => {
+  /* getBBox() reports a bbox in the element's OWN user space, so anything inside
+     a transformed group is measured in the wrong place -- the route cards are
+     translate(500,y) groups whose children report x -204..204, and the camera
+     was being fitted from -212 instead of 290. Map through the element's CTM
+     relative to the svg instead. */
+  const userBox = (el, svg) => {
+    let bb; try { bb = el.getBBox(); } catch (e) { return null; }
+    if (!bb || (!bb.width && !bb.height)) return null;
+    /* getCTM() maps to the VIEWPORT, which folds in the viewBox scale and
+       collapses every frame to a few hundred units. Compose the screen CTMs
+       instead: svg-screen inverse times element-screen gives element user
+       space -> svg user space, which is the coordinate system the frame is
+       expressed in. */
+    let m = null;
+    try {
+      const es = el.getScreenCTM(), ss = svg.getScreenCTM();
+      if (es && ss) m = ss.inverse().multiply(es);
+    } catch (e) { m = null; }
+    if (!m) return bb;
+    const pt = svg.createSVGPoint();
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const [px, py] of [[bb.x, bb.y], [bb.x + bb.width, bb.y],
+                            [bb.x, bb.y + bb.height], [bb.x + bb.width, bb.y + bb.height]]) {
+      pt.x = px; pt.y = py;
+      const q = pt.matrixTransform(m);
+      if (q.x < x0) x0 = q.x; if (q.y < y0) y0 = q.y;
+      if (q.x > x1) x1 = q.x; if (q.y > y1) y1 = q.y;
+    }
+    return { x: x0, y: y0, width: x1 - x0, height: y1 - y0 };
+  };
   const svg = document.querySelector('#viz');
   const r = svg.getBoundingClientRect();
   let minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9, n = 0;
@@ -38,12 +68,19 @@ const MEASURE = () => {
     for (const el of g.querySelectorAll('*')) {
       if (['g','clipPath','animate','animateTransform','defs'].includes(el.tagName)) continue;
       if (el.closest('clipPath')) continue;
+      // Content clipped by a clip-path is bounded on screen by the clip
+      // region, but getBBox() reports it unclipped. Measuring it grew the
+      // frame to fit text nobody can see -- the comment sheet inside the
+      // phone runs 346 units past the screen it is clipped to, which is why
+      // the phone was rendering as a thumbnail. The clip region is a real
+      // painted rect and gets measured on its own, so skipping these is safe.
+      if (el.closest('[clip-path]')) continue;
       if (el.getAttribute('fill') === 'transparent' && !el.getAttribute('stroke')) continue;
       let op = 1, p = el;
       while (p && p !== svg) { op *= +(p.getAttribute('opacity') ?? 1); p = p.parentNode; }
       if (op < 0.06) continue;
       if (el.tagName === 'text' && !el.textContent.trim()) continue;
-      let bb; try { bb = el.getBBox(); } catch (e) { continue; }
+      let bb = userBox(el, svg); if (!bb) continue;
       if (!bb.width && !bb.height) continue;
       minX = Math.min(minX, bb.x); minY = Math.min(minY, bb.y);
       maxX = Math.max(maxX, bb.x + bb.width); maxY = Math.max(maxY, bb.y + bb.height);
@@ -65,7 +102,7 @@ function fit(m, aspect, pad) {
 (async () => {
   const browser = await chromium.launch();
   const out = {};
-  for (const view of [['desktop', 1440, 900, 'FIT'], ['mobile', 390, 800, 'FIT_M']]) {
+  for (const view of [['desktop', 1440, 900, 'FIT'], ['mobile', 375, 780, 'FIT_M']]) {
     const page = await browser.newPage({ viewport: { width: view[1], height: view[2] } });
     await page.goto(URL, { waitUntil: 'load' });
     await page.waitForTimeout(1200);
