@@ -57,6 +57,36 @@ const VIEWS = [
         // for that reason; counting it here reported a phantom frame-overflow on
         // every scene that shows it (the six console screens, cases, measure).
         const stamp = svg.querySelector('g[pointer-events="none"]');
+            /* getBBox() reports a bbox in the element's OWN user space, so anything inside
+     a transformed group is measured in the wrong place -- the route cards are
+     translate(500,y) groups whose children report x -204..204, and the camera
+     was being fitted from -212 instead of 290. Map through the element's CTM
+     relative to the svg instead. */
+  const userBox = (el, svg) => {
+    let bb; try { bb = el.getBBox(); } catch (e) { return null; }
+    if (!bb || (!bb.width && !bb.height)) return null;
+    /* getCTM() maps to the VIEWPORT, which folds in the viewBox scale and
+    collapses every frame to a few hundred units. Compose the screen CTMs
+    instead: svg-screen inverse times element-screen gives element user
+    space -> svg user space, which is the coordinate system the frame is
+    expressed in. */
+    let m = null;
+    try {
+    const es = el.getScreenCTM(), ss = svg.getScreenCTM();
+    if (es && ss) m = ss.inverse().multiply(es);
+    } catch (e) { m = null; }
+    if (!m) return bb;
+    const pt = svg.createSVGPoint();
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const [px, py] of [[bb.x, bb.y], [bb.x + bb.width, bb.y],
+                            [bb.x, bb.y + bb.height], [bb.x + bb.width, bb.y + bb.height]]) {
+      pt.x = px; pt.y = py;
+      const q = pt.matrixTransform(m);
+      if (q.x < x0) x0 = q.x; if (q.y < y0) y0 = q.y;
+      if (q.x > x1) x1 = q.x; if (q.y > y1) y1 = q.y;
+    }
+    return { x: x0, y: y0, width: x1 - x0, height: y1 - y0 };
+  };
         const vis = [...svg.children].filter(g =>
           g.tagName === 'g' && g !== stamp && +(g.getAttribute('opacity') ?? 1) > 0.05);
         for (const g of vis) {
@@ -89,7 +119,7 @@ const VIEWS = [
             while (p2 && p2 !== svg) { op *= +(p2.getAttribute('opacity') ?? 1); p2 = p2.parentNode; }
             if (op < 0.06) continue;
             if (n.tagName === 'text' && !n.textContent.trim()) continue;
-            let bb; try { bb = n.getBBox(); } catch (e) { continue; }
+            let bb = userBox(n, svg); if (!bb) continue;
             if (!bb.width && !bb.height) continue;
             minX = Math.min(minX, bb.x); minY = Math.min(minY, bb.y);
             maxX = Math.max(maxX, bb.x + bb.width); maxY = Math.max(maxY, bb.y + bb.height);
