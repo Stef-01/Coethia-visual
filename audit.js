@@ -144,7 +144,10 @@ const VIEWS = [
           const oh = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
           if (ow <= 1 || oh <= 1) continue;
           const frac = (ow * oh) / Math.min(a.width * a.height, b.width * b.height);
-          if (frac > 0.34) hits.push(boxes[i].s + ' / ' + boxes[j].s);
+          // 0.34 passed real overlaps: twoclocks had a view counter running across four
+          // labels and week12 had six labels touching, both under a third of the
+          // smaller box each. 0.12 is where the screenshot pass and the audit agree.
+          if (frac > 0.12) hits.push(boxes[i].s + ' / ' + boxes[j].s);
         }
         return { box, nodes, texts, tiny, nan, minX, minY, maxX, maxY, groups: vis.length, hits };
       });
