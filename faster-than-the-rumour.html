@@ -1083,7 +1083,7 @@ const FIT = {
   chain:'52 -13 792 751',
   gate:'52 -53 886 840',
   decided:'138 63 755 716',
-  law:'194 78 578 548',
+  law:'191 78 578 548',
   desk:'76 -60 848 804',
   mandate:'156 46 688 653',
   money:'156 46 688 653',
@@ -1136,14 +1136,14 @@ const FIT_M = {
   reel:'268 23 464 640',
   swipe:'251 23 498 686',
   comments:'281 23 438 604',
-  anatomy:'243 4 515 709',
+  anatomy:'241 2 517 712',
   counterpost:'235 -10 577 795',
-  trap:'202 20 596 822',
+  trap:'201 20 597 823',
   reach:'192 116 617 849',
-  twoclocks:'36 -287 983 1355',
-  chain:'204 44 592 815',
+  twoclocks:'36 -295 983 1355',
+  chain:'205 44 591 814',
   gate:'66 -134 872 1201',
-  decided:'-19 -299 1039 1431',
+  decided:'-19 -307 1039 1431',
   law:'185 8 588 810',
   desk:'76 -283 848 1168',
   mandate:'86 -103 828 1141',
@@ -1152,12 +1152,12 @@ const FIT_M = {
   ledger:'140 116 698 962',
   arithmetic:'139 116 723 996',
   gaps:'76 -91 848 1168',
-  notone:'145 82 710 978',
+  notone:'145 83 709 977',
   five:'119 60 763 1051',
   facets:'113 24 774 1067',
   crosstab:'91 29 766 1055',
-  axes:'35 -191 946 1304',
-  quadrants:'61 -164 998 1376',
+  axes:'35 -199 946 1304',
+  quadrants:'61 -112 998 1376',
   middle:'81 -136 834 1149',
   oldnew:'133 29 734 1012',
   laws:'200 53 528 728',
@@ -1165,12 +1165,12 @@ const FIT_M = {
   coethia:'283 87 435 599',
   stations:'283 87 435 599',
   listen:'116 -91 768 1058',
-  map:'4 -303 1008 1389',
+  map:'4 -293 1008 1389',
   translate:'118 86 764 1052',
   lenses:'19 -192 963 1326',
-  grants:'116 -243 988 1362',
+  grants:'116 -244 989 1363',
   segments:'116 -95 773 1065',
-  subsidy:'3 -248 994 1370',
+  subsidy:'3 -248 995 1370',
   placement:'116 -77 768 1058',
   privacy:'116 -77 768 1058',
   measure:'76 53 848 1169',
@@ -1464,8 +1464,19 @@ function drawConFrame(){
   const nrw = isNarrow();
   conHead = label(conFrame, CX0 - (RAIL ? 0 : 2), CON.y + (nrw ? 96 : 78), '',
                   nrw ? 12 : 15.5, 500, GTEXT);
-  conStep = mono(conFrame, nrw ? CX0 - 2 : rx-28, CON.y + (nrw ? 66 : 78), '', 7.5, GERR,
-                 nrw ? 'start' : 'end');
+  /* [mobile] The head paints at 12 * TK * CON_TK = 30.2 units and wraps to two
+     lines, so its first line's ascender reaches y-30.2 = CON.y+65.8 -- the
+     eyebrow's own baseline -- and the pair overlapped by 5.4 of the eyebrow's
+     25.8-unit box while both sat at CX0. Nothing can be spent vertically: the
+     band from the app-bar rule (CON.y+44) down to the earliest console body
+     (segments' modal title, top at CON.y+150) is 106 units, and the eyebrow
+     plus a two-line head already need 101 of them. So the eyebrow moves to the
+     right edge, where the desktop already keeps it. The longest step, 'THE
+     CONSTRAINT', is 14 * 7.5 * TK * CON_TK * 0.72 = 190 units and ends at
+     rx-28, so it starts at 632 -- 47 clear of the widest head first line (26
+     characters, 409 units from CX0, ending at 585) and 14 units below the
+     avatar row. Desktop already used rx-28 / 'end' at CON.y+78. */
+  conStep = mono(conFrame, rx-28, CON.y + (nrw ? 66 : 78), '', 7.5, GERR, 'end');
   // stepper rail (desktop only)
   conRailG = conFrame.append('g');
   if (RAIL){
@@ -1542,20 +1553,28 @@ function mField(g, x, y, w, lab, val, opts){
   return y + 58;
 }
 function mBanner(g, x, y, w, kind, title, lines){
-  /* Every metric here was authored at 1x. Inside the console the type is painted
-     at TK * CON_TK -- about 2x on a phone -- so the 15-unit lead ends up holding
-     18.6 units of type and the two body lines print over each other. Scaling the
-     box with the type keeps the proportions the banner was drawn with; at
-     desktop k is 1 and this is byte-identical to before. */
+  /* Every metric here was authored at 1x. Inside the console the type paints at
+     TK * CON_TK -- about 2x on a phone -- so a flat 15-unit lead ends up holding
+     18.6 units of type, and neither the title nor the body was wrapping to the
+     box, so a 62-character line ran ~600 units out of a 365-unit banner into the
+     panel beside it. Scale the box with its own type and wrap both to the width
+     that is actually available. At desktop k is 1, no wrap cap is applied, and
+     the output is byte-identical to the original. */
   const k = INCON ? ctk() : 1;
-  const h = (30 + lines.length*15 + 8) * k;
-  const box = g.append('g').attr('class','ntc');
   const err = kind === 'err';
+  const inner = w - 40*k - 14;
+  const cap = sz => k > 1 ? Math.max(12, Math.floor(inner / (sz * ctk() * 0.52))) : 0;
+  const tcap = cap(10.5), bcap = cap(9.3);
+  const tLines = (tcap && title.length > tcap) ? 2 : 1;
+  const bodyTop = 35 + (tLines - 1) * 15;
+  const h = (bodyTop + lines.length*15 + 8) * k;
+  const box = g.append('g').attr('class','ntc');
   roundRect(box, x, y, w, h, 8 * k, err ? GERRBG : '#e6f4ea', err ? GERR : GGRN, 1.1);
   box.append('circle').attr('cx',x+21*k).attr('cy',y+21*k).attr('r',8.5*k).attr('fill', err ? GERR : GGRN);
   label(box, x+21*k, y+25*k, err ? '!' : '✓', 10, 700, '#FFFFFF', 'middle');
-  label(box, x+40*k, y+18*k, title, 10.5, 600, err ? GERR : GGRN);
-  lines.forEach((ln,i)=> label(box, x+40*k, y+(35+i*15)*k, ln, 9.3, 400, '#3c4043'));
+  label(box, x+40*k, y+18*k, title, 10.5, 600, err ? GERR : GGRN, 'start', tcap);
+  lines.forEach((ln,i2)=> label(box, x+40*k, y+(bodyTop + i2*15)*k, ln, 9.3, 400, '#3c4043',
+                                'start', bcap));
   return y + h + 14 * k;
 }
 function mTabs(g, x, y, tabs, active){
@@ -1665,13 +1684,24 @@ function mTree(g, y, rows){
 function mCounters(g, y, items, teal){
   const nar = isNarrow();
   const w = nar ? 0 : CW / items.length;
-  const rh = 68;
+  /* At narrow these stack one per row inside the console, so the type paints at
+     TK * CON_TK -- about 2.5x on a phone. The 42-unit lead and the 68-unit pitch
+     were drawn for 1x type: at 2.5x the 18-unit value carries 43 units of ascent
+     on its own, so it climbs into the label above it and its descent reaches the
+     label of the row below. Both gaps are re-derived from the painted line
+     heights, the way mBanner right above scales its box, and the value's
+     authored size drops -- at 15 it still reads 1.74x the label, the ratio the
+     real metric cards use, and the block stays inside the sheet. */
+  const vs = nar ? 15 : 18;                      // the big number
+  const lh = 8.6 * ctk(), vh = vs * ctk();       // painted label / value lines
+  const vd = nar ? Math.round(1.24 * vh) : 27;   // label baseline -> value baseline
+  const rh = nar ? vd + Math.round(1.62 * lh) : 68;
   items.forEach((it,i)=>{
     const x = nar ? CX0 : CX0 + i*w;
     const cy = nar ? y + i*rh : y;
     const cell = g.append('g');
     label(cell, x, cy, it.l, 8.6, 400, GSUB);
-    const t = label(cell, x, cy+(nar?42:27), '', 18, 500, it.hi ? (teal?TEAL_D:GBLUE) : GTEXT);
+    const t = label(cell, x, cy+vd, '', vs, 500, it.hi ? (teal?TEAL_D:GBLUE) : GTEXT);
     if (!REDUCE && it.v != null){
       t.transition('count').duration(1300).delay(300+i*120).ease(VALUE_EASE)
         .tween('t', function(){
@@ -1923,7 +1953,20 @@ const QUAD = [
         .attr('cx', qx+26+rnd()*(w/2-52)).attr('cy', qy+26+rnd()*(w/2-52))
         .attr('r',4).attr('fill',q.c).attr('opacity',.85);
     }
-    label(g, qx+w/4, qy+w/2-16, q.t, 10, 700, INK, 'middle');
+    /* Each persona name is authored at 10 and centred in a 250-unit quadrant --
+       a 250-unit box, but wrapFor's own cap for size 10 is round(600/10) = 60
+       characters, a 600-unit budget. So nothing wraps and at narrow
+       "Therapeutic Minimalist" paints 22 * 10 * 2.21 * 0.52 = 253 units (more in
+       Work Sans 700, whose advance runs nearer 0.63em), crosses the vertical axis
+       and lands on "Natural Autonomist" 250 units away. Both share one y and one
+       size, so the encroachment is the whole box height. One word per line fits
+       instead: the widest, "Therapeutic", is 154 units at TK=2.21 and 210 at the
+       3.0 ceiling, inside a 250-unit quadrant either way. The anchor rises 40
+       units because the second line is placed by applyTypeScale at one narrow
+       lead below the first (13.2 * TK, up to 40 units), and it has to stay above
+       the quadrant's own bottom edge -- the axis path at 380 for the top row, the
+       map edge at 630 and the mono trust label below it for the bottom row. */
+    label(g, qx+w/4, qy+w/2-(isNarrow()?56:16), q.t, 10, 700, INK, 'middle', isNarrow()?12:0);
     g.attr('tabindex',-1).attr('role','button').attr('aria-label', q.t + '. Needs: ' + q.need)
       .style('cursor','pointer');
   });
@@ -1935,7 +1978,16 @@ const QUAD = [
   mono(gMap, x0+w/2, y0+w+22, 'LOW INSTITUTIONAL TRUST', 7.5, MUTE, 'middle');
   mono(gMap, x0-12, y0+w/2, 'LOW APPETITE', 7.5, MUTE, 'end');
   mono(gMap, x0+w+12, y0+w/2, 'HIGH APPETITE', 7.5, MUTE);
-  label(gMap, 500, y0+w+52, 'Same population. Sorted by what predicts response.', 11.5, 700, INK, 'middle');
+  /* 30 units of authored gap under LOW INSTITUTIONAL TRUST is one 11.5 line at
+     TK=1. At narrow two baselines need 1.25 * 11.5 * TK -- 31.7 units at 2.21 and
+     43.1 at the 3.0 ceiling -- so the caption's cap height climbed into the mono
+     above it, and because the mono is the smaller box (274 units wide against the
+     caption's 660) two units of intersection is already 12% of its area. Neither
+     string wraps at these caps, so the gap itself has to grow. 72 buys 50 units,
+     enough at the ceiling, and still leaves the caption's descender 49 units
+     inside the mobile frame's 760 floor with nothing below it -- the provenance
+     stamp is hidden on this key. */
+  label(gMap, 500, y0+w+(isNarrow()?72:52), 'Same population. Sorted by what predicts response.', 11.5, 700, INK, 'middle');
 })();
 bindTipQ = null;
 
@@ -2287,7 +2339,12 @@ listen: { crumb:'Keyword Planner \u00b7 Marion County', step:'STATION 1', head:'
 
 grants: { crumb:'Ad Grants \u00b7 account', step:'STATION 4', head:'The account, and its rules', rail:1, tint:true,
   draw(g){
-    let y = CY0 - 4;
+    /* CY0 is set low enough for a two-line console title. This is the one
+       console screen whose title fits on one line (26 chars, exactly
+       renderConsole's cap), so at narrow the body can start 34 units higher --
+       which is the room the re-scaled counter rows below need in order to keep
+       the commit banner inside the sheet. */
+    let y = isNarrow() ? CY0 - 38 : CY0 - 4;
     y = mCounters(g, y+8, [
       { l:'Monthly inventory', v:10000, pre:'$', hi:true },
       { l:'Account CTR floor', s:'5%' },
@@ -2329,15 +2386,20 @@ segments: { crumb:'Audience segments \u00b7 custom segment', step:'THE NUANCE', 
       .attr('class','simnote').attr('opacity', segOn.size ? 1 : 0);
     // the estimate panel
     const px = mx + mw*0.62, pw = mw*0.38 - 22;
-    mCard(modal, px, my+52, pw, 150);
+    /* pk scales the panel's 1x paddings by the factor its own type is painted
+       at, so the 28-unit gap under 'Audience size' and the 15-unit row step stop
+       holding roughly twice their height. pk is 1 at desktop, where every offset
+       below evaluates to its original literal. */
+    const pk = isNarrow() ? ctk() : 1;
+    mCard(modal, px, my+52, pw, 150 * pk);
     label(modal, px+14, my+74, 'Audience size', 9.8, 600, GTEXT);
-    const az = label(modal, px+14, my+102, segOn.size ? '' : '\u2014', 17, 500, TEAL_D);
+    const az = label(modal, px+14, my+52+50*pk, segOn.size ? '' : '\u2014', 17, 500, TEAL_D);
     az.attr('class','azn');
     let tot = 0; segOn.forEach(i => tot += SEG_TERMS[i].v);
     az.property('__v', tot);
-    mono(modal, px+14, my+118, 'WEEKLY IMPRESSIONS, EST.', 6.6, GSUB);
+    mono(modal, px+14, isNarrow() ? my+52+67*pk : my+118, 'WEEKLY IMPRESSIONS, EST.', 6.6, GSUB);
     [['Search', .74],['YouTube', .52],['Display', .40]].forEach((sfc,i)=>{
-      const by = my+130 + i*15;
+      const by = my+52+(78+i*15)*pk;
       label(modal, px+14, by+8, sfc[0], 8.2, 400, GSUB);
       modal.append('rect').attr('x',px+66).attr('y',by+2).attr('width',(pw-84)).attr('height',5)
         .attr('rx',2.5).attr('fill',GSURF);
@@ -2345,10 +2407,11 @@ segments: { crumb:'Audience segments \u00b7 custom segment', step:'THE NUANCE', 
         .attr('width', segOn.size ? (pw-84)*sfc[1] : 0).attr('height',5)
         .attr('rx',2.5).attr('fill','#9FD8D4');
     });
-    modal.append('path').attr('d','M '+(px+14)+' '+(my+182)+' H '+(px+pw-14))
+    modal.append('path').attr('d','M '+(px+14)+' '+(my+52+130*pk)+' H '+(px+pw-14))
       .attr('stroke',GBORD).attr('stroke-width',1);
-    mono(modal, px+14, my+196, 'CONDITION TARGETED', 6.6, GSUB);
-    label(modal, isNarrow() ? px+14 : px+pw-14, my+(isNarrow()?224:197), 'never', 11, 700, TEAL_D,
+    // the panel grew with pk, so its footer follows the same anchor
+    mono(modal, px+14, my+52+144*pk, 'CONDITION TARGETED', 6.6, GSUB);
+    label(modal, isNarrow() ? px+14 : px+pw-14, my+52+(isNarrow()?172:145)*pk, 'never', 11, 700, TEAL_D,
           isNarrow() ? 'start' : 'end');
     /* Desktop: the five term chips run y 378..531 and this banner was authored at
        my+214 (420), i.e. inside the chip column. Dropped below the chips. It
@@ -2371,19 +2434,26 @@ subsidy: { crumb:'Auction insights', step:'THE MATH', head:'Ad Rank \u2014 why r
      [CX0+CW*0.5, 'Your county health page', '10', '$5.00', GGRN, 'exact-match, credible, useful']]
       .forEach(c=>{
         const card = g.append('g');
-        mCard(card, c[0], y, cw2, isNarrow() ? 232 : 128);
-        label(card, c[0]+16, y+24, c[1], 10.5, 600, GTEXT);
-        label(card, c[0]+16, y+42, c[5], 8.6, 400, GSUB);
         const nr = isNarrow();
-        const vy = nr ? 102 : 92, fy = nr ? 214 : 114;
-        mono(card, c[0]+16, y+66, 'QUALITY SCORE', 6.8, GSUB);
+        /* Every offset below was authored at 1x. Inside the console the type is
+           painted at TK*CON_TK, so at narrow the title/subtitle pair needed 10.3
+           more units than it had and each eyebrow/value pair 9. Spread them and
+           grow the card to match; desktop keeps its authored numbers exactly. */
+        const ty  = nr ?  30 :  24, sy = nr ?  62 :  42;
+        const qy  = nr ?  98 :  66, vy = nr ? 152 :  92;
+        const by2 = nr ? 196 :  66, wy = nr ? 250 :  92;
+        const fy  = nr ? 292 : 114;
+        mCard(card, c[0], y, cw2, nr ? 320 : 128);
+        label(card, c[0]+16, y+ty, c[1], 10.5, 600, GTEXT);
+        label(card, c[0]+16, y+sy, c[5], 8.6, 400, GSUB);
+        mono(card, c[0]+16, y+qy, 'QUALITY SCORE', 6.8, GSUB);
         label(card, c[0]+16, y+vy, c[2] + ' / 10', 16, 700, c[4]);
-        mono(card, nr ? c[0]+16 : c[0]+cw2-16, y+(nr?150:66),
+        mono(card, nr ? c[0]+16 : c[0]+cw2-16, y+by2,
              nr ? 'EQUAL-RANK BID' : 'BID FOR EQUAL RANK', 6.8, GSUB, nr ? 'start' : 'end');
-        label(card, nr ? c[0]+16 : c[0]+cw2-16, y+(nr?186:vy), c[3], 16, 700, c[4], nr ? 'start' : 'end');
+        label(card, nr ? c[0]+16 : c[0]+cw2-16, y+wy, c[3], 16, 700, c[4], nr ? 'start' : 'end');
         label(card, c[0]+16, y+fy, 'Ad Rank = bid \u00d7 quality', 8.6, 400, GSUB);
       });
-    y += isNarrow() ? 254 : 146;
+    y += isNarrow() ? 344 : 146;
     label(g, CX0+CW/2, y, 'Same position. One fifth of the price, because the page deserves it.', 11.5, 700, GTEXT, 'middle');
     y += 26;
     mono(g, CX0, y, 'AND THE DOWNSTREAM DIFFERENCE \u2014 PRACTITIONER BENCHMARKS', 7, GSUB);
@@ -2547,6 +2617,15 @@ function renderConsole(key){
     }
     if (cur) ln.push(cur);
     const fs = +(conHead.attr('data-fs') || 12) * TK * (+conHead.attr('data-tk') || 1);
+    /* drawConFrame() bakes the title 30 units under the mono eyebrow, and it
+       bakes it at load, before the first computeTK(), when TK is still 1 -- so
+       it cannot scale that gap itself and ctk() would read 0.84 there. Painted
+       at TK * CON_TK the 12-unit title carries ~29 units of ascent and the
+       eyebrow ~5 of descent, so 'STATION 4' lands inside the title's first
+       line. The eyebrow cannot move up: the app-bar rule is 22 units above it.
+       So the baseline is re-set here, where TK is real, to the room the painted
+       line actually asks for. */
+    conHead.attr('y', CON.y + 66 + Math.max(30, Math.round(fs * 1.35)));
     ln.forEach((t,i)=> conHead.append('tspan')
       .attr('x', CX0 - 2).attr('dy', i ? fs * 1.25 : 0).text(t));
   } else {
@@ -3831,8 +3910,18 @@ function reelUI(g, S, r, o){
   cap.forEach((c,i)=> label(g, bx, by + 26 + i*lead, c, 8.4, 400, '#EDEAE4'));
   label(g, bx, by + 30 + cap.length*lead, r.tag, 8.2, 700, '#A8CDE5');
   if (!MOBILE()){
-    pth(g, 'M '+bx+' '+(by+68)+' v -7 q 0 -3 3 -3 q 3 0 3 3 v 7 M '+(bx+6)+' '+(by+61)+' q 3 1 3 4', P_INK, 1.2);
-    label(g, bx+13, by+68, r.aud, 7.2, 400, 'rgba(239,238,231,.82)');
+    /* The mic mark and the audio credit belong under the hashtag line, so they
+       have to be measured from it rather than from a fixed offset. The hashtags
+       sit at by + 30 + cap.length*lead -- by + 60 once the caption wraps, which
+       at desktop's CUT of 34 it always does -- and a hard-coded by+68 left an
+       8-unit gap under an 8.2 line that needs 1.25 * 8.2 = 10.25, so the credit
+       clipped the hashtags in reel, swipe, counterpost and trap alike. 16 units
+       gives the same clearance the caption lines have, and lifts the mic mark's
+       top clear of the hashtag descender. Desktop only: MOBILE() drops the
+       credit entirely on a phone, so none of this reaches the narrow layout. */
+    const audY = by + 30 + cap.length*lead + 16;
+    pth(g, 'M '+bx+' '+audY+' v -7 q 0 -3 3 -3 q 3 0 3 3 v 7 M '+(bx+6)+' '+(audY-7)+' q 3 1 3 4', P_INK, 1.2);
+    label(g, bx+13, audY, r.aud, 7.2, 400, 'rgba(239,238,231,.82)');
   }
   // progress + home indicator
   ln(g, S.x+14, S.y+S.h-16, S.x+S.w-14, S.y+S.h-16, 'rgba(239,238,231,.28)', 2);
@@ -3959,7 +4048,23 @@ function drawPhoneScene(key, fresh){
         label(G, sx2, y+112, s[0], i===1&&k===0?15:12.5, 700, i===1&&k===0?P_WARN:P_INK, 'middle');
         mono(G, sx2, y+134, s[1].toUpperCase(), 5.8, P_MUTE, 'middle');
       });
-      p.bio.split('\n').forEach((b,k)=> label(G, x+22, y+(nar?176:166)+k*(nar?20:15), b, 8.4, 400, '#C0B6AE'));
+      /* The two bio lines are authored 20 units apart, which is a TK=1 gap.
+         This scene's narrow frame is FIT_M.reach ('192 116 617 849'): 617
+         units into a 339px stage is sc 0.549, so TK is 7.7/(7.2*0.549) =
+         1.947 and 8.4 paints 16.35 units tall. Two baselines then need about
+         1.25*16.35 = 20.4, and label()'s own leading for that size is
+         8.4*1.947*1.32 = 21.58 -- 20 is short of both. flowY declines to
+         rescue it by 0.15 of a unit: the second line's last guard is
+         676 - 21.58*0.78 = 659.17 against a recorded bottom of 659.02.
+         Both cards run this expression, but only the creator card was scored
+         as a collision: its first line carries an emoji, and the fallback
+         face's deeper descent drops that line's ink below where the county
+         card's pure-Latin line ends. Deriving the step from TK gives 24.5
+         here and grows with the scale, so line two lands at 680.5 -- 26 units
+         clear of the follow pill at y+232 and well inside the 290-unit card.
+         The Math.max floor keeps a wide narrow viewport from tightening below
+         the authored 20. Desktop keeps its 15. */
+      p.bio.split('\n').forEach((b,k)=> label(G, x+22, y+(nar?176:166)+k*(nar ? Math.max(20, 8.4*TK*1.5) : 15), b, 8.4, 400, '#C0B6AE'));
       roundRect(G, x+22, y+(nar?232:224), pw-44, 32, 16, i===0?'none':P_INK, i===0?'#8A7768':'none', 1.4);
       label(G, x+pw/2, y+(nar?253:245), i===0?'Follow':'Following', 9, 700, i===0?P_GOLD:P_INK, 'middle');
     });
@@ -4291,6 +4396,18 @@ function drawLanes(key, fresh){
   label(gLanes, CX - 26, laneY(19) + (nar ? 60 : 52), 'fifteen minutes,', 9.6, 700, WARN, 'end');
   label(gLanes, CX - 26, laneY(19) + (nar ? 88 : 68), 'and nobody to ask', 9.6, 700, WARN, 'end');
 
+  /* Health education and Communications are 24 hours apart on an axis that
+     gives the last eight days 190 units, so their bar centres land 23.5 units
+     apart -- less than the label beside them occupies. A desk needs 32 (a 9.4
+     name plus its role 15 below, and 17.1 of that is em box); a phone needs
+     MIN_SANS * TK * 1.42 = 34, because the name paints at the 8.0 sans floor
+     times TK 3.0 and is 27.8 units tall on its own. Each segment is its own
+     group, so FLOW -- keyed by parent -- cannot see the block above it: carry
+     an explicit floor instead. Only Communications ever moves (8.5 units on a
+     desk, 10.6 on a phone), away from the bar it could be confused with and
+     still nearest its own. */
+  const LPITCH = nar ? MIN_SANS * TK * 1.42 : 15 + 17 * TK;
+  let lastLab = -1e9;
   CHAIN.forEach((c,i)=>{
     const y0 = laneY(c.a), y1 = laneY(c.b);
     const g2 = gLanes.append('g').attr('class','chainseg').datum(c).style('cursor','pointer')
@@ -4298,8 +4415,10 @@ function drawLanes(key, fresh){
     roundRect(g2, DX-11, y0, 22, Math.max(7, y1-y0), 5, '#DCEBF5', '#3A5D74', 1.1);
     padHit(g2, DX-16, y0-3, 32, Math.max(16, y1-y0+6), 0);
     const my = (y0 + y1)/2;
-    label(g2, DX + 26, my + 1, c.n, nar ? 7.4 : 9.4, 700, '#3A5D74');
-    if (!nar) label(g2, DX + 26, my + 15, c.r, 8.4, 400, MUTE);
+    const ly = Math.max(my + 1, lastLab + LPITCH);
+    lastLab = ly;
+    label(g2, DX + 26, ly, c.n, nar ? 7.4 : 9.4, 700, '#3A5D74');
+    if (!nar) label(g2, DX + 26, ly + 15, c.r, 8.4, 400, MUTE);
   });
   bindTip(gLanes.selectAll('g.chainseg'), d => '<b>'+d.n+'</b> — '+d.r+'<br><br>'+d.why, d => d.n);
   const py = laneY(POST_AT);
@@ -4312,7 +4431,14 @@ function drawLanes(key, fresh){
   const views = label(gLanes, nar ? 900 : 840, nar ? 142 : 300, '0 views', nar?11:23, 700, WARN, 'end');
   mono(gLanes, nar ? 900 : 840, nar ? 170 : 320, 'ON THE CREATOR’S POST', 6.4, MUTE, 'end');
   const clock = mono(gLanes, 500, 128, 'TUESDAY 08:00', 8.6, MUTE, 'middle');
-  mono(gLanes, 500, 104, 'ONE WIRE STORY. BOTH SIDES SEE IT AT 08:04.', 7, GOLD, 'middle');
+  /* 24 units of lead, authored at TK=1. On a phone TK is 3.0 and the clock
+     alone paints 25.8 units of type, whose box reaches 24 units above its own
+     baseline -- exactly onto this eyebrow, which descends 5 below it. 40 units
+     of lead clears both, and there is room to take: the mobile frame opens at
+     y -287. flowY cannot do this one -- the eyebrow is drawn after the clock
+     but above it, and flowY only ever pushes downward. On a desk the pair is
+     already 14 units clear, so 104 stays. */
+  mono(gLanes, 500, nar ? 88 : 104, 'ONE WIRE STORY. BOTH SIDES SEE IT AT 08:04.', 7, GOLD, 'middle');
   const cross = gLanes.append('g').attr('opacity',0);
   const note  = label(gLanes, 500, 742, '', 12.5, 700, INK, 'middle');
 
@@ -4463,7 +4589,21 @@ function drawScaleScene(){
     pth(P, 'M '+(px-42)+' '+(cy+52)+' q 42 26 84 0 Z', '#8A8474', 1.8, '#FFFFFF');
     draw(P, px, cy+50);
     mono(P, px, cy+96, title, 7.4, col, 'middle');
-    label(P, px, cy + (nar ? 158 : 118), sub, 9.4, 400, MUTE, 'middle');
+    /* [desktop] The two pans hang inside `beam`, which finishes under
+       rotate(11). In screen space -- where the collision test measures -- an
+       11-degree rotation inflates a text AABB vertically by width * sin11, and
+       these subs are wide: 132 and 147 units, i.e. 25 and 28 units of pure
+       rotational inflation, against a mono heading that only gains 7 and 4.
+       The clearance the pair actually needs is
+           (H_head + H_sub)/2 + tan11 * (W_head + W_sub)/2 = 26.2 and 26.1,
+       so the authored 22 sat about 4 units inside both, painting 28% and 34% of
+       the smaller box -- under the old 34% gate, over the new 12% one. 36 gives
+       9.8 units of margin, enough to survive a 30% error in the em-width
+       constants, and tan is monotone so every intermediate frame of the
+       rotation clears as well. The headings stay put: they keep their 24 units
+       of air under the bowl, and the lower caption's new AABB bottom (481.9)
+       still clears the narration block's top at 495.4. */
+    label(P, px, cy + (nar ? 158 : 132), sub, 9.4, 400, MUTE, 'middle');
     return P;
   }
   // CORRECT: a stack of cleared documents
@@ -5153,7 +5293,7 @@ function drawQuadScene(key, fresh){
   if (key === 'axes'){
     ln(gQuad, cx-R-30, cy, cx+R+30, cy, '#C9C3B6', 1.4);
     ln(gQuad, cx, cy-R-30, cx, cy+R+30, '#C9C3B6', 1.4);
-    mono(gQuad, cx, cy-R-44, 'HIGH INTERVENTION APPETITE', 6.6, MUTE, 'middle');
+    mono(gQuad, cx, cy-R-(nar?60:44), 'HIGH INTERVENTION APPETITE', 6.6, MUTE, 'middle');
     mono(gQuad, cx, cy+R+56, 'LOW INTERVENTION APPETITE', 6.6, MUTE, 'middle');
     mono(gQuad, cx-R-38, cy-8, 'LOW TRUST', 6.6, MUTE, 'end');
     mono(gQuad, cx+R+38, cy-8, 'HIGH TRUST', 6.6, MUTE, 'start');
@@ -5171,7 +5311,7 @@ function drawQuadScene(key, fresh){
         .attr('transform','translate('+tx+','+ty+') scale(0.44)');
       else p.attr('transform','translate('+tx+','+ty+') scale(0.44)');
     }
-    label(gQuad, 500, nar?150:132, 'Two dimensions do what seven facets could not', nar?14:18, 300, INK, 'middle');
+    label(gQuad, 500, nar?137:132, 'Two dimensions do what seven facets could not', nar?13:18, 300, INK, 'middle');
     label(gQuad, 500, nar?780:606, 'Because these are properties of the decision, not of the person.', 12.5, 700, INK, 'middle');
     if (!nar) label(gQuad, 500, 630, 'And we map the barrier, never the identity: two households can share low trust and need opposite things.',
           10, 400, MUTE, 'middle');
@@ -5227,7 +5367,20 @@ function drawQuadScene(key, fresh){
     L.slice(0,3).forEach((t,k)=> label(G, x+(nar?24:200), y+(nar?42:30)+k*(nar?26:17), t, 9.4, 400, '#55606A'));
     G.transition().delay(REDUCE?0:140+i*180).duration(REDUCE?1:420).attr('opacity',1);
   });
-  label(gQuad, 500, nar?880:610, 'Four different rooms. The clinical content in all four is identical.', 13, 700, INK, 'middle');
+  /* At narrow the four rooms stack instead of tiling 2x2, so this caption has to
+     clear the fourth card, not the second row. Card 4 is at y 764 (140 + 3*208)
+     and its deepest ink is the price mono at baseline 912, bottom 917 at TK=3.
+     The authored 880 put the caption inside that band: centred text auto-wraps
+     at cap 46 into two lines 51.5 apart and ~45 tall, so line two ran 896-941
+     straight through the price (87 x 21.6 of overlap, 40% of the mono's own
+     box) and line one's ascender at 844 grazed 'route.', which flowY had
+     already pushed from 832 down to 840. flowY cannot fix this one: gQuad holds
+     only the four card groups here, fewer children than the previous pass
+     recorded, so the child-count guard declines and 880 is honoured literally.
+     984 puts line one's top at 948 -- 31 clear of the price, 101 clear of
+     'route.' -- and the block ends at 1045, still 167 above the frame floor at
+     1212, so the mobile frame does not have to grow. */
+  label(gQuad, 500, nar?984:610, 'Four different rooms. The clinical content in all four is identical.', 13, 700, INK, 'middle');
   applyTypeScale();
 }
 
