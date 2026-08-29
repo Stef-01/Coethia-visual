@@ -1,7 +1,7 @@
 /* Interaction test: every control in the piece is exercised and its effect
    asserted. Layout audits do not catch a dead button.
    Run: node interact.js  (AUDIT_URL=... to test a deployment)              */
-const { chromium } = require('C:/Users/stefa/Menu-app/node_modules/playwright');
+const { chromium } = require('playwright');
 const path = require('path');
 const URL = process.env.AUDIT_URL ||
   ('file:///' + path.resolve(__dirname, 'faster-than-the-rumour.html').replace(/\\/g, '/'));

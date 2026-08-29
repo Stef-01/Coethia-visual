@@ -2,7 +2,7 @@
    Walks every scene at two widths and reports: console errors, empty stages,
    content that overflows its own camera frame, and NaN geometry.
    Run: node audit.js [--shots] [--only=key1,key2]                             */
-const { chromium } = require('C:/Users/stefa/Menu-app/node_modules/playwright');
+const { chromium } = require('playwright');
 const path = require('path');
 const fs = require('fs');
 
@@ -78,6 +78,10 @@ const VIEWS = [
             if (n.tagName === 'g' || n.tagName === 'clipPath' || n.tagName === 'animate'
                 || n.tagName === 'animateTransform') continue;
             if (n.closest('clipPath')) continue;
+            // clipped content is bounded by its clip region, which is itself
+            // a painted rect and measured separately; getBBox() ignores the
+            // clip and would report a frame overflow for invisible geometry
+            if (n.closest('[clip-path]')) continue;
             const fill = n.getAttribute('fill');
             const stroke = n.getAttribute('stroke');
             if (fill === 'transparent' && !stroke) continue;

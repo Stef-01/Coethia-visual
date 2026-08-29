@@ -3,7 +3,7 @@
    scene that contains it and matches the stage's own aspect — so scenes fill the
    stage instead of letterboxing. Writes the FIT / FIT_M maps back into the file.
    Run: node measure.js                                                         */
-const { chromium } = require('C:/Users/stefa/Menu-app/node_modules/playwright');
+const { chromium } = require('playwright');
 const path = require('path'), fs = require('fs');
 const FILE = path.resolve(__dirname, 'faster-than-the-rumour.html');
 const URL = 'file:///' + FILE.replace(/\\/g, '/');
@@ -38,6 +38,13 @@ const MEASURE = () => {
     for (const el of g.querySelectorAll('*')) {
       if (['g','clipPath','animate','animateTransform','defs'].includes(el.tagName)) continue;
       if (el.closest('clipPath')) continue;
+      // Content clipped by a clip-path is bounded on screen by the clip
+      // region, but getBBox() reports it unclipped. Measuring it grew the
+      // frame to fit text nobody can see -- the comment sheet inside the
+      // phone runs 346 units past the screen it is clipped to, which is why
+      // the phone was rendering as a thumbnail. The clip region is a real
+      // painted rect and gets measured on its own, so skipping these is safe.
+      if (el.closest('[clip-path]')) continue;
       if (el.getAttribute('fill') === 'transparent' && !el.getAttribute('stroke')) continue;
       let op = 1, p = el;
       while (p && p !== svg) { op *= +(p.getAttribute('opacity') ?? 1); p = p.parentNode; }

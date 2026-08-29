@@ -1061,12 +1061,12 @@ const FIT = {
   states:'133 75 730 692',
   sequelae:'104 -52 797 756',
   parent:'-39 -127 885 839',
-  reel:'-39 -112 862 818',
-  swipe:'-39 -180 1008 956',
-  comments:'-39 -104 857 813',
-  anatomy:'-39 -104 868 823',
-  counterpost:'-39 -55 886 841',
-  trap:'-39 -101 839 796',
+  reel:'92 -17 731 693',
+  swipe:'94 -85 875 830',
+  comments:'74 -23 744 706',
+  anatomy:'163 23 671 636',
+  counterpost:'132 70 742 703',
+  trap:'92 -6 708 672',
   reach:'-39 -156 935 887',
   twoclocks:'164 65 702 666',
   chain:'-39 -136 875 830',
@@ -1088,7 +1088,7 @@ const FIT = {
   quadrants:'-39 -175 999 947',
   middle:'-39 -160 923 875',
   oldnew:'166 40 686 651',
-  laws:'170 93 529 501',
+  laws:'173 93 529 501',
   loop:'-64 -74 750 711',
   coethia:'-64 -74 750 711',
   stations:'-64 -74 750 711',
@@ -1122,12 +1122,12 @@ const FIT_M = {
   states:'199 -16 602 815',
   sequelae:'234 -50 532 720',
   parent:'-39 -305 885 1198',
-  reel:'-39 -226 787 1065',
-  swipe:'-39 -275 961 1300',
-  comments:'-39 -405 1033 1398',
-  anatomy:'-39 -323 969 1311',
-  counterpost:'-39 -306 996 1348',
-  trap:'-39 -245 982 1328',
+  reel:'252 9 495 670',
+  swipe:'78 -159 843 1141',
+  comments:'285 31 435 588',
+  anatomy:'70 -212 859 1163',
+  counterpost:'160 -155 797 1079',
+  trap:'57 -143 886 1198',
   reach:'-39 -93 815 1103',
   twoclocks:'44 -307 1031 1395',
   chain:'-39 -215 949 1284',
@@ -1137,7 +1137,7 @@ const FIT_M = {
   desk:'-39 -349 955 1292',
   mandate:'94 -84 812 1099',
   money:'94 -84 812 1099',
-  people:'-39 -228 978 1324',
+  people:'-39 -227 978 1324',
   ledger:'-40 -111 1009 1365',
   arithmetic:'-40 -69 1009 1365',
   gaps:'-39 -210 961 1300',
@@ -1146,29 +1146,29 @@ const FIT_M = {
   facets:'-44 -183 987 1336',
   crosstab:'-46 -163 959 1297',
   axes:'-39 -303 1013 1370',
-  quadrants:'-39 -277 1092 1477',
+  quadrants:'-39 -277 1092 1478',
   middle:'-39 -269 942 1274',
   oldnew:'133 37 734 993',
-  laws:'204 84 493 668',
+  laws:'207 84 493 668',
   loop:'-81 -260 839 1135',
   coethia:'-81 -260 839 1135',
   stations:'-81 -260 839 1135',
   listen:'124 -71 752 1018',
   map:'12 -279 992 1342',
   translate:'-224 -561 926 1253',
-  lenses:'-39 -103 1012 1370',
+  lenses:'-39 -103 1013 1370',
   grants:'124 -71 752 1018',
   segments:'124 -71 752 1018',
-  subsidy:'122 -73 756 1023',
+  subsidy:'121 -75 758 1025',
   placement:'124 -71 752 1018',
-  privacy:'124 -75 758 1025',
+  privacy:'124 -71 752 1018',
   measure:'-26 -220 942 1275',
-  cases:'-39 -113 938 1269',
+  cases:'-39 -111 935 1266',
   weeks:'181 -188 787 1065',
-  tiers:'-410 -471 1299 1757',
+  tiers:'-410 -470 1299 1757',
   fit:'-326 -419 1227 1661',
   week12:'84 -232 832 1126',
-  backtotheroom:'84 -530 1292 1748',
+  backtotheroom:'84 -530 1291 1747',
   close:'-81 -260 839 1135'
 };
 const frameFor = name => (isNarrow() ? FRAMES_MOBILE : FRAMES)[name];
@@ -1260,7 +1260,14 @@ function label(g, x, y, txt, size, weight, fill, anchor, wrapCap){
     if (FLOW.x !== null && Math.abs(x - FLOW.x) < 40 && y - lead * 0.8 < FLOW.bottom){
       y = FLOW.bottom + lead * 0.8; pushed = true;
     }
-    if (lines || pushed) FLOW = { x: x, bottom: y + ((lines ? lines.length : 1) - 1) * lead + lead * 0.15 };
+    // Was: only blocks that wrapped (or were pushed) recorded themselves in FLOW.
+    // That conservatism is why two SHORT stacked captions still collide -- neither
+    // wraps, so neither sets FLOW, so the second is never pushed. The wheel at
+    // ~line 1789 is the clearest case: 'ONE EVIDENCE' / 'BASE', 16 units apart at
+    // size 10, painted ~30 units tall each on a phone. Every centred label now
+    // records itself; the x-proximity and y-proximity guards above are what keep a
+    // row of chips from turning into a staircase, not this condition.
+    FLOW = { x: x, bottom: y + ((lines ? lines.length : 1) - 1) * lead + lead * 0.15 };
   }
   if (!lines) return mk(y, txt);
   // Scenes built inside a load-time IIFE are drawn before computeTK() has ever

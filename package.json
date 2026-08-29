@@ -1,0 +1,27 @@
+{
+  "name": "coethia-visual",
+  "version": "1.0.0",
+  "description": "Three scrollytelling explainers in one shared design system. Open any file in a browser — no build step, no server required.",
+  "main": "audit.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Stef-01/Coethia-visual.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Stef-01/Coethia-visual/issues"
+  },
+  "homepage": "https://github.com/Stef-01/Coethia-visual#readme",
+  "devDependencies": {
+    "playwright": "^1.62.1"
+  }
+}
