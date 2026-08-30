@@ -455,8 +455,31 @@ window.addEventListener('DOMContentLoaded', function(){
    is a placeholder. Every platform mechanic is real and cited.
    ===================================================================== */
 
+/* Two independent streams, and the separation is load-bearing.
+
+   `rnd()` places GEOMETRY -- smoke particles, the cliff path's jitter, the quadrant
+   scatter. It used to be one un-reseeded global stream shared with the epidemic
+   simulation, which made every drawn position a function of how many times anything
+   had been drawn or run before it. Redrawing a scene moved its content. That is why
+   `quadrants` never converged in the frame fitter: each measurement pass redrew it and
+   measured different geometry, so there was no fixed point to find. It is also why the
+   audit and a direct probe disagreed about that scene's text sizes at the same
+   viewport, and why `--verify` could report IDEMPOTENT while the artifact was not --
+   both passes consumed the stream in the same order, so they agreed with each other
+   and with nothing else.
+
+   Every draw that consumes `rnd()` now reseeds first, so a scene's geometry is a pure
+   function of that scene. The constants are arbitrary but fixed; what matters is that
+   they never change. */
 let _s = 20260825;
+function reseed(n){ _s = n; }
 function rnd(){ _s = (_s * 1103515245 + 12345) & 0x7fffffff; return _s / 0x7fffffff; }
+
+/* The simulation gets its own stream. Clicking "run" is meant to be stochastic -- that
+   is the point of the scene -- but on a shared stream it also silently moved the smoke,
+   the cliff and the quadrant scatter, which are not supposed to move at all. */
+let _sim = 71828182;
+function simRnd(){ _sim = (_sim * 1103515245 + 12345) & 0x7fffffff; return _sim / 0x7fffffff; }
 
 const CLIENT = 'Marion County Public Health';
 
@@ -1999,6 +2022,7 @@ function drawLoopPanel(){
   }
 }
 function setLoop(id){
+  reseed(14142135);   // see rnd(): geometry must not depend on draw history
   loopOpen = loopOpen === id ? null : id;
   loopNodes.selectAll('g.lstn').select('circle.lc')
     .attr('fill', d => d.id === loopOpen ? '#E7F2F1' : '#FFFFFF')
@@ -3236,6 +3260,7 @@ function roomTrace(alive){
 }
 
 function drawRoomScene(key, fresh){
+  reseed(31415926);
   buildRoom();
   const nar = isNarrow();
   roomScene.select('g.kid').attr('opacity', key === 'room' ? 1 : 0);
@@ -3531,7 +3556,7 @@ function runSim(){
   const pos = {}; order.forEach((v,k) => pos[v] = k);
   const sus = d3.range(100).filter(i => state[i] === 's');
   if (!sus.length) return;
-  let inf = [sus[Math.floor(rnd()*sus.length)]];
+  let inf = [sus[Math.floor(simRnd()*sus.length)]];
   state[inf[0]] = 'x';
   let gen = 0, total = 1;
   const nar = isNarrow();
@@ -3555,9 +3580,9 @@ function runSim(){
     if (run !== simRun) return;
     const next = [];
     inf.forEach(src => {
-      const contacts = 12 + Math.floor(rnd()*7);
+      const contacts = 12 + Math.floor(simRnd()*7);
       for (let c = 0; c < contacts; c++){
-        const t = order[Math.floor(rnd()*100)];
+        const t = order[Math.floor(simRnd()*100)];
         if (state[t] === 's'){ state[t] = 'x'; next.push(t); }
       }
       state[src] = 'r';
@@ -3594,6 +3619,7 @@ const COV = [
 ];
 
 function drawCurve(){
+  reseed(27182818);
   gCurve.selectAll('*').remove();
   const nar = isNarrow();
   const x0 = nar ? 250 : 190, x1 = nar ? 740 : 830;
@@ -5371,6 +5397,7 @@ const QUADS = [
 ];
 
 function drawQuadScene(key, fresh){
+  reseed(16180339);
   gQuad.selectAll('*').remove();
   const nar = isNarrow();
   const cx = 500, cy = nar ? 400 : 340, R = nar ? 250 : 220;

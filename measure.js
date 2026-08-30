@@ -1,5 +1,5 @@
 /* Frame fitter for faster-than-the-rumour.html  —  convergent, history-independent.
-   Run: node measure.js [--dry] [--verify] [--only=k1,k2] [--report=path.json]
+   Run: node measure.js [--dry] [--verify] [--strict] [--only=k1,k2] [--report=path.json]
 
    WHAT THIS SOLVES
 
@@ -65,6 +65,10 @@ const W_LARGE      = 24000; // forces TK to its ceiling of 3
 const PROBE_CENTRE = { x: 500, y: 350 };  // fixed: see the note in fitAll()
 
 const DRY    = process.argv.includes('--dry');
+/* Without this the process exits 0 however many scenes were refused or failed to
+   converge, so a CI step reads a partial fit as a clean one. Default stays 0 so
+   nothing that already calls this breaks. */
+const STRICT = process.argv.includes('--strict');
 const VERIFY = process.argv.includes('--verify');
 const ONLY   = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean);
 const REPORT = (process.argv.find(a => a.startsWith('--report=')) || '').slice(9);
@@ -384,6 +388,10 @@ async function fitAll(browser) {
     ' steps: ' + slow.map(r => r.key + ' (resid ' + r.residual + ')').join(', '));
 
   if (REPORT) { fs.writeFileSync(REPORT, JSON.stringify(first.log, null, 1)); console.log('report -> ' + REPORT); }
+  if (STRICT && (unfit.length || slow.length)) {
+    console.error('--strict: ' + unfit.length + ' refused, ' + slow.length + ' unconverged');
+    process.exitCode = 1;
+  }
   if (DRY) { console.log('\n--dry: nothing written'); return; }
 
   const fmt = o => Object.entries(o).map(([k, v]) => "  " + k + ":'" + v + "'").join(',\n');
