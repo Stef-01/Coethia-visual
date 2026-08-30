@@ -66,6 +66,40 @@ reduced motion. Verified statically:
   naive check that read the duration argument without the guard above it — recorded because the next
   person will flag it too.
 
+## No text alternative carries the figures — pieces 2 and 3
+
+Checked all three explainers rather than assuming, because the README's accessibility section makes a
+specific claim and I wanted to know which piece it belongs to:
+
+| piece | table markup | "read the data as a table" affordance |
+|---|---|---|
+| `political-health-personas.html` | **yes** | **yes** |
+| `belief-based-communication.html` | no | no |
+| `faster-than-the-rumour.html` | no | no |
+
+So **the README's claim is accurate and correctly scoped** — its Accessibility section sits under the
+personas piece, which does carry a real table with every figure in it. Nothing is being
+misrepresented.
+
+But it does mean `faster-than-the-rumour.html` presents 59 scenes of cited epidemiology, coverage,
+cost and workforce figures with no non-visual route to any of them. What it has instead is a single
+`aria-label` on the `svg` — a 90-word prose summary of the whole argument. That is genuinely better
+than nothing and it is not a substitute: it describes what the piece argues, not what any figure is.
+A screen-reader user is told there is a coverage cliff at ninety-five percent and cannot reach the
+$244,480 per case, the 412,000 views, or the five reasons and their shares.
+
+Not fixed here, deliberately. A table for 59 scenes is scene-by-scene authoring with editorial
+decisions about which figures are load-bearing, and the personas piece shows the repo already knows
+how to do it. Recorded as the largest accessibility gap in this piece.
+
+## What the interactive surface does right
+
+Worth stating, because it is easy to only list faults. `setTabbing(sel, on)` flips `tabindex` between
+0 and −1 per scene, so a scene's controls enter the tab order only while that scene is current. That
+is the correct pattern for a 59-scene document — the alternative is a tab order hundreds of stops
+long, most of it pointing at things nobody can see. Interactive groups also carry `role="button"` and
+an `aria-label` built from their own content rather than a generic string.
+
 ## Not done
 
 The hands-on tier. `accessibility-scan` and `accessibility-inspect` drive a live page, and the
