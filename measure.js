@@ -1,5 +1,6 @@
 /* Frame fitter for faster-than-the-rumour.html  —  convergent, history-independent.
    Run: node measure.js [--dry] [--verify] [--strict] [--only=k1,k2] [--report=path.json]
+        node measure.js --curve=<key>     sample F(w) across the bracket and print it
 
    WHAT THIS SOLVES
 
@@ -61,7 +62,16 @@ const ITERS        = 8;     // root-finding steps after the two bracket probes
 const GRID         = 2;     // quantise the written frame; kills sub-unit chatter
 const GROWTH_CAP   = 1.9;   // w* / w_at_TK1 above this -> UNFITTABLE, keep old frame
 const W_SMALL      = 40;    // forces TK to its floor of 1
-const W_LARGE      = 24000; // forces TK to its ceiling of 3
+/* Climb to the TK ceiling instead of jumping to an absurd width.
+   W_LARGE used to be 24000, which does pin TK at 3 -- and renders the scene at a scale
+   around 0.014, where the composed getScreenCTM used by userBox() loses precision and
+   reports the extent tens of units short. That corrupted the upper bracket: measured on
+   `subsidy`, F(24000) = 971 while F(971) = 994, so wTK3 was NOT the maximum of F, the
+   sign guarantee g(wTK3) <= 0 was false, and g stayed positive across the whole
+   bracket. There was no root to find. Four scenes were reported as "does not converge"
+   for that reason, and the fault was here, not in the artifact. */
+const W_CLIMB      = 1.4;   // widen by this factor per step while TK is still rising
+const W_CLIMB_MAX  = 6;     // steps; 1.4^6 is ~7.5x, past the ceiling for any real scene
 const PROBE_CENTRE = { x: 500, y: 350 };  // fixed: see the note in fitAll()
 
 const DRY    = process.argv.includes('--dry');
@@ -72,6 +82,10 @@ const STRICT = process.argv.includes('--strict');
 const VERIFY = process.argv.includes('--verify');
 const ONLY   = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean);
 const REPORT = (process.argv.find(a => a.startsWith('--report=')) || '').slice(9);
+/* Diagnostic. A scene that will not converge is either a discontinuous F -- the root
+   falls inside a jump, so no w satisfies F(w) = w -- or a non-monotone one. Neither is
+   visible from a residual. This prints the map so the shape can be read directly. */
+const CURVE  = (process.argv.find(a => a.startsWith('--curve=')) || '').slice(8);
 
 /* scenes whose interactions move content outward — measured in their widest state */
 const POKE = {
@@ -233,7 +247,18 @@ async function fitScene(page, key, aspect, seedCentre) {
 
   const lo = await F(W_SMALL);          // TK pinned to 1: the smallest the scene can be
   if (!lo.box) return { key, status: 'EMPTY', evals };
-  const hi = await F(W_LARGE);          // TK pinned to 3: the largest it can be
+  /* Widen until TK stops rising. The last measurement is then taken at the TK ceiling
+     AND inside the regime where the renderer still measures accurately, which is what
+     makes it a valid upper bracket rather than merely a large number. */
+  let hi = lo, w = Math.max(lo.box.w, W_SMALL);
+  for (let i = 0; i < W_CLIMB_MAX; i++) {
+    w *= W_CLIMB;
+    const r = await F(w);
+    if (!r.box) break;
+    const rising = (r.tk || 0) > (hi.tk || 0) + 1e-3;
+    hi = r;
+    if (!rising) break;                 // TK has hit its ceiling
+  }
   if (!hi.box) return { key, status: 'EMPTY', evals };
 
   const wTK1 = lo.box.w, wTK3 = hi.box.w;
@@ -361,6 +386,47 @@ async function fitAll(browser) {
 
 (async () => {
   const browser = await chromium.launch();
+
+  if (CURVE) {
+    for (const [name, vw, vh] of [['desktop', 1440, 900], ['mobile', 375, 780]]) {
+      const page = await browser.newPage({ viewport: { width: vw, height: vh } });
+      await page.goto(URL, { waitUntil: 'load' });
+      await page.waitForTimeout(1200);
+      const aspect = await page.evaluate(() => {
+        const r = document.querySelector('#viz').getBoundingClientRect(); return r.width / r.height;
+      });
+      await page.evaluate(k => document.querySelector('.step[data-key="' + k + '"]')
+        .scrollIntoView({ behavior: 'auto', block: 'center' }), CURVE);
+      await page.waitForTimeout(400);
+      const F = async (w) => {
+        const conBounce = CON_KEYS.includes(CURVE) ? CON_KEYS.find(c => c !== CURVE) : null;
+        await page.evaluate(APPLY, [CURVE, frameOfWidth(Math.round(w), aspect, PROBE_CENTRE.x, PROBE_CENTRE.y), conBounce]);
+        await page.waitForTimeout(SETTLE);
+        const m = await page.evaluate(MEASURE);
+        return m.n ? { w: fitBox(m, aspect, PAD).w, tk: m.tk } : null;
+      };
+      const lo = await F(W_SMALL), hi = await F(W_LARGE);
+      if (!lo || !hi) { console.log(name + ': ' + CURVE + ' measured empty'); await page.close(); continue; }
+      console.log('\n' + name + '  ' + CURVE + '   bracket [' + Math.round(lo.w) + ', ' + Math.round(hi.w) + ']');
+      console.log('      w        F(w)     g=F-w      TK     monotone?');
+      let prev = null;
+      const STEPS = 10;
+      for (let i = 0; i <= STEPS; i++) {
+        const w = lo.w + (hi.w - lo.w) * (i / STEPS);
+        const r = await F(w);
+        if (!r) continue;
+        const g = r.w - w;
+        const mono = prev === null ? '' : (r.w + 1e-9 >= prev ? 'yes' : 'NO  <-- F decreased');
+        console.log('  ' + String(Math.round(w)).padStart(6) + '  ' + String(Math.round(r.w)).padStart(7) +
+          '  ' + String(g.toFixed(1)).padStart(8) + '  ' + (r.tk || 0).toFixed(2).padStart(6) + '   ' + mono);
+        prev = r.w;
+      }
+      await page.close();
+    }
+    await browser.close();
+    return;
+  }
+
   const first = await fitAll(browser);
 
   if (VERIFY) {
