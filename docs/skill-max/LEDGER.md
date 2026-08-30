@@ -490,3 +490,64 @@ Checked statically rather than assumed, since `E_EXIT` is a curve the piece neve
   The static check flagged it because it read the duration argument without the guard above it.
   The literal stays — it is a default parameter rather than a call-site timing decision, and renaming
   it would change every draw-on's feel for no measured gain.
+
+---
+
+## Step 1 — `CON_TK` versus the legibility floor — REVERTED, and the reversal is the result
+
+**Ran.** Code stage.
+
+**What was tried.** Solve the floor for the console, the tightest consumer:
+`PX_FLOOR = 7.0` with `TK = clamp(PX_FLOOR / (BASE_LABEL · CON_TK · sc), 1, 3)`, referencing `CON_TK`
+inside `computeTK()` so the two cannot drift. Console text then lands on 7.00px and all other mobile
+text on 8.33px, which is above its own floor and therefore harmless in isolation.
+
+**Metrics.** Measured in two stages, because ~8% larger type changes every extent and judging it
+before refitting would have been judging the wrong thing.
+
+| | baseline | floor solved | and refitted |
+|---|---|---|---|
+| findings | 6 | 8 | **12** |
+| text collisions | **0** | 6 | **11** |
+| sub-7px scenes | 6 | **1** | **1** |
+| frame overflow | 0 | 1 | 0 |
+| scenes the fitter cannot converge | 4 | — | **20** |
+
+It works, in the narrow sense: five of the six sub-7px scenes clear. It costs eleven text collisions
+across ten scenes and takes the fitter from four non-converging scenes to twenty. Eight percent more
+type is eight percent less room, and this piece does not have it.
+
+**Reverted**, per the gate. Trading zero collisions for eleven to clear five sub-7px scenes inside a
+recreated desktop console is a worse artifact, not a better one.
+
+**Kept from the attempt**, because it is true regardless of the code: the corrected arithmetic. The
+old comment above `CON_TK` was wrong three ways and that is why the conflict went unnoticed for as
+long as it did — it assumed a 375px stage (the stage is **339px**; 375 was the viewport), derived
+`sc = 0.499` from that (measured **0.4508**), and assumed `TK` pins at 3 on a phone (measured
+**2.372**; `TK` only pins at 3 when `sc ≤ 0.3565`). Every figure in the chain was off, so its
+conclusion that 0.84 clears the floor was too.
+
+**Documented rather than hidden.** `docs/coethia-brand-palette.md` now carries the exemption with the
+table above. Two things follow from that, and both are deliberate:
+
+- **`audit.js` is unchanged and still reports all six.** Lowering the threshold for console scenes
+  would have made the number go to zero without making the artifact better, and would have hidden a
+  true fact. Six standing findings with a written reason is a reminder; zero findings with a tuned
+  threshold is a lie.
+- There is a real case that 6.47px is *correct* here rather than merely tolerated. The console is a
+  recreation of a desktop product at desktop density, and the piece's own stated reason for `CON_TK`
+  is that the sheet should read "as what it is: a desktop tool, seen small." A phone rendering of a
+  desktop console that is fully legible at phone type sizes has stopped being a recreation of it.
+
+**Declined.** Raising the `TK` ceiling above 3.0 for the two scenes where the clamp binds
+(`decided`, `backtotheroom`). That inflates type further in exactly the scenes with the widest frames,
+which is the feedback loop this repo already documents, and the measurement above shows which
+direction that goes.
+
+**Uncovered.** The one thing that would actually fix these six scenes was not attempted, because it is
+not a type-scale change: a mobile-specific console layout — fewer rows, larger type, same object.
+That is scene authoring and belongs to a composition pass. Recorded in the brand-palette doc as the
+real fix.
+
+**For the next stage.** The 6-finding, zero-collision state is the floor for this artifact until
+someone re-authors the console for narrow. Do not attempt to close those six with a constant.

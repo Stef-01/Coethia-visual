@@ -1,0 +1,34 @@
+# stef-skill-max fleet manifest
+# stage	skill	source	role
+# source is whatever `npx skills add <source> --skill <skill>` accepts.
+# Stage -1 reads this file. Keep it the single source of truth: never hardcode a
+# skill name in a script or in SKILL.md without adding the row here.
+0	webapp-testing	anthropics/skills	drive a real browser; baseline and final verification
+0	stitched-full-page-capture	MengTo/Skills	full-page shots of lazy/animated/scroll-driven pages
+1	visual-storytelling-design	lyndonkl/claude	narrative arc, annotation layering, direct labelling
+2	frontend-design	anthropics/skills	aesthetic direction; refuses templated defaults
+3	canvas-design	anthropics/skills	static composition, design-philosophy-first
+4	algorithmic-art	anthropics/skills	generative geometry with seeded randomness
+5	gsap-utils	greensock/gsap-skills	clamp / mapRange / snap math for type scales
+6	motion-design	lottiefiles/motion-design-skill	duration scale, easing set, choreography layers
+6	animation-systems	MengTo/Skills	second opinion on motion tokens
+7	svg-animation	iart-ai/web-animation-skills	stroke draw-on, path morph, motion along path
+7	masked-reveal	MengTo/Skills	reveal technique
+7	staggered-word-reveal	MengTo/Skills	reveal technique
+8	gsap-core	greensock/gsap-skills	core tween API, matchMedia, reduced motion
+8	gsap-timeline	greensock/gsap-skills	sequencing, position parameter, nesting
+8	cinematic-scroll-storytelling	MengTo/Skills	scene-to-scene narrative motion
+9	gsap-scrolltrigger	greensock/gsap-skills	scroll binding, pinning, scrub, refresh, cleanup
+9	gsap-plugins	greensock/gsap-skills	SplitText, Flip, DrawSVG, MorphSVG, Observer
+9	gsap-scrolltrigger-storytelling	MengTo/Skills	scroll storytelling patterns
+9	scroll-progress-timeline	MengTo/Skills	progress-driven timelines
+9	scroll-scrubbed-visual-sequence	MengTo/Skills	scrubbed multi-scene sequences
+10	gsap-performance	greensock/gsap-skills	transforms only, batching, no layout thrash
+10	optimize-web-animations	MengTo/Skills	profiling and cost reduction, library-agnostic
+11	color-accessibility-audit	georgekhananaev/claude-skills-vault	WCAG contrast + CVD simulation; ships scan_svg.py
+11	accessibility-scan	AccessLint/skills	rule engine against the live DOM
+11	accessibility-inspect	AccessLint/skills	keyboard, focus order, screen-reader names and roles
+11	accessibility-fix	AccessLint/skills	apply and verify remediations
+12	audit-ai-design-slop	MengTo/Skills	adversarial pass for machine-generated visual tells
+12	frontend-design-review	microsoft/skills	independent review lens: quality pillars, system compliance
+GATE	accessibility-diff	AccessLint/skills	a11y regression check, used by the gate protocol

@@ -186,3 +186,41 @@ console is really **two islands** (the kit and the screens) with page art on
 both sides. Repairing the split recoloured 46 further literals. It also
 surfaced a latent layout bug: short Gantt bars whose titles overflowed, now
 given a minimum width.
+
+
+---
+
+## The console legibility exemption — measured, 2026-08-29
+
+Six scenes carry text below the 7px floor the audit enforces: `subsidy` 6 of 27, `privacy` 4 of 18,
+`segments` 3 of 33, `placement` 2 of 27, `listen` 2 of 20, `grants` 1 of 20. All six are the
+recreated Google Ads console. This is a **deliberate exemption with a measured price**, not a defect
+left unfixed, and the audit is expected to keep reporting it.
+
+The arithmetic. `TK` is solved so base-7.2 text lands exactly on `MIN_LABEL_PX` — measured,
+7.2 × 2.372 × 0.4508 = **7.70px**, the floor, precisely. `CON_TK = 0.84` then multiplies *after* it:
+7.70 × 0.84 = **6.47px**. The floor and `CON_TK` are mutually exclusive by construction; no value of
+`CON_TK` below 1.0 satisfies both.
+
+Solving the floor for the console instead — `PX_FLOOR / (BASE_LABEL · CON_TK · sc)`, putting console
+text on 7.00px and all other mobile text on 8.33px — was implemented, measured and reverted:
+
+| | before | floor solved for console | and refitted |
+|---|---|---|---|
+| findings | 6 | 8 | **12** |
+| text collisions | **0** | 6 | **11** |
+| sub-7px scenes | 6 | **1** | **1** |
+| scenes the fitter cannot converge | 4 | — | **20** |
+
+Eight percent more type is eight percent less room, and this piece does not have it. Trading zero
+collisions for eleven in order to clear five sub-7px scenes inside a recreated desktop UI is a worse
+artifact, not a better one.
+
+There is also a case that 6.47px is *correct* here rather than merely tolerable. The console is a
+recreation of a desktop product at desktop density; the piece's own reasoning for `CON_TK` is that the
+sheet should read "as what it is: a desktop tool, seen small." A phone rendering of a desktop console
+that is fully legible at phone type sizes is no longer a recreation of that console.
+
+**What would actually fix it** is not a scale factor. It is a mobile-specific console layout — fewer
+rows, larger type, the same object — which is scene authoring rather than a constant, and belongs to a
+composition pass rather than to the type scale.

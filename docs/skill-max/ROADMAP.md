@@ -53,7 +53,7 @@ is a real outcome and must not be relabelled; `BLOCKED` when it cannot proceed a
 
 | # | step | status |
 |---|---|---|
-| 1 | `CON_TK` — close the last six findings | IN PROGRESS |
+| 1 | `CON_TK` — close the last six findings | REVERTED — measured, documented as an exemption |
 | 2 | Remotion project as a sibling | TODO |
 | 3 | Prototype remaining motion, port the numbers | TODO |
 | 4 | New scenes | TODO |
