@@ -11,6 +11,14 @@ const SHOTS = process.argv.includes('--shots');
 const ONLY = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean);
 const SHOT_DIR = path.join(__dirname, '.shots');
 
+/* Long enough for the slowest entrance to land. Measured from the source: 17 of the
+   50 transition call sites finish after 1500ms, and the slowest --
+   `.duration(520).delay(260 + i*420)` -- completes at about 4140ms for an eight-item
+   stagger. Everything below 4140 measures a third of the piece in flight, which
+   reports the positions and extents of content that has not arrived yet. If stage 6
+   brings the durations into a scale, this can come back down. */
+const SETTLE = 4500;
+
 const VIEWS = [
   { name: 'desktop', width: 1440, height: 900 },
   { name: 'mobile', width: 375, height: 780 }
@@ -44,7 +52,7 @@ const VIEWS = [
         const el = document.querySelector('.step[data-key="' + k + '"]');
         el.scrollIntoView({ behavior: 'auto', block: 'center' });
       }, key);
-      await page.waitForTimeout(1500);
+      await page.waitForTimeout(SETTLE);
 
       const r = await page.evaluate(() => {
         const svg = document.querySelector('#viz');

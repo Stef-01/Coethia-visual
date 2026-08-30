@@ -49,7 +49,13 @@ const FILE = path.resolve(__dirname, 'faster-than-the-rumour.html');
 const URL = 'file:///' + FILE.replace(/\\/g, '/');
 
 const PAD          = 34;    // breathing room around the composition, in units
-const SETTLE       = 1500;  // let entrance transitions land before measuring
+/* Long enough for the slowest entrance to land. Measured from the source: 17 of the 50
+   transition call sites finish after 1500ms, and the slowest -- .duration(520) with
+   .delay(260 + i*420) -- completes around 4140ms for an eight-item stagger. Fitting a
+   frame to content that has not arrived yet fits it to the wrong geometry, and it hid a
+   real 57-unit frame overflow on r0 for as long as this was 1500. Stage 6's duration
+   budget is designed to bring this back down; until it lands, this is the honest value. */
+const SETTLE       = 4500;
 const TOL          = 3;     // units; |F(w) - w| below this counts as converged
 const ITERS        = 8;     // root-finding steps after the two bracket probes
 const GRID         = 2;     // quantise the written frame; kills sub-unit chatter
