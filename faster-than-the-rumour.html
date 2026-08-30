@@ -968,7 +968,7 @@ function drawOn(sel, dur, delayFn){
       .attr('stroke-dasharray', L + ' ' + L)
       .attr('stroke-dashoffset', L)
       .style('opacity', 1)
-      .transition('draw').duration(dur || 900)
+      .transition('draw').duration(dur || CAMERA)
       .delay(delayFn ? delayFn(d, i) : 0)
       .ease(E_MOVE)
       .attr('stroke-dashoffset', 0)
@@ -3231,7 +3231,7 @@ function roomTrace(alive){
   const p = roomScene.append('path').attr('class','ecg').attr('d', d)
     .attr('fill','none').attr('stroke', alive ? '#2E6B2B' : WARN)
     .attr('stroke-width', 2).attr('stroke-linecap','round').attr('stroke-linejoin','round');
-  drawOn(d3.selectAll(p.nodes()), alive ? 1500 : 2200);
+  drawOn(d3.selectAll(p.nodes()), alive ? T_SWEEP : Math.round(T_SWEEP*1.6));
   return p;
 }
 
@@ -3632,7 +3632,7 @@ function drawCurve(){
   const pts = COV.map((d,i)=>[X(i), Y(d[1])]);
   const dPath = 'M ' + pts.map(p=>p[0]+' '+p[1]).join(' L ');
   const line = pth(gCurve, dPath, WARN, 2.6);
-  drawOn(d3.selectAll(line.nodes()), REDUCE?1:2000);
+  drawOn(d3.selectAll(line.nodes()), Math.round(T_SWEEP*1.4));
 
   COV.forEach((d,i)=>{
     const cx = X(i), cy = Y(d[1]);
@@ -5875,7 +5875,7 @@ function render(key){
   if (wheelOn && prev !== key && !REDUCE){
     loopNodes.selectAll('g.lstn').attr('opacity',0)
       .transition('rise').duration(T_BASE).delay((d,i)=>0+i*S_ROW).ease(E_ENTER).attr('opacity',1);
-    drawOn(gWheel.selectAll('path.larc'), 420, (d,i)=>420+i*80);
+    drawOn(gWheel.selectAll('path.larc'), T_BASE, (d,i)=>T_BASE+i*S_BEAT);
     gWheel.selectAll('path.lhead').attr('opacity',0)
       .transition('rise').duration(T_QUICK).ease(E_ENTER).delay((d,i)=>T_QUICK+i*S_ROW).attr('opacity',.75);
   }
@@ -5898,7 +5898,7 @@ function render(key){
   setTabbing(gRoute.selectAll('g.rcard'), key === 'translate');
   if (key === 'translate' && prev !== 'translate' && !REDUCE){
     gRoute.select('g.ebase').attr('opacity',0).transition('rise').duration(T_BASE).ease(E_ENTER).delay(0).attr('opacity',1);
-    drawOn(gRoute.selectAll('path.rlead'), 480, (d,i)=>420+i*110);
+    drawOn(gRoute.selectAll('path.rlead'), T_BASE, (d,i)=>T_BASE+i*S_BEAT);
     gRoute.selectAll('g.rcard').attr('opacity',0)
       .transition('rise').duration(T_BASE).delay((d,i)=>T_QUICK+i*S_BEAT).ease(E_ENTER).attr('opacity',1);
   }
