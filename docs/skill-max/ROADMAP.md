@@ -54,9 +54,9 @@ is a real outcome and must not be relabelled; `BLOCKED` when it cannot proceed a
 | # | step | status |
 |---|---|---|
 | 1 | `CON_TK` — close the last six findings | REVERTED — measured, documented as an exemption |
-| 2 | Remotion project as a sibling | TODO |
-| 3 | Prototype remaining motion, port the numbers | TODO |
-| 4 | New scenes | TODO |
+| 2 | Remotion project as a sibling | DONE |
+| 3 | Prototype remaining motion, port the numbers | DONE — 47/47 inside budget |
+| 4 | New scenes | BLOCKED — needs owner direction, see ledger |
 | 5 | Publish `stef-skill-max`, switch to pointer | DONE |
 | 6 | Finish the fitter's review | TODO |
 | 7 | The four scenes that do not converge | TODO |

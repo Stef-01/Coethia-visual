@@ -551,3 +551,53 @@ real fix.
 
 **For the next stage.** The 6-finding, zero-collision state is the floor for this artifact until
 someone re-authors the console for narrow. Do not attempt to close those six with a constant.
+
+---
+
+## Step 3 — the last three entrances — DONE
+
+**Ran.** `motion-design` / `animation-systems` reasoning; the Remotion harness from Step 2 is what
+made the layering question answerable rather than a matter of taste.
+
+**Changed.** Three call sites. Each was decided by which layer it belongs to, not by shaving numbers
+until the check passed — that distinction matters, because a budget satisfied by arbitrary trimming
+would pass the same gate and feel worse.
+
+| site | was | now | why |
+|---|---|---|---|
+| warning dots | 620 delay + 620 | 240 + 240 | supporting geometry; it was queueing behind the primary instead of following it |
+| figure on the curve | 620 delay + 620 | 240 + 620 | a person arriving is a beat, so it keeps `T_ENTER`'s weight; only the wait goes |
+| receding cards | 1245ms on `E_ENTER` | 785ms on `E_EXIT` | it is a dim, not an arrival |
+
+**Metrics.** Entrances inside the 1200ms budget: 44/47 → **47/47**, worst 1245ms → **1180ms**. Audit
+6 findings unchanged, zero collisions, 0 console errors, interact 12/12.
+
+**A classifier bug found and bounded.** The receding-cards site had the entrance curve because the
+curve-assignment pass read `bk.attr('opacity',1).transition()…attr('opacity',.45)` and took the
+pre-set `1` — the *initial state* — as a target, so `max(1, .45) > 0.5` resolved to an entrance.
+Checked across the whole file rather than assumed local: three sites set an opacity before
+`.transition()`, and only this one was misclassified; the other two pre-set 0 and target 1, which
+resolves correctly either way.
+
+**Uncovered.** The harness was used to reason about layering, not to step every one of the 47
+entrances frame by frame. Doing that properly is a `remotion studio` session with a human watching,
+which is the one thing in this pipeline an agent cannot substitute for.
+
+## Step 4 — New scenes — BLOCKED, and deliberately not attempted
+
+The mechanical half is ready: the token scale exists, the harness renders it deterministically, and
+a new scene's motion could arrive with real timings rather than placeholders.
+
+**What is missing is editorial direction, and it is not mine to invent.** This piece is 59 scenes of
+cited public-health argument, rebuilt specifically to answer eight named faults recorded in
+`docs/PLAN-faster-than-the-rumour.md` — the founder's verdict on the previous version. Adding scenes
+without knowing which gap they fill would be speculation dressed as work, and on this subject matter
+speculation is worse than absence: every figure in the piece is real and cited except the recreated
+Ads console, which says so.
+
+**What would unblock it,** in one sentence: which argument the piece currently does not make, or
+makes too thinly. Given that, the scene follows — drawn in the repo's own idiom, obeying the standing
+rule that no rounded rectangle carries an idea, passing the layout and accessibility gates in its own
+right.
+
+**Skipping to Step 6** rather than sitting on this, since Steps 6 through 9 need no such input.
