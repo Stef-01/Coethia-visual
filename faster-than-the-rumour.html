@@ -988,10 +988,27 @@ const P_BG='#141010', P_SHELL='#0F0B09', P_CASE='#5A473A', P_EDGE='#8A7768',
       P_GOLD='#EBDDA8', P_WARN='#E5B693', P_GLASS='#A8CDE5', P_LINE='#3A2E27',
       P_ROOM='#1B1410';
 
-function show(sel, v, dur){ sel.transition('vis').duration(dur || FADE)
-  /* the one helper both shows and hides, so the curve has to follow the
-     direction rather than being fixed at the call site */
-  .ease(v ? E_ENTER : E_EXIT).attr('opacity', v); }
+function show(sel, v, dur){
+  /* opacity 0 does NOT remove anything from the accessibility tree -- only aria-hidden,
+     display:none or visibility:hidden do. Without the attribute below, a screen-reader
+     user BROWSING rather than tabbing meets every control in every scene that is not on
+     screen. Measured on `cliff`: 85 role="button" elements present, 2 focusable, and 65
+     sitting at opacity ~0 and fully exposed -- including "AK" and "ME", state labels
+     from a different scene entirely.
+
+     setTabbing() cannot fix this. It gets the tab ORDER right, and the accessibility
+     tree does not care about tabindex. Hiding at the group is the fix, because it covers
+     every element in the scene in one place rather than per control.
+
+     Set on the way out and cleared on the way in, both immediately -- not on the
+     transition -- so a scene is announceable the moment it starts arriving and gone from
+     the tree the moment it starts leaving. Only an exact 0 hides; `show(g, .16)` is a
+     dim, and a dimmed thing is still there. */
+  sel.attr('aria-hidden', v === 0 ? 'true' : null)
+     .transition('vis').duration(dur || FADE)
+     /* the one helper both shows and hides, so the curve follows the direction
+        rather than being fixed at the call site */
+     .ease(v ? E_ENTER : E_EXIT).attr('opacity', v); }
 
 function drawOn(sel, dur, delayFn){
   sel.each(function(d, i){
@@ -6012,6 +6029,20 @@ function render(key){
     gFit.selectAll('g.fitcard').attr('opacity',0)
       .transition('rise').duration(T_BASE).ease(E_ENTER).delay((d,i)=>0+i*S_BEAT).attr('opacity',1);
   }
+
+  /* ONE invariant, enforced in one place: nothing hidden from the accessibility tree is
+     in the tab order.
+
+     Individual draw sites set tabindex=0 at draw time and only some are gated by
+     setTabbing(), so a control belonging to a scene the reader has left could stay
+     focusable. Measured: the cliff scene's three controls -- "Seed one case", "Now all
+     of them", "vaccination coverage, percent" -- were focusable on all 59 scenes.
+
+     Before show() began setting aria-hidden, that was a Tab stop on an invisible
+     control: bad. After, it was a Tab stop that announces nothing at all: worse. The
+     fix belongs here rather than at 30-odd draw sites, because a sweep cannot be
+     forgotten by the next scene someone adds. */
+  svg.selectAll('[aria-hidden="true"] [tabindex="0"]').attr('tabindex', -1);
 }
 
 /* =====================================================================

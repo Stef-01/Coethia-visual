@@ -132,6 +132,52 @@ it produced 317 findings between them, all false.
 targets, equivalent function available elsewhere) that a script cannot decide. Counted and listed,
 deliberately not called failures.
 
+## The largest accessibility finding of the pass, and it came from an anomaly
+
+While confirming the accessibility tree I noticed both `five` and `desk` reporting their first button
+as `"Seed one case"` — a control belonging to `cliff`. Following that rather than moving on:
+
+**`opacity: 0` does not remove an element from the accessibility tree.** Only `aria-hidden`,
+`display: none` or `visibility: hidden` do. Every control in every off-screen scene was therefore both
+in the tab order and announced. Measured on `cliff`: **85 `role="button"` elements present, 2 actually
+usable, 65 exposed** — including `"AK"` and `"ME"`, US state labels from a different scene.
+
+`setTabbing()` could not fix this. It manages the tab *order*, and the accessibility tree does not
+care about `tabindex`.
+
+Two changes. `show()` now sets `aria-hidden` on the way out and clears it on the way in, both
+immediately rather than on the transition, so a scene is announceable as it starts arriving and gone
+from the tree as it starts leaving — and only an exact `0` hides, because `show(g, .16)` is a dim and a
+dimmed thing is still there. Then `render()` enforces one invariant in one place:
+
+```js
+svg.selectAll('[aria-hidden="true"] [tabindex="0"]').attr('tabindex', -1);
+```
+
+**Nothing hidden from the tree is in the tab order.** That belongs in one sweep rather than at 30-odd
+draw sites, because a sweep cannot be forgotten by the next scene someone adds.
+
+### It also reframes my own earlier "CLEAN"
+
+| | before | after |
+|---|---|---|
+| focusable objects | 260 | **64** |
+| scenes exposing controls | 54 of 59 | **18 of 59** |
+| SC 2.5.8 under-size targets | 176 | **13**, across 6 scenes |
+| accessibility tree on `five` | 30 nodes, 19 buttons | 7 nodes, 5 buttons |
+
+**196 of the 260 Tab stops were leaked controls from scenes the reader had already left.** The earlier
+result — "every one of 260 focusable objects is reachable" — was true and close to meaningless. A tab
+order of 260 stops where 196 land on invisible controls is not an accessible interface; it passes a
+reachability check and fails a person.
+
+The under-size count falling 176 → 13 is the same story: 163 of those were leaked too. The 13 that
+remain are real and are still reported, not asserted.
+
+Verified after: audit 6 findings and zero collisions, interact 12/12 with 0 console errors, reduced
+motion CLEAN, and zero real keyboard findings — the one that appeared (`crosstab`, 5 of 7) was checked
+against a focused probe on that single scene, which found 7 of 7.
+
 ## Not done
 
 The rest of the hands-on tier. `accessibility-scan` and `accessibility-inspect` drive a live page, and the

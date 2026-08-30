@@ -1,4 +1,13 @@
-/* Keyboard and accessible-name check.  Run: node a11y.js
+/* Keyboard, accessible-name, reflow and accessibility-tree check.  Run: node a11y.js
+
+   A KNOWN LIMITATION, stated because it has produced false findings four times. The
+   aggregate walk visits 59 scenes in sequence and carries focus state between them, and
+   that residual state occasionally makes a scene look partly unreachable. Every such
+   finding so far has been the walk, not the page: `weeks` reported 4 of 9 and a focused
+   probe on that one scene found 10 of 10; `crosstab` reported 5 of 7 and a focused probe
+   found 7 of 7. Treat any "Tab reached N of M" from this file as a POINTER, and confirm
+   it by driving that single scene from a fresh page before believing it. A metric points;
+   it does not diagnose.
    The hands-on tier: the things a contrast scanner cannot decide. For every scene,
    is each interactive object actually reachable by Tab, does it announce a name, and
    does it carry a role? setTabbing() flips tabindex per scene, so a scene's controls
@@ -15,9 +24,15 @@ const SETTLE = 1500;
 const SURFACE = () => {
   const svg = document.querySelector('#viz');
   const out = { focusable: [], nameless: [], roleless: [] };
+  out.buriedFocusable = [];
   for (const el of svg.querySelectorAll('[tabindex]')) {
     const ti = el.getAttribute('tabindex');
     if (ti !== '0') continue;                       // -1 is deliberately out of the order
+    /* focusable AND hidden from the tree is the worst combination: Tab lands on it and
+       a screen reader announces nothing. Worth checking explicitly, because the fix for
+       one half of the problem (hiding invisible scenes from the tree) can create it. */
+    if (el.closest('[aria-hidden="true"]'))
+      out.buriedFocusable.push((el.getAttribute('aria-label') || el.tagName).slice(0, 40));
     const name = el.getAttribute('aria-label') || (el.textContent || '').trim();
     const role = el.getAttribute('role');
     const box = el.getBoundingClientRect();
@@ -47,6 +62,8 @@ const SURFACE = () => {
       if (!s.focusable.length) continue;
       scenesWithControls++; totalFocusable += s.focusable.length;
       s.nameless.forEach(n => findings.push([view, k, 'no accessible name', n]));
+      (s.buriedFocusable || []).forEach(n =>
+        findings.push([view, k, 'focusable but inside aria-hidden — Tab lands, nothing announced', n]));
       s.roleless.forEach(n => findings.push([view, k, 'no role', n]));
       // a control smaller than 24x24 CSS px fails WCAG 2.2 SC 2.5.8 target size (minimum)
       /* WCAG 2.2 SC 2.5.8 asks 24x24 CSS px of any POINTER target. Reported separately
@@ -114,6 +131,65 @@ const SURFACE = () => {
     console.log(`${view}: ${scenesWithControls} of ${keys.length} scenes expose controls, ${totalFocusable} focusable objects`);
     await page.close();
   }
+  /* ---- WCAG 1.4.10 reflow -------------------------------------------------
+     Content must reflow without two-dimensional scrolling at 320 CSS px wide.
+     That is the real bar, not "looks fine on a phone": 320px is 400% zoom of a
+     1280px viewport, which is how a low-vision reader actually uses this. */
+  {
+    const page = await b.newPage({ viewport: { width: 320, height: 640 } });
+    await page.addInitScript(() => { window.__fastTimers = true; });
+    await page.goto(URL, { waitUntil: 'load' });
+    await page.waitForTimeout(1500);
+    const keys = await page.$$eval('.step', els => els.map(e => e.dataset.key));
+    let worst = 0, worstKey = '';
+    for (const k of keys) {
+      await page.evaluate(kk => document.querySelector('.step[data-key="' + kk + '"]')
+        .scrollIntoView({ behavior: 'auto', block: 'center' }), k);
+      await page.waitForTimeout(700);
+      const over = await page.evaluate(() =>
+        document.documentElement.scrollWidth - document.documentElement.clientWidth);
+      if (over > worst) { worst = over; worstKey = k; }
+    }
+    console.log(`\nreflow at 320px: worst horizontal overflow ${worst}px` +
+      (worst > 1 ? `  <-- ${worstKey} (WCAG 1.4.10 wants 0)` : '  — no two-dimensional scrolling'));
+    if (worst > 1) findings.push(['320px', worstKey, `horizontal overflow ${worst}px`, 'WCAG 1.4.10 reflow']);
+    await page.close();
+  }
+
+  /* ---- the accessibility tree, as a screen reader receives it -------------
+     page.accessibility.snapshot() was removed from Playwright; the current API is
+     locator.ariaSnapshot(), which returns the tree as text. Checked on a scene with
+     real controls rather than on the document, because setTabbing() means a scene's
+     controls only enter the tree while that scene is current. */
+  {
+    const page = await b.newPage({ viewport: { width: 1440, height: 900 } });
+    await page.addInitScript(() => { window.__fastTimers = true; });
+    await page.goto(URL, { waitUntil: 'load' });
+    await page.waitForTimeout(1500);
+    for (const scene of ['five', 'desk']) {
+      await page.evaluate(k => document.querySelector(`.step[data-key="${k}"]`)
+        ?.scrollIntoView({ behavior: 'auto', block: 'center' }), scene);
+      await page.waitForTimeout(2500);
+      let tree = '';
+      try { tree = await page.locator('#viz').ariaSnapshot(); } catch (e) { tree = ''; }
+      const lines = tree.split('\n').filter(l => l.trim());
+      const buttons = lines.filter(l => /- button/.test(l));
+      const named   = lines.filter(l => /"[^"]{3,}"/.test(l));
+      const group   = lines.find(l => /- group/.test(l));
+      console.log(`\naccessibility tree on '${scene}': ${lines.length} nodes, ${named.length} named, ${buttons.length} buttons`);
+      if (!tree)          findings.push(['tree', scene, 'ariaSnapshot returned nothing', '']);
+      else {
+        if (!group)          findings.push(['tree', scene, 'the chart is not exposed as a group', '']);
+        if (!buttons.length) findings.push(['tree', scene, 'no buttons reach the accessibility tree', '']);
+        // an unnamed button announces as "button" and nothing else
+        const anon = buttons.filter(l => !/"[^"]{3,}"/.test(l));
+        if (anon.length) findings.push(['tree', scene, `${anon.length} button(s) reach the tree with no name`, '']);
+        if (buttons.length) console.log('  first button announces as: ' + buttons[0].trim().slice(0, 74));
+      }
+    }
+    await page.close();
+  }
+
   await b.close();
   console.log();
   if (small.length) {
