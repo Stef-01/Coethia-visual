@@ -4606,7 +4606,16 @@ function drawLanes(key, fresh){
         cross.attr('data-on','1').attr('opacity',1);
         ln(cross, CX + 20, y, DX - 20, y, WARN, 1.3, '3 3');
         const cl2 = nar ? 30 : 16;
-        const cdir = nar ? 1 : -1;   // below the rule on a phone, above it on a desk
+        /* Below the rule on a phone, above it on a desk -- UNLESS below would run into
+           the closing note, which is fixed at y 742 and painted at 12.5 * TK. The
+           crossing fires wherever views hit 40,000, and laneY runs to 690, so a late
+           crossing puts "is still drafting" on top of "412,000 views against one post".
+           Place the annotation on whichever side has room; a fixed direction is what
+           made this collide. Invisible until now because the collision only exists in
+           the scene's FINAL state, which the audit never reached -- the lane is driven
+           by a 16s d3.timer and the suite settled at 4500ms. */
+        const NOTE_Y = 742, noteHalf = 12.5 * TK * 0.72;
+        const cdir = (nar && (y + cl2 * 3 + 12 < NOTE_Y - noteHalf)) ? 1 : -1;
         mono(cross, (CX+DX)/2, y + cdir*cl2, '40,000 VIEWS', 6.8, WARN, 'middle');
         label(cross, (CX+DX)/2, y + cdir*cl2*2, 'and the epidemiologist', nar ? 7.6 : 9.2, 700, WARN, 'middle');
         label(cross, (CX+DX)/2, y + cdir*cl2*3, 'is still drafting', nar ? 7.6 : 9.2, 700, WARN, 'middle');
