@@ -3412,7 +3412,8 @@ function drawR0(){
         g2.append('circle').attr('cx', S.cx + Math.cos(a)*rr).attr('cy', S.cy + Math.sin(a)*rr)
           .attr('r', 2.4).attr('fill', WARN).attr('opacity', .5);
       }
-      g2.transition().delay(REDUCE?0:T_ENTER).duration(T_ENTER).ease(E_ENTER).attr('opacity',1);
+      // secondary layer: follows the primary, does not queue behind it
+      g2.transition().delay(REDUCE?0:T_QUICK).duration(T_QUICK).ease(E_ENTER).attr('opacity',1);
     }
     // generation one
     const k = si === 0 ? 15 : 1;
@@ -3651,7 +3652,8 @@ function drawCurve(){
   const wg = gCurve.append('g')
     .attr('transform','translate('+X(COV.length-1)+','+(Y(92.4)-16)+') scale(0.9)').attr('opacity',0);
   person(wg, SKIN.a, WARN, HAIR.black);
-  wg.transition().delay(REDUCE?0:T_ENTER).duration(T_ENTER).ease(E_ENTER).attr('opacity',1);
+  // a figure arriving is a beat, so it keeps T_ENTER's weight; only the wait goes
+  wg.transition().delay(REDUCE?0:T_QUICK).duration(T_ENTER).ease(E_ENTER).attr('opacity',1);
 
   label(gCurve, nar?500:190, nar?110:118, 'Three points, and a different disease', nar?15:19, 300, INK, nar?'middle':'start');
   label(gCurve, nar?500:190, nar?136:144,
@@ -3807,7 +3809,8 @@ function drawArc(){
         .attr('stroke-dasharray','2 3');
       if (!gone.has(n)) ln(bk, x+3, SY+r*54+42-h+6, x+bw-11, SY+r*54+42-h+6, '#FFFFFF', 1.4);
       if (!REDUCE && gone.has(n)){
-        bk.attr('opacity',1).transition().delay(T_QUICK + n*S_ROW).duration(T_ENTER).ease(E_ENTER).attr('opacity',.45);
+        // a dim, not an arrival -- it recedes, so it accelerates away
+        bk.attr('opacity',1).transition().delay(n*S_ROW).duration(T_BASE).ease(E_EXIT).attr('opacity',.45);
       }
     }
   }
