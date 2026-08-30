@@ -601,3 +601,89 @@ rule that no rounded rectangle carries an idea, passing the layout and accessibi
 right.
 
 **Skipping to Step 6** rather than sitting on this, since Steps 6 through 9 need no such input.
+
+---
+
+## Step 6 — Finish the fitter's review — DONE
+
+**Ran.** Own analysis rather than a second review fleet — the earlier six-lens pass lost one lens and
+eight of nine refuters to a session limit, and re-running it was not the cheapest way to resolve what
+those refuters had claimed. Two of the claims were testable directly from the source.
+
+**The un-reseeded PRNG claim: CONFIRMED, and it was the largest remaining defect.**
+`_s = 20260825` is set once at load and never reset. `rnd()` is consumed inside four `draw*`
+functions — smoke particles, the cliff path's jitter, the quadrant scatter, the loop nodes. So every
+drawn position was a function of how many times anything had been drawn or run before it: **redrawing
+a scene moved its content.**
+
+That one cause explains three things previously recorded as three separate mysteries:
+
+- `quadrants` never converging in the fitter — each pass redrew it and measured different geometry.
+- the audit and a direct probe disagreeing about that scene's text sizes at the same viewport. The
+  ledger recorded this as "scene rendering may depend on scroll history". Correct, and this is why.
+- `--verify` reporting `IDEMPOTENT` while the artifact was not. Both passes consumed the stream in the
+  same order, so they agreed with each other and with nothing else.
+
+Fixed: every geometry draw reseeds on entry, so a scene is a pure function of itself. The epidemic
+simulation moved to its own stream — clicking "run" is meant to be stochastic, but on a shared stream
+it also silently moved the smoke, the cliff and the scatter, which are not.
+
+Verified order-invariant: `quadrants` measures identically fitted alone or after `descent`.
+
+**The `SETTLE` claim: already resolved**, in the commit that raised it to 4500. Re-checked against the
+new token values: the longest entrance is now 1180ms and the longest sweep 2800ms, both well inside it.
+
+**The `Math.random` half of the PRNG claim: refuted at the source.** There is no `Math.random` in the
+file. The generator is a seeded LCG, exactly as the README says — the defect was that it was seeded
+*once*, not that it was unseeded.
+
+**`--strict` added**, the one refuter-confirmed finding still outstanding. Without it the process exits
+0 however many scenes were refused or failed to converge, so a CI step reads a partial fit as a clean
+one. Verified: unconverged scene exits 1, converged exits 0, and the flagless default stays 0.
+
+**Uncovered.** The `render-semantics` lens still has not run as an independent review. Its subject —
+whether `APPLY` truly re-establishes geometry at the new TK — was substantially answered by the
+`conKey` and PRNG findings, but "substantially" is not "audited", and I am not claiming otherwise.
+
+## Step 7 — The four scenes that would not converge — DONE, and the fault was mine
+
+**Suspected cause was wrong.** The roadmap said to look for something positioned *from* the frame —
+`drawConFrame`, `layoutDash`, a draw-time `viewBox` read. There is none: `placeStamp` is the only
+frame-positioned thing and it is excluded from measurement. The 1-D model was sound.
+
+**Found by adding a diagnostic rather than by more guessing.** `measure.js --curve=<key>` samples
+`F(w)` across the bracket and prints the map. On `subsidy` at mobile:
+
+```
+     w      F(w)     g=F-w      TK
+   768       816     +48.5    2.42
+   951       995     +43.9    3.00
+   971       994     +23.1    3.00   <- F decreased
+```
+
+`g` is **positive across the entire bracket**, so no root existed in it. `F(24000) = 971` while
+`F(971) = 994`: `wTK3` was not the maximum of `F`, and the sign guarantee `g(wTK3) ≤ 0` that the
+bracket depends on was simply false.
+
+**Cause.** `W_LARGE = 24000` pinned `TK` at its ceiling — which is what it was for — and rendered the
+scene at `sc ≈ 0.014`, where the composed `getScreenCTM` in `userBox()` loses precision and reports
+the extent tens of units short. The probe corrupted the measurement it existed to enable.
+
+**Fixed** by climbing 1.4× per step while `TK` is still rising and stopping at the ceiling, so the
+upper probe sits at `TK = 3` *and* inside the regime where the renderer measures accurately.
+
+| scene | residual before | after | status |
+|---|---|---|---|
+| `subsidy` | 24.4 | **0** | CLAMPED_HI |
+| `map` | 17.8 | **0.1** | CLAMPED_HI |
+| `lenses` | 17.9 | **0.5** | CLAMPED_HI |
+| `quadrants` | 20.4 | **−0.6** | CLAMPED_HI |
+
+`CLAMPED_HI` is also the honest classification: all four have a saturated type scale, so legibility
+there is being bought with frame size.
+
+**Declined.** Re-running the full review fleet to re-derive what one diagnostic answered in a single
+pass.
+
+**Uncovered.** Whether the same precision cliff affects any *other* extreme-scale path in the suite.
+`audit.js` never renders at an absurd width, so it should not — but that is reasoning, not a test.

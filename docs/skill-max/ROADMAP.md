@@ -58,8 +58,8 @@ is a real outcome and must not be relabelled; `BLOCKED` when it cannot proceed a
 | 3 | Prototype remaining motion, port the numbers | DONE — 47/47 inside budget |
 | 4 | New scenes | BLOCKED — needs owner direction, see ledger |
 | 5 | Publish `stef-skill-max`, switch to pointer | DONE |
-| 6 | Finish the fitter's review | TODO |
-| 7 | The four scenes that do not converge | TODO |
+| 6 | Finish the fitter's review | DONE |
+| 7 | The four scenes that do not converge | DONE — all four at residual ≈0 |
 | 8 | Stage 11 — accessibility | TODO |
 | 9 | Stage 12 — adversarial taste QA | TODO |
 | 10 | Stages 1–4, only if 9 justifies them | TODO |
