@@ -687,3 +687,74 @@ pass.
 
 **Uncovered.** Whether the same precision cliff affects any *other* extreme-scale path in the suite.
 `audit.js` never renders at an absurd width, so it should not — but that is reasoning, not a test.
+
+## Step 9 (continued) — Stage 12 adversarial taste QA: the F6 boxes finding — PARTIAL, backfilling a gap
+
+**This entry is bookkeeping, not new work.** Commit `c734de9` (`Add boxes.js`) and
+`docs/skill-max/12-qa.md` did real work under this step — screenshots of all 59 scenes at `29cfd78`,
+a dedicated static check for standing rule 5's rounded-rectangle prohibition, and a finding — but
+neither the ledger nor the roadmap's Step 9 row was updated afterward. Standing rule 6 says a step
+with no ledger entry did not happen; this closes that gap on the record rather than leaving it open
+going into Step 10's own gate, which depends on what Step 9 found.
+
+**What `boxes.js` checked.** Every `roundRect` in the piece, classified as chrome — accompanied by a
+path, circle, polygon, image or line, or a data mark whose siblings vary in size (a proportional bar,
+a gantt span, an escalating tier) — versus a box carrying only words. Three passes, each correcting an
+overcount: 37 (every text-only box, including proportional bars) → 21 (added the sibling-variance
+distinction, still counted controls and a cartogram) → 7 (exempted controls and the four scenes that
+recreate a real interface: `segments`, `subsidy`, `placement`, `privacy`).
+
+**Finding.** `measure` — the "What a Coethia report leads with" dashboard — is six identically-sized
+250×84 cards, each a mono eyebrow over a cited number ($41, $12, +18pt, −11pt, plus two "not
+celebrated" nulls), with no drawn thing anywhere in the scene. It is independently also the emptiest
+frame in the piece, 36% coverage, 786×316 content in an 854×810 frame. Two unrelated measures landing
+on the same scene is the strongest signal Stage 12 has produced.
+
+**Open question, recorded rather than resolved.** `boxes.js` exempts anything with `role="button"` as
+interface chrome, which also removes `cases` — three identical 240×250 cards — because they're
+clickable. But `cases` is named explicitly in the founder's F6 verdict ("three `roundRect`s with
+chips"), and a clickable card is still a card. The honest count is 7 or 10 depending on whether an
+interactive box earns the chrome exemption. Not resolved here either; recorded for whoever picks it up.
+
+**Not attempted, and correctly so.** Fixing `measure` needs four new drawn things — a coin or receipt
+line for cost, a before/after pair for the comprehension delta, a moved needle for belief movement —
+inventing visual metaphors for cited public-health figures on a piece whose whole premise is that
+every number is real except the one console that says so. That is authoring, not QA, and it is
+exactly what Step 10 is gated on.
+
+**Uncovered.** 55 of 59 screenshots still not examined for the broader adversarial-taste sweep
+(composition, hierarchy, generic-pattern audit) that Step 9 also calls for — `boxes.js` only checked
+the one named rule, not general taste. The `cases` / `role="button"` exemption question above.
+Whether `translate`'s single box-only card (found alongside `measure`, 1 × 273×66) is worth fixing on
+its own even while `measure` waits on illustration work — not evaluated either way.
+
+## Step 10 — Stages 1–4 — BLOCKED
+
+**Its own gate, read literally.** Step 10 runs "only if Step 9 justifies them... with its findings as
+their scope, not as a general pass." Step 9 has now produced exactly one finding of that shape:
+`measure`'s six box-only cards, above. The other two Step-9 findings on record — 41% mean frame
+emptiness, and the `cases` exemption question — are named as the owner's call in their own writeups,
+not handed over as a scope for drawing work.
+
+**Why blocked rather than attempted.** Closing the `measure` finding means choosing four specific
+visual metaphors for cited figures in a piece the founder's own verdict already condemned once for
+inventing box-shaped stand-ins for content (fault F6, the fault this whole rebuild exists to remove).
+Step 4 declined new-scene work on exactly this basis: "editorial direction... is not mine to invent."
+Re-illustrating an existing scene's central visual device, on a public-health argument where every
+other figure is real and cited, is the same category of decision — not a mechanical fix — so the same
+reasoning holds for an unattended run with no owner present to approve the metaphors.
+
+**What would unblock it.** The owner picks or approves the four illustrations for `measure`, and rules
+on the `cases` / interactive-box exemption question above. After that, Step 10's scope is exactly
+those choices, drawn in the repo's existing hand-illustration style (~30 precedents already in the
+piece), gated by Step 1's floor, the collision check, and Stage 11's accessibility walk — same as any
+other drawn content.
+
+**Gate.** No scene code changed this step. `node audit.js` — 59 scenes, 6 findings {tiny-text: 6},
+zero collisions, 0 console errors — and `node interact.js` — 12/12 — both reproduce the roadmap's
+recorded baseline exactly, confirming the ledger backfill and this block decision changed nothing on
+disk that the gate can see.
+
+**Uncovered.** Everything Step 9 has not covered (see above). Step 10 stays blocked on the same input
+regardless of how much of the remaining 55 screenshots get examined, unless one of them surfaces a
+second finding shaped the same way `measure`'s is.

@@ -61,8 +61,8 @@ is a real outcome and must not be relabelled; `BLOCKED` when it cannot proceed a
 | 6 | Finish the fitter's review | DONE |
 | 7 | The four scenes that do not converge | DONE — all four at residual ≈0 |
 | 8 | Stage 11 — accessibility | PARTIAL — colour, reduced motion and keyboard all CLEAN; screen-reader tree and zoom outstanding |
-| 9 | Stage 12 — adversarial taste QA | PARTIAL — 4 of 59 examined, 2 defects fixed, 41% mean frame emptiness quantified |
-| 10 | Stages 1–4, only if 9 justifies them | TODO |
+| 9 | Stage 12 — adversarial taste QA | PARTIAL — 4 of 59 examined for general taste, 2 defects fixed, 41% mean frame emptiness quantified; all 59 scanned for the F6 rounded-rect rule (`boxes.js`), `measure` is the clear violation — see ledger |
+| 10 | Stages 1–4, only if 9 justifies them | BLOCKED — `measure`'s box-only cards justify it in scope, but closing it needs owner-approved illustration concepts for cited figures; not mine to invent unattended, see ledger |
 | 11 | Close out | DONE — see RESULT.md |
 
 ---
