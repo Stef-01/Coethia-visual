@@ -53,11 +53,11 @@ is a real outcome and must not be relabelled; `BLOCKED` when it cannot proceed a
 
 | # | step | status |
 |---|---|---|
-| 1 | `CON_TK` — close the last six findings | TODO |
+| 1 | `CON_TK` — close the last six findings | IN PROGRESS |
 | 2 | Remotion project as a sibling | TODO |
 | 3 | Prototype remaining motion, port the numbers | TODO |
 | 4 | New scenes | TODO |
-| 5 | Publish `stef-skill-max`, switch to pointer | TODO |
+| 5 | Publish `stef-skill-max`, switch to pointer | DONE (published; pointer switch pending) |
 | 6 | Finish the fitter's review | TODO |
 | 7 | The four scenes that do not converge | TODO |
 | 8 | Stage 11 — accessibility | TODO |

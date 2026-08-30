@@ -435,3 +435,58 @@ same command would have deleted 57 frames.
 evaluations). Its extent is not purely a function of `TK` — something in it is positioned from the
 frame — so the 1-D model is an approximation for that scene. The written frame is the best of the
 search, reproducibly so, and no hard metric regressed.
+
+---
+
+## Step 5 — Publish `stef-skill-max` — DONE
+
+**Ran.** No fleet skill; this is plumbing.
+
+**Changed.** Nothing in this repo. `~/stef-skill-max` pushed to
+**https://github.com/Stef-01/stef-skill-max** (public, `main`, 5 commits).
+
+Pre-publish scan first, because publishing is not reversible in the way a commit is: every tracked
+file grepped for credentials, absolute local paths and email addresses. Clean — the only hits were the
+word "token" in design-token context. No `/Users/...` paths (the scripts use `$HOME`), no addresses in
+file contents.
+
+**Verified end to end**, in a throwaway directory rather than in this repo, because this repo's suite
+was mid-run:
+
+```
+./bootstrap.sh
+  -> stef-skill-max: fetched Stef-01/stef-skill-max@main
+preflight.sh from the fetched copy
+  -> 35/35 required skills present
+./bootstrap.sh   (again)
+  -> using cached copy, ref main
+```
+
+So the durable-pointer mechanism works: fetch, extract, preflight, and TTL cache on the second call.
+
+**Declined.** Switching this repo's vendored copy from `--full` to `--link`. It is a one-command
+change but it rewrites `.claude/skills/stef-skill-max/` while `measure.js` is running against the
+artifact, and there is no reason to do it in that window.
+
+**Uncovered.** `/plugin marketplace add Stef-01/stef-skill-max` not exercised — it needs an
+interactive session. The marketplace JSON validates and the layout matches the documented shape, but
+that is not the same as having installed it.
+
+**For the next stage.** Once the fit lands: re-vendor with the default `--link` mode and confirm
+`bootstrap.sh` resolves from inside this repo. Note that `CLAUDE.md` is gitignored here, so the
+trigger block stays local either way — the skill still travels because `.claude/skills/` is tracked
+and the skill's own description is what fires it.
+
+## Reduced motion after the token rewrite — verified, no change needed
+
+Checked statically rather than assumed, since `E_EXIT` is a curve the piece never had:
+
+- Every motion token is `REDUCE`-aware — durations collapse to 1ms, staggers to 0, curves to
+  `easeLinear`.
+- Zero sites still carry a redundant inline `REDUCE?1:` on a duration; the tokens now carry it
+  centrally, which is strictly better than 53 local copies of the same conditional.
+- One apparent gap, `.duration(dur || 900)` in the stroke draw-on helper, is not one: the function
+  returns early under `REDUCE` after snapping to the final state, so that duration is unreachable.
+  The static check flagged it because it read the duration argument without the guard above it.
+  The literal stays — it is a default parameter rather than a call-site timing decision, and renaming
+  it would change every draw-on's feel for no measured gain.
