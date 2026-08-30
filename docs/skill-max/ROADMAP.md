@@ -60,7 +60,7 @@ is a real outcome and must not be relabelled; `BLOCKED` when it cannot proceed a
 | 5 | Publish `stef-skill-max`, switch to pointer | DONE |
 | 6 | Finish the fitter's review | DONE |
 | 7 | The four scenes that do not converge | DONE — all four at residual ≈0 |
-| 8 | Stage 11 — accessibility | TODO |
+| 8 | Stage 11 — accessibility | PARTIAL — colour+reduced-motion done; hands-on tier outstanding |
 | 9 | Stage 12 — adversarial taste QA | TODO |
 | 10 | Stages 1–4, only if 9 justifies them | TODO |
 | 11 | Close out | TODO |
