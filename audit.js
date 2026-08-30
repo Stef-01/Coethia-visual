@@ -35,6 +35,10 @@ const VIEWS = [
     const errs = [];
     page.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
     page.on('pageerror', e => errs.push('PAGEERROR ' + e.message));
+    /* Collapse the two d3.timer spans (air 13s, twoclocks 16s) so the settle window
+       actually reaches their final state. Both END by creating content, so without this
+       the suite measures them mid-animation and has never checked what they finish as. */
+    await page.addInitScript(() => { window.__fastTimers = true; });
     await page.goto(URL, { waitUntil: 'load' });
     await page.waitForTimeout(1200);
 

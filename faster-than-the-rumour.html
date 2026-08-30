@@ -907,6 +907,17 @@ const REDUCE  = typeof matchMedia === 'function'
   && matchMedia('(prefers-reduced-motion: reduce)').matches;
 const FADE    = REDUCE ? 1 : 500;
 const CAMERA  = REDUCE ? 1 : 900;
+/* Two scenes are driven by d3.timer rather than by transitions -- the aerosol drift in
+   `air` over 13s and the lane playhead in `twoclocks` over 16s -- and both END by
+   creating content: the figure in the doorway and the cited caption in one, the
+   crossing labels in the other. The verification suite settles 4500ms, so without a way
+   to collapse these spans it never measures either scene's final state, and their camera
+   frames were fitted mid-animation. Raising SETTLE past 16.5s is not the answer: at 118
+   scene-passes it would put a single audit past half an hour.
+
+   audit.js and measure.js set window.__fastTimers before the page loads. Nothing in
+   normal use does, and nothing should -- the spans are the scene. */
+const TIMER_SPAN = ms => (typeof window !== 'undefined' && window.__fastTimers) ? 1 : ms;
 /* ---- motion tokens -------------------------------------------------------
    Before this block the piece had 25 distinct durations, 43 distinct per-item
    staggers, and 39 of 56 transitions with no explicit easing at all -- which
@@ -3331,7 +3342,7 @@ function drawRoomScene(key, fresh){
              SKIN.a, CLOTH.dust, HAIR.brown);
       applyTypeScale(); return;
     }
-    const SPAN = 13000;
+    const SPAN = TIMER_SPAN(13000);
     const t0 = Date.now();
     airTimer = d3.timer(function(){
       const t = Math.min(1, (Date.now() - t0) / SPAN);
@@ -4579,7 +4590,7 @@ function drawLanes(key, fresh){
     if (laneTimer) return;
     lanePlayed = true;
     playhead.attr('opacity',.9);
-    const SPAN = REDUCE ? 400 : 16000;
+    const SPAN = REDUCE ? 400 : TIMER_SPAN(16000);
     const t0 = Date.now();
     laneTimer = d3.timer(function(){
       const t = Math.min(1, (Date.now()-t0)/SPAN);
