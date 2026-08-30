@@ -903,6 +903,39 @@ const E_MOVE  = REDUCE ? d3.easeLinear : d3.easeCubicInOut;  // travelling betwe
 const E_VALUE = REDUCE ? d3.easeLinear : d3.easeCubicOut;
 const VALUE_EASE = E_VALUE;   // prior name, kept so existing call sites keep working
 
+/* Durations. Five steps; the names are about weight, not meaning -- the curve above
+   carries the meaning. Replaces 25 distinct literals across 53 call sites.          */
+const T_TAP   = REDUCE ? 1 : 140;   // feedback on a control the reader just touched
+const T_QUICK = REDUCE ? 1 : 240;   // one small object arriving, or a value stepping
+const T_BASE  = REDUCE ? 1 : 400;   // the default: one object doing one thing
+const T_ENTER = REDUCE ? 1 : 620;   // a composed group arriving
+/* A long deliberate traverse where the travel IS the content rather than the arrival
+   of it. Two sites qualify, both intentional: a beam rotating into position, and the
+   key that turns 340 degrees -- that one keeps T_SWEEP doubled, because a full turn
+   needs the time. The entrance budget below does not apply to a sweep.              */
+const T_SWEEP = REDUCE ? 1 : 1400;
+
+/* Staggers, chosen by what the sequence is FOR rather than by how many items it has.
+   Replaces 43 distinct per-item steps.
+
+   These are DELAY steps only. `i*N` also appears throughout the drawing code as
+   layout geometry -- `x + i*92` is a column position, `360 + i*214` is a row -- so a
+   substitution that is not scoped to the inside of a .delay() argument silently
+   rewrites the layout into timing tokens. It looks like it works and it moves every
+   object in the scene.                                                              */
+const S_TIGHT = REDUCE ? 0 : 14;    // hundreds of cells -- reads as a wipe
+const S_ROW   = REDUCE ? 0 : 55;    // rows and list items -- a sequence the eye follows
+const S_BEAT  = REDUCE ? 0 : 80;    // a few major objects, each meant to be noticed
+/* 80, not the 120 this started at, and the arithmetic is the reason: 120 across an
+   eight-item run costs 840ms of stagger before the duration is even counted, which
+   put 23 of 48 entrances over budget. At 80 the same run costs 560 and a T_ENTER
+   group lands at 1180. Still a clearly perceptible beat -- 80ms is about five frames. */
+
+/* Budget: delay + (n-1)*stagger + duration <= 1200ms for every ENTRANCE. Not a
+   preference -- 17 of the 50 call sites used to finish after the suite's 1500ms
+   settle, so a third of the piece was measured in flight and every frame fit and
+   collision count was taken against content that had not arrived.                   */
+
 const INK='#212E36', PAPER='#F8F6F1', MUTE='#666666', ALARM='#B8492E',
       RED='#D53F3B', TEAL='#7FCCC8', TEAL_D='#31756F', BLUE='#C3DCEB',
       GOLD='#8D5D1C', ACCENT='#F37940', LINE='#DCD5C6';
@@ -1428,9 +1461,9 @@ const titleText = gTitle.append('text')
 function setTitle(txt){
   if (titleText.text() === txt) return;
   if (REDUCE){ titleText.text(txt); return; }
-  titleText.transition('title').duration(200).attr('opacity',0)
+  titleText.transition('title').duration(T_QUICK).attr('opacity',0)
     .on('end', function(){
-      d3.select(this).text(txt).transition('title').duration(280).ease(E_ENTER).ease(E_ENTER).attr('opacity',1);
+      d3.select(this).text(txt).transition('title').duration(T_QUICK).ease(E_ENTER).ease(E_ENTER).attr('opacity',1);
     });
 }
 
@@ -1732,7 +1765,7 @@ function mCounters(g, y, items, teal){
     label(cell, x, cy, it.l, 8.6, 400, GSUB);
     const t = label(cell, x, cy+vd, '', vs, 500, it.hi ? (teal?TEAL_D:GBLUE) : GTEXT);
     if (!REDUCE && it.v != null){
-      t.transition('count').duration(1300).delay(300+i*120).ease(VALUE_EASE)
+      t.transition('count').duration(T_SWEEP).delay(0+i*S_BEAT).ease(VALUE_EASE)
         .tween('t', function(){
           const iv = d3.interpolateNumber(0, it.v);
           return k => t.text((it.pre||'') + Math.round(iv(k)).toLocaleString('en-US') + (it.suf||''));
@@ -1942,7 +1975,7 @@ function drawLoopPanel(){
   lines.slice(0,3).forEach((ln,k)=> label(loopPanel, px+92, py+50+k*15, ln, 9.5, 400, '#3A4750'));
   if (!REDUCE){
     loopPanel.attr('opacity',0).attr('transform','translate(0,8)')
-      .transition('lp').duration(300).ease(E_ENTER)
+      .transition('lp').duration(T_BASE).ease(E_ENTER)
       .attr('opacity',1).attr('transform','translate(0,0)');
   }
 }
@@ -2213,7 +2246,7 @@ function drawGanttPanel(){
   });
   if (!REDUCE){
     ganttPanel.attr('opacity',0).attr('transform','translate(0,8)')
-      .transition('gp').duration(300).ease(E_ENTER)
+      .transition('gp').duration(T_BASE).ease(E_ENTER)
       .attr('opacity',1).attr('transform','translate(0,0)');
   }
 }
@@ -2616,7 +2649,7 @@ function drawSegChips(){
   if (!az.empty()){
     if (!segOn.size) az.text('\u2014');
     else if (REDUCE) az.text(tot.toLocaleString('en-US'));
-    else az.transition('az').duration(520).ease(VALUE_EASE)
+    else az.transition('az').duration(T_ENTER).ease(VALUE_EASE)
       .tween('t', function(){ const i0 = +(az.property('__last')||0);
         return k => az.text(Math.round(i0 + (tot-i0)*k).toLocaleString('en-US')); })
       .on('end', ()=> az.property('__last', tot));
@@ -2673,13 +2706,13 @@ function renderConsole(key){
     return;
   }
   conBody.attr('opacity',0).attr('transform','translate(0,10)')
-    .transition('screen').duration(420).ease(E_ENTER)
+    .transition('screen').duration(T_BASE).ease(E_ENTER)
     .attr('opacity',1).attr('transform','translate(0,0)');
   conBody.selectAll('g.ntc').attr('opacity',0)
-    .transition('commit').duration(380).ease(E_ENTER).delay((d,i)=>820+i*170).attr('opacity',1);
+    .transition('commit').duration(T_BASE).ease(E_ENTER).delay((d,i)=>T_ENTER+i*S_BEAT).attr('opacity',1);
   conBody.selectAll('rect.effbar').each(function(d,i){
     const w = this.__w;
-    d3.select(this).transition('commit').duration(760).delay(420+i*110).ease(VALUE_EASE)
+    d3.select(this).transition('commit').duration(T_ENTER).delay(i*S_BEAT).ease(VALUE_EASE)
       .attr('width', w);
   });
 }
@@ -2962,7 +2995,7 @@ function drawCasePanel(){
 
   if (!REDUCE){
     casePanel.attr('opacity',0).attr('transform','translate(0,10)')
-      .transition('cp').duration(320).ease(E_ENTER)
+      .transition('cp').duration(T_BASE).ease(E_ENTER)
       .attr('opacity',1).attr('transform','translate(0,0)');
   }
 }
@@ -3264,10 +3297,10 @@ function drawRoomScene(key, fresh){
         // and someone opens the door
         const who = roomAir.append('g').attr('transform','translate(162,432) scale(1.5)').attr('opacity',0);
         person(who, SKIN.a, CLOTH.dust, HAIR.brown);
-        who.transition().duration(700).ease(E_ENTER).attr('opacity',1);
+        who.transition().duration(T_ENTER).ease(E_ENTER).attr('opacity',1);
         label(roomAir, 500, 560, 'Fifty-five percent of it is still in the air when the next person walks in.',
               11.5, 700, WARN, 'middle').attr('opacity',0)
-          .transition().delay(500).duration(500).ease(E_ENTER).attr('opacity',1);
+          .transition().delay(T_QUICK).duration(T_ENTER).ease(E_ENTER).attr('opacity',1);
         applyTypeScale();
       }
     });
@@ -3292,7 +3325,7 @@ function drawRoomScene(key, fresh){
       mono(tg, x + 10, y + 32, t[0], 6.4, WARN);
       label(tg, x + 10, y + 32 + tl, t[1], 9.4, 700, INK);
       label(tg, x + 10, y + 32 + tl*2, t[2], 8, 400, MUTE);
-      tg.transition().duration(520).ease(E_ENTER).delay(260 + i*420).attr('opacity',1);
+      tg.transition().duration(T_ENTER).ease(E_ENTER).delay(0 + i*S_BEAT).attr('opacity',1);
     });
     if (!nar){
       label(roomTags, 500, 556, '762 confirmed cases in West Texas. Most of them unvaccinated children.',
@@ -3360,7 +3393,7 @@ function drawR0(){
         g2.append('circle').attr('cx', S.cx + Math.cos(a)*rr).attr('cy', S.cy + Math.sin(a)*rr)
           .attr('r', 2.4).attr('fill', WARN).attr('opacity', .5);
       }
-      g2.transition().delay(REDUCE?0:1500).duration(REDUCE?1:900).ease(E_ENTER).attr('opacity',1);
+      g2.transition().delay(REDUCE?0:T_ENTER).duration(T_ENTER).ease(E_ENTER).attr('opacity',1);
     }
     // generation one
     const k = si === 0 ? 15 : 1;
@@ -3370,7 +3403,7 @@ function drawR0(){
         .attr('transform','translate('+(S.cx + Math.cos(a)*rr)+','+(S.cy + Math.sin(a)*rr)+') scale(0.92)')
         .attr('opacity',0);
       person(p, SKIN.b, WARN, HAIR.dark);
-      p.transition().delay(REDUCE?0:420 + i*46).duration(REDUCE?1:340).ease(E_ENTER).attr('opacity',1);
+      p.transition().delay(REDUCE?0:T_QUICK + i*S_ROW).duration(T_BASE).ease(E_ENTER).attr('opacity',1);
       const rayD = 'M '+(S.cx + Math.cos(a)*30)+' '+(S.cy + Math.sin(a)*30)+
                    ' L '+(S.cx + Math.cos(a)*(rr-26))+' '+(S.cy + Math.sin(a)*(rr-26));
       pth(G, rayD, WARN, 1, null, '3 3').attr('opacity',.5);
@@ -3491,8 +3524,8 @@ function runSim(){
       const st = state[i];
       const col = st === 'x' ? RED : st === 'r' ? CLOTH.terra : st === 'i' ? CLOTH.off : SKIN.off;
       const hd  = st === 'x' ? WARN : st === 'r' ? SKIN.f : st === 'i' ? SKIN.off : SKIN.b;
-      d3.select(this).select('path').transition().duration(REDUCE?1:220).ease(E_MOVE).attr('fill', col);
-      d3.select(this).select('circle').transition().duration(REDUCE?1:220).ease(E_MOVE).attr('fill', hd);
+      d3.select(this).select('path').transition().duration(T_BASE).ease(E_MOVE).attr('fill', col);
+      d3.select(this).select('circle').transition().duration(T_BASE).ease(E_MOVE).attr('fill', hd);
     });
   }
   paint();
@@ -3592,14 +3625,14 @@ function drawCurve(){
       label(nd, cx, cy + (i===0 ? -20 : -20), d[1].toFixed(1) + '%', 15, 700, INK, i===0?'start':'end');
     }
     if (!nar || i % 2 === 0) mono(nd, cx, y0 + 30, d[0], 6.2, MUTE, 'middle');
-    nd.transition().delay(REDUCE?0:300 + i*230).duration(REDUCE?1:300).ease(E_ENTER).attr('opacity',1);
+    nd.transition().delay(REDUCE?0:0 + i*S_BEAT).duration(T_BASE).ease(E_ENTER).attr('opacity',1);
   });
 
   // the walker who walks off it
   const wg = gCurve.append('g')
     .attr('transform','translate('+X(COV.length-1)+','+(Y(92.4)-16)+') scale(0.9)').attr('opacity',0);
   person(wg, SKIN.a, WARN, HAIR.black);
-  wg.transition().delay(REDUCE?0:1900).duration(500).ease(E_ENTER).attr('opacity',1);
+  wg.transition().delay(REDUCE?0:T_ENTER).duration(T_ENTER).ease(E_ENTER).attr('opacity',1);
 
   label(gCurve, nar?500:190, nar?110:118, 'Three points, and a different disease', nar?15:19, 300, INK, nar?'middle':'start');
   label(gCurve, nar?500:190, nar?136:144,
@@ -3642,7 +3675,7 @@ function drawRoomsScene(fresh){
       } else {
         const p = gRooms.append('g').attr('transform','translate('+cx+','+cy+') scale(0.66)').attr('opacity',0);
         person(p, i%3?SKIN.b:SKIN.e, i%2?CLOTH.dust:CLOTH.olive, HAIR.dark);
-        p.transition().delay(REDUCE?0:i*36).duration(REDUCE?1:260).ease(E_ENTER).attr('opacity',1);
+        p.transition().delay(REDUCE?0:i*S_ROW).duration(T_QUICK).ease(E_ENTER).attr('opacity',1);
       }
     }
     label(gRooms, 500, nar ? 154 : 148, 'One room of twenty', nar?15:19, 300, INK, 'middle');
@@ -3661,7 +3694,7 @@ function drawRoomsScene(fresh){
       pth(gl, 'M '+x+' '+(y+14)+' L '+x+' '+y+' L '+(x+18)+' '+y+' L '+(x+18)+' '+(y+14), '#C9C3B6', 1.1);
       gl.append('circle').attr('cx',x+5).attr('cy',y+8).attr('r',2.1).attr('fill',WARN);
       gl.append('circle').attr('cx',x+13).attr('cy',y+8).attr('r',2.1).attr('fill',WARN);
-      gl.transition().delay(REDUCE?0:(r*cols+c)*3).duration(REDUCE?1:200).ease(E_ENTER).attr('opacity',1);
+      gl.transition().delay(REDUCE?0:(r*cols+c)*S_TIGHT).duration(T_QUICK).ease(E_ENTER).attr('opacity',1);
     }
   }
   label(gRooms, 500, nar ? 154 : 148, '14,000 classrooms', nar?15:19, 300, INK, 'middle');
@@ -3711,7 +3744,7 @@ function drawUS(){
     else if (isOver) t.append('circle').attr('cx', x + (c-gap)/2).attr('cy', y + (c-gap)/2)
       .attr('r', 5).attr('fill', '#FFFFFF');
     if (isRose) pth(t, 'M '+(x+c-gap-13)+' '+(y+11)+' l 4 -5 l 4 5', isOver?'#FFFFFF':'#8A8474', 1.5);
-    t.transition().delay(REDUCE?0:i*14).duration(REDUCE?1:260).ease(E_ENTER).attr('opacity',1);
+    t.transition().delay(REDUCE?0:i*S_TIGHT).duration(T_QUICK).ease(E_ENTER).attr('opacity',1);
   });
   bindTip(gUS.selectAll('g.tile'),
     d => '<b>'+d.ab+'</b><br>'+(d.isRose?'exemptions rose this year':'exemptions did not rise')+
@@ -3755,7 +3788,7 @@ function drawArc(){
         .attr('stroke-dasharray','2 3');
       if (!gone.has(n)) ln(bk, x+3, SY+r*54+42-h+6, x+bw-11, SY+r*54+42-h+6, '#FFFFFF', 1.4);
       if (!REDUCE && gone.has(n)){
-        bk.attr('opacity',1).transition().delay(700 + n*40).duration(600).ease(E_ENTER).attr('opacity',.45);
+        bk.attr('opacity',1).transition().delay(T_QUICK + n*S_ROW).duration(T_ENTER).ease(E_ENTER).attr('opacity',.45);
       }
     }
   }
@@ -4251,7 +4284,7 @@ function drawPhoneScene(key, fresh){
         mono(row, S.x+S.w-22, y+24, c[3], 5.4, P_MUTE, 'middle');
       } else mono(row, S.x+S.w-16, y-14, c[3] + '  \u2661', 5.4, P_MUTE, 'end');
       if (i === 2 && !nar) label(row, S.x+44, y+40, 'View 412 replies', 7.6, 700, '#8A7768');
-      row.transition().delay(REDUCE?0:120+i*90).duration(REDUCE?1:300).ease(E_ENTER).attr('opacity',1);
+      row.transition().delay(REDUCE?0:0+i*S_ROW).duration(T_BASE).ease(E_ENTER).attr('opacity',1);
     });
     roundRect(cl, S.x+14, S.y+S.h-38, S.w-28, 26, 13, '#251C17', '#3A2B22', 1);
     label(cl, S.x+28, S.y+S.h-21, 'Add comment...', 7.6, 400, '#6E5C4F');
@@ -4513,7 +4546,7 @@ function drawLanes(key, fresh){
       }
       if (t >= 1){
         laneTimer.stop(); laneTimer = null;
-        playhead.transition().duration(400).ease(E_EXIT).attr('opacity',0);
+        playhead.transition().duration(T_BASE).ease(E_EXIT).attr('opacity',0);
         note.text('412,000 views against one post, nine days late.');
         applyTypeScale();
       }
@@ -4586,7 +4619,7 @@ function drawDesks(key){
     }
     roundRect(bar, 340, gy-30, 320, 28, 14, PAPER, WARN, 1.6);
     mono(bar, 500, gy-11, 'EXTERNAL COMMUNICATIONS PAUSED', 7.4, WARN, 'middle');
-    bar.transition().duration(REDUCE?1:600).ease(E_ENTER).attr('opacity',1);
+    bar.transition().duration(T_ENTER).ease(E_ENTER).attr('opacity',1);
     gDesks.selectAll('g.deskunit').attr('opacity',.34);
     label(gDesks, 500, nar?110:180, 'And sometimes it goes to zero', nar?15:19, 300, INK, 'middle');
     label(gDesks, 500, nar?740:548, 'An operating model that depends on being allowed to speak is not resilient.',
@@ -4648,7 +4681,7 @@ function drawScaleScene(){
   const rot = 'rotate(11,'+cx+','+cy+')';
   if (REDUCE) beam.attr('transform', rot);
   else beam.attr('transform','rotate(0,'+cx+','+cy+')')
-           .transition().delay(500).duration(1400).ease(E_ENTER).attr('transform', rot);
+           .transition().delay(T_QUICK).duration(T_SWEEP).ease(E_ENTER).attr('transform', rot);
 
   label(gScale, 500, nar?150:130, 'It does not balance, and it never will', nar?15:19, 300, INK, 'middle');
   const lines = ['The side that can publish in minutes and iterate daily',
@@ -4760,7 +4793,7 @@ function drawDeskScene(key){
         }
         pth(G, d + ' Z', '#C9C3B6', 1.6, '#FBE3D2');
         label(G, h[1], h[2]+4, h[0], 9.2, 700, WARN, 'middle');
-        G.transition().delay(REDUCE?0:i*130).duration(REDUCE?1:420).ease(E_ENTER).attr('opacity',1);
+        G.transition().delay(REDUCE?0:i*S_BEAT).duration(T_BASE).ease(E_ENTER).attr('opacity',1);
       });
       label(gDesk, 500, isNarrow()?800:578, 'Six infrastructure gaps. Not one of them is a talent gap.',
             13, 700, INK, 'middle');
@@ -4819,7 +4852,7 @@ function drawDeskScene(key){
       ln(gDesk, px+34, y+22, px+pw-60, y+22, '#EFEAE0', 18);
       const w = (pw-94) * b[2];
       ln(gDesk, px+34, y+22, px+34, y+22, i===2?'#E74D4E':WARN, 18)
-        .transition().duration(REDUCE?1:900).ease(E_MOVE).delay(REDUCE?0:200+i*220).attr('x2', px+34+w);
+        .transition().duration(T_BASE).ease(E_MOVE).delay(REDUCE?0:0+i*S_BEAT).attr('x2', px+34+w);
       label(gDesk, px+34, y+48, b[1], 9.6, 400, MUTE);
       // a stack being sliced, drawn at the end of each bar
       if (i===2) pth(gDesk, 'M '+(px+34+w)+' '+(y+4)+' l 40 36', '#E74D4E', 2.4);
@@ -4841,7 +4874,7 @@ function drawDeskScene(key){
       for (let k = 0; k < r[1]; k++){
         const p = gDesk.append('g').attr('transform','translate('+(gx+k*40)+','+yy+') scale(0.62)');
         person(p, r[2]?SKIN.b:SKIN.e, r[2]?WARN:CLOTH.navy, HAIR.dark);
-        if (r[2] && !REDUCE) p.transition().delay(1200 + i*260 + k*140).duration(700).ease(E_EXIT)
+        if (r[2] && !REDUCE) p.transition().delay(i*S_BEAT + k*S_BEAT)  /* two nested staggers already cost enough; no base delay */.duration(T_ENTER).ease(E_EXIT)
           .attr('opacity',.12).attr('transform','translate('+(gx+k*40)+','+(yy-16)+') scale(0.62)');
         else if (r[2]) p.attr('opacity',.12);
       }
@@ -5026,7 +5059,7 @@ function drawCrowd(key, fresh){
       const g = gCrowd.append('g').attr('opacity',0)
         .attr('transform','translate('+(x0+(i%10)*cell)+','+(y0+Math.floor(i/10)*cell)+') scale(0.7)');
       person(g, on ? SKIN.b : SKIN.off, on ? WARN : CLOTH.off, null);
-      g.transition().delay(REDUCE?0:i*11).duration(REDUCE?1:240).ease(E_ENTER).attr('opacity',1);
+      g.transition().delay(REDUCE?0:i*S_TIGHT).duration(T_QUICK).ease(E_ENTER).attr('opacity',1);
     }
     label(gCrowd, 500, nar?150:148, '93 of every 100 confirmed cases', nar?15:19, 300, INK, 'middle');
     label(gCrowd, 500, nar?192:172, 'were unvaccinated or of unknown status.', 10.5, 400, MUTE, 'middle');
@@ -5069,7 +5102,7 @@ function drawCrowd(key, fresh){
       }
       if (r.id === 'refuse') roundRect(G, nar?220:x-cw/2+6, nar?y-56:y-108, nar?560:cw-12, nar?120:336, 8,
         'none', '#E74D4E', 1.2).attr('stroke-dasharray','5 5');
-      G.transition().delay(REDUCE?0:140+i*170).duration(REDUCE?1:420).ease(E_ENTER).attr('opacity',1);
+      G.transition().delay(REDUCE?0:0+i*S_BEAT).duration(T_BASE).ease(E_ENTER).attr('opacity',1);
     });
     bindTip(gCrowd.selectAll('g.reason'), d => '<b>'+d.n+'</b> — '+d.share+' in 100<br><br>'+d.need, d => d.n);
     label(gCrowd, 500, nar?130:148, 'Only one of these is a refusal', nar?15:19, 300, INK, 'middle');
@@ -5096,7 +5129,7 @@ function drawCrowd(key, fresh){
     label(G, nar ? 500 : bx+acc+w/2, by + (nar ? 130 + i*46 : 124), s[0], 10.4, 700,
           s[2]==='#C9C3B6'?MUTE:s[2], nar ? 'middle' : 'middle');
     if (!nar) label(G, bx+acc+w/2, by+142, s[3], 8.6, 400, MUTE, 'middle');
-    G.transition().delay(REDUCE?0:200+i*280).duration(REDUCE?1:500).ease(E_ENTER).attr('opacity',1);
+    G.transition().delay(REDUCE?0:0+i*S_BEAT).duration(T_ENTER).ease(E_ENTER).attr('opacity',1);
     acc += w;
   });
   // the people in the movable slice
@@ -5254,7 +5287,7 @@ function drawFacetScene(key, fresh){
       const by2 = y0 + 104 + rows*28;
       mixBar(G, x-52, by2, 104, mixFor(FA.id+c), 12);
       mono(G, x, by2 + 26, 'REASON MIX', 5.8, MUTE, 'middle');
-      G.transition().delay(REDUCE?0:120+ci*130).duration(REDUCE?1:380).ease(E_ENTER).attr('opacity',1);
+      G.transition().delay(REDUCE?0:0+ci*S_BEAT).duration(T_BASE).ease(E_ENTER).attr('opacity',1);
     });
     label(gFacet, 500, nar?680:632, 'Every column carries all five reasons, in almost the same proportions.',
           12.5, 700, INK, 'middle');
@@ -5277,7 +5310,7 @@ function drawFacetScene(key, fresh){
         vals.push(mx2.map(v=>v/d3.sum(mx2)));
         const G = gFacet.append('g').attr('opacity',0);
         mixBar(G, x0 + ci*cwid + 6, y0 + 12 + bi*rh, cwid - 16, mx2, 30);
-        G.transition().delay(REDUCE?0:60+(bi*A.length+ci)*40).duration(REDUCE?1:280).ease(E_ENTER).attr('opacity',1);
+        G.transition().delay(REDUCE?0:0+(bi*A.length+ci)*S_ROW).duration(T_QUICK).ease(E_ENTER).attr('opacity',1);
       });
     });
     // the actual finding, computed rather than asserted
@@ -5337,7 +5370,7 @@ function drawQuadScene(key, fresh){
       const tx = cx + q.x*(40 + rnd()*R*0.72) , ty = cy - q.y*(34 + rnd()*R*0.66);
       const p = gQuad.append('g').attr('transform','translate('+gx+','+gy2+') scale(0.4)').attr('opacity',.8);
       person(p, SKIN.b, q.col, null);
-      if (!REDUCE) p.transition().delay(500 + i*11).duration(1100).ease(E_MOVE)
+      if (!REDUCE) p.transition().delay(T_QUICK + i*S_TIGHT).duration(T_SWEEP).ease(E_MOVE)
         .attr('transform','translate('+tx+','+ty+') scale(0.44)');
       else p.attr('transform','translate('+tx+','+ty+') scale(0.44)');
     }
@@ -5395,7 +5428,7 @@ function drawQuadScene(key, fresh){
     const words = q.need.split(' '); const L = ['']; let li = 0;
     words.forEach(w2 => { if ((L[li]+' '+w2).trim().length > (nar?62:42)){ li++; L[li]=w2; } else L[li]=(L[li]+' '+w2).trim(); });
     L.slice(0,3).forEach((t,k)=> label(G, x+(nar?24:200), y+(nar?42:30)+k*(nar?26:17), t, 9.4, 400, '#55606A'));
-    G.transition().delay(REDUCE?0:140+i*180).duration(REDUCE?1:420).ease(E_ENTER).attr('opacity',1);
+    G.transition().delay(REDUCE?0:0+i*S_BEAT).duration(T_BASE).ease(E_ENTER).attr('opacity',1);
   });
   /* At narrow the four rooms stack instead of tiling 2x2, so this caption has to
      clear the fourth card, not the second row. Card 4 is at y 764 (140 + 3*208)
@@ -5450,7 +5483,7 @@ function drawMach(key){
         pth(G,'M '+(cxx-9)+' '+(cyy+9)+' l 18 -18', GOLD, 1.8); }
       label(G, x+52, y+2, (i+1) + '. ' + l[0], nar?11:13, 700, INK);
       mono(G, x+52, y+20, 'EARNED IN ' + l[1].toUpperCase(), 6, MUTE);
-      G.transition().delay(REDUCE?0:120+i*160).duration(REDUCE?1:400).ease(E_ENTER).attr('opacity',1);
+      G.transition().delay(REDUCE?0:0+i*S_BEAT).duration(T_BASE).ease(E_ENTER).attr('opacity',1);
     });
     label(gMach, 500, nar?130:136, 'Five laws, each with a failure it predicts', nar?14:18, 300, INK, 'middle');
     applyTypeScale();
@@ -5471,9 +5504,9 @@ function drawMach(key){
   [0,1,2].forEach(k=> pth(burst, 'M '+(LX+42)+' '+(LY+20)+' q '+(60+k*26)+' '+(-52+k*52)+' '+(112+k*26)+' '+(-42+k*42), '#E74D4E', 1.6, null, '4 5'));
   if (!REDUCE){
     key2.attr('transform','rotate(0,'+(LX-78)+','+(LY+20)+')')
-        .transition().duration(2600).ease(E_ENTER).attr('transform','rotate(340,'+(LX-78)+','+(LY+20)+')');
-    burst.transition().delay(700).duration(400).attr('opacity',1)
-         .transition().delay(1400).duration(900).ease(E_ENTER).ease(E_EXIT).attr('opacity',.16);
+        .transition().duration(T_SWEEP*2 /* 340 degrees needs the time */).ease(E_ENTER).attr('transform','rotate(340,'+(LX-78)+','+(LY+20)+')');
+    burst.transition().delay(T_QUICK).duration(T_BASE).attr('opacity',1)
+         .transition().delay(T_ENTER).duration(T_ENTER).ease(E_ENTER).ease(E_EXIT).attr('opacity',.16);
   } else burst.attr('opacity',.4);
   const ML = nar ? 30 : 20;
   ['episodic — exists only when there is money','broadcast — one message to everyone',
@@ -5691,7 +5724,7 @@ function drawWeek12(){
     if (h[3]==='meas'){ [10,17,24].forEach((hh,k)=> ln(G, x-14+k*14, y+8, x-14+k*14, y+8-hh, '#2E6B2B', 5)); }
     if (h[3]==='fast'){ pth(G, 'M '+(x+4)+' '+(y-14)+' l -12 16 l 8 0 l -4 12 l 14 -16 l -8 0 Z', '#2E6B2B', 1.6, '#2E6B2B'); }
     label(G, h[1], h[2]+40, h[0], narW ? 8.2 : 9.2, 700, '#2E6B2B', 'middle');
-    G.transition().delay(REDUCE?0:i*140).duration(REDUCE?1:440).ease(E_ENTER).attr('opacity',1);
+    G.transition().delay(REDUCE?0:i*S_BEAT).duration(T_BASE).ease(E_ENTER).attr('opacity',1);
   });
   label(gDesk, 500, 100, 'Week twelve. The same desk.', 18, 300, INK, 'middle');
   label(gDesk, 500, 578, 'Six holes, six fills. That is the deliverable.', 13, 700, INK, 'middle');
@@ -5822,10 +5855,10 @@ function render(key){
   setTabbing(loopNodes.selectAll('g.lstn'), key === 'loop');
   if (wheelOn && prev !== key && !REDUCE){
     loopNodes.selectAll('g.lstn').attr('opacity',0)
-      .transition('rise').duration(360).delay((d,i)=>140+i*90).ease(E_ENTER).attr('opacity',1);
+      .transition('rise').duration(T_BASE).delay((d,i)=>0+i*S_ROW).ease(E_ENTER).attr('opacity',1);
     drawOn(gWheel.selectAll('path.larc'), 420, (d,i)=>420+i*80);
     gWheel.selectAll('path.lhead').attr('opacity',0)
-      .transition('rise').duration(280).ease(E_ENTER).delay((d,i)=>620+i*70).attr('opacity',.75);
+      .transition('rise').duration(T_QUICK).ease(E_ENTER).delay((d,i)=>T_QUICK+i*S_ROW).attr('opacity',.75);
   }
 
   /* ---- act seven ---- */
@@ -5838,17 +5871,17 @@ function render(key){
   setTabbing(gMap.selectAll('g.quad'), key === 'map');
   if (key === 'map' && prev !== 'map' && !REDUCE){
     gMap.selectAll('g.quad').attr('opacity',0)
-      .transition('rise').duration(420).ease(E_ENTER).delay((d,i)=>160+i*130).attr('opacity',1);
+      .transition('rise').duration(T_BASE).ease(E_ENTER).delay((d,i)=>0+i*S_BEAT).attr('opacity',1);
   }
 
   show(gRoute, key === 'translate' ? 1 : 0);
   if (key === 'translate'){ layoutRoutes(); }
   setTabbing(gRoute.selectAll('g.rcard'), key === 'translate');
   if (key === 'translate' && prev !== 'translate' && !REDUCE){
-    gRoute.select('g.ebase').attr('opacity',0).transition('rise').duration(420).ease(E_ENTER).delay(120).attr('opacity',1);
+    gRoute.select('g.ebase').attr('opacity',0).transition('rise').duration(T_BASE).ease(E_ENTER).delay(0).attr('opacity',1);
     drawOn(gRoute.selectAll('path.rlead'), 480, (d,i)=>420+i*110);
     gRoute.selectAll('g.rcard').attr('opacity',0)
-      .transition('rise').duration(460).delay((d,i)=>560+i*140).ease(E_ENTER).attr('opacity',1);
+      .transition('rise').duration(T_BASE).delay((d,i)=>T_QUICK+i*S_BEAT).ease(E_ENTER).attr('opacity',1);
   }
 
   show(gRig, key === 'lenses' ? 1 : 0);
@@ -5859,7 +5892,7 @@ function render(key){
   if (key === 'measure'){ layoutDash(); }
   if (key === 'measure' && prev !== 'measure' && !REDUCE){
     gDash.selectAll('g.dcell').attr('opacity',0)
-      .transition('rise').duration(340).ease(E_ENTER).delay((d,i)=>140+i*110).attr('opacity',1);
+      .transition('rise').duration(T_BASE).ease(E_ENTER).delay((d,i)=>0+i*S_BEAT).attr('opacity',1);
   }
 
   /* ---- act eight ---- */
@@ -5868,7 +5901,7 @@ function render(key){
   setTabbing(gCase.selectAll('g.ccard'), key === 'cases');
   if (key === 'cases' && prev !== 'cases' && !REDUCE){
     caseHub.selectAll('g.ccard').attr('opacity',0)
-      .transition('rise').duration(400).delay((d,i)=>200+i*130).ease(E_ENTER).attr('opacity',1);
+      .transition('rise').duration(T_BASE).delay((d,i)=>0+i*S_BEAT).ease(E_ENTER).attr('opacity',1);
   }
 
   /* ---- act nine ---- */
@@ -5877,23 +5910,23 @@ function render(key){
   setTabbing(gGantt.selectAll('g.phase'), key === 'weeks');
   if (key === 'weeks' && prev !== 'weeks' && !REDUCE){
     gantt.selectAll('g.phase').attr('opacity',0)
-      .transition('rise').duration(380).delay((d,i)=>160+i*120).ease(E_ENTER).attr('opacity',1);
+      .transition('rise').duration(T_BASE).delay((d,i)=>0+i*S_BEAT).ease(E_ENTER).attr('opacity',1);
   }
 
   show(gTier, key === 'tiers' ? 1 : 0);
   if (key === 'tiers' && prev !== 'tiers' && !REDUCE){
     gTier.selectAll('g.tier').attr('opacity',0)
       .attr('transform',function(){ return 'translate('+this.getAttribute('data-x')+','+(+this.getAttribute('data-y')+26)+')'; })
-      .transition('rise').duration(640).delay((d,i)=>140+i*160).ease(E_ENTER)
+      .transition('rise').duration(T_ENTER).delay((d,i)=>0+i*S_BEAT).ease(E_ENTER)
       .attr('opacity',1)
       .attr('transform',function(){ return 'translate('+this.getAttribute('data-x')+','+this.getAttribute('data-y')+')'; });
-    gTier.selectAll('path.ascent').attr('opacity',0).transition('rise').duration(520).ease(E_ENTER).delay(760).attr('opacity',.8);
+    gTier.selectAll('path.ascent').attr('opacity',0).transition('rise').duration(T_ENTER).ease(E_ENTER).delay(T_QUICK).attr('opacity',.8);
   }
 
   show(gFit, key === 'fit' ? 1 : 0);
   if (key === 'fit' && prev !== 'fit' && !REDUCE){
     gFit.selectAll('g.fitcard').attr('opacity',0)
-      .transition('rise').duration(420).ease(E_ENTER).delay((d,i)=>160+i*140).attr('opacity',1);
+      .transition('rise').duration(T_BASE).ease(E_ENTER).delay((d,i)=>0+i*S_BEAT).attr('opacity',1);
   }
 }
 
