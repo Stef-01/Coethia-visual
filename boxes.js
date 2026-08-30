@@ -85,7 +85,11 @@ const SCAN = () => {
   await p.addInitScript(() => { window.__fastTimers = true; });
   await p.goto(URL, { waitUntil: 'load' });
   await p.waitForTimeout(1500);
-  const keys = await p.$$eval('.step', e => e.map(x => x.dataset.key));
+  let keys = await p.$$eval('.step', e => e.map(x => x.dataset.key));
+  /* Scene filter. Useful for re-checking a single scene after a fix without paying for
+     a 59-scene walk. */
+  const ONLY = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean);
+  if (ONLY.length) keys = keys.filter(k => ONLY.includes(k));
   const hits = [];
   for (const k of keys) {
     await p.evaluate(kk => document.querySelector(`.step[data-key="${kk}"]`)
@@ -94,12 +98,50 @@ const SCAN = () => {
     const boxes = await p.evaluate(SCAN);
     if (boxes.length) hits.push([k, boxes]);
   }
+  /* SELF-VERIFY. Every hit is re-checked from a fresh page visiting only that scene, and
+     a hit that does not reproduce is dropped and reported as dropped.
+
+     Not because this check has been caught being wrong -- it has not. Its `measure`
+     finding was real, and drawing the six glyphs is what cleared it. The guard is here
+     because the OTHER aggregate walker in this repo, a11y.js, produced false findings
+     four times by carrying state across a 59-scene sequence, and the pattern that caught
+     it every time was a second isolated pass. Encoding that costs one page load per
+     flagged scene, and it means a future false positive announces itself instead of being
+     acted on.
+
+     A note against my own reasoning, since it nearly went the other way: after `measure`
+     was fixed, a probe found glyphs present and I briefly concluded the check had been
+     wrong all along. It had not -- the glyphs were there because the fix had landed one
+     commit earlier. "The defect is absent now" and "the check was wrong" are different
+     claims, and a fix in between makes them look identical. Check the log before
+     blaming the instrument. */
+  const verified = [];
+  const dropped = [];
+  for (const [k, boxes] of hits) {
+    const vp = await b.newPage({ viewport: { width: 1440, height: 900 } });
+    await vp.addInitScript(() => { window.__fastTimers = true; });
+    await vp.goto(URL, { waitUntil: 'load' });
+    await vp.waitForTimeout(1500);
+    await vp.evaluate(kk => document.querySelector(`.step[data-key="${kk}"]`)
+      .scrollIntoView({ behavior: 'auto', block: 'center' }), k);
+    await vp.waitForTimeout(SETTLE);
+    const again = await vp.evaluate(SCAN);
+    await vp.close();
+    if (again.length) verified.push([k, again]);
+    else dropped.push([k, boxes.length]);
+  }
   await b.close();
-  const flagged = hits.filter(([k]) => !RECREATED.has(k) && !CHART_FORMS.has(k));
-  const exempt  = hits.filter(([k]) =>  RECREATED.has(k));
+  if (dropped.length) {
+    console.log('dropped — flagged by the aggregate walk, did NOT reproduce in isolation:');
+    dropped.forEach(([k, n]) => console.log(`  ${k.padEnd(15)} ${n} box(es) — the aggregate walk was wrong here`));
+    console.log();
+  }
+  const hits2 = verified;
+  const flagged = hits2.filter(([k]) => !RECREATED.has(k) && !CHART_FORMS.has(k));
+  const exempt  = hits2.filter(([k]) =>  RECREATED.has(k));
   console.log(`${keys.length} scenes scanned`);
   console.log(`${exempt.length} scene(s) exempt as recreated interfaces: ${exempt.map(h => h[0]).join(', ') || 'none'}`);
-  const forms = hits.filter(([k]) => CHART_FORMS.has(k));
+  const forms = hits2.filter(([k]) => CHART_FORMS.has(k));
   if (forms.length) console.log(`exempt as a recognised chart form: ${forms.map(h => h[0] + ' (' + h[1].length + ' tiles)').join(', ')}`);
   console.log();
   const violations = flagged.map(([k, bs]) => [k, bs.filter(o => !o.encoding)]).filter(h => h[1].length);

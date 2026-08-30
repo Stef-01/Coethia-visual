@@ -1240,7 +1240,7 @@ const FIT = {
   weeks:'83 -151 931 883',
   tiers:'41 4 918 871',
   fit:'166 24 668 634',
-  week12:'76 -59 848 804',
+  week12:'76 -60 848 804',
   backtotheroom:'76 -54 848 804',
   close:'213 90 574 544'
 };
@@ -1274,7 +1274,7 @@ const FIT_M = {
   people:'86 -71 828 1141',
   ledger:'140 116 698 962',
   arithmetic:'139 116 723 996',
-  gaps:'76 -91 848 1168',
+  gaps:'76 -92 848 1168',
   notone:'145 83 709 977',
   five:'119 60 763 1051',
   facets:'113 24 774 1067',
@@ -1301,7 +1301,7 @@ const FIT_M = {
   weeks:'211 42 583 803',
   tiers:'82 -116 836 1152',
   fit:'96 -49 808 1113',
-  week12:'76 -249 848 1168',
+  week12:'76 -240 848 1168',
   backtotheroom:'76 -41 848 1168',
   close:'283 87 435 599'
 };
@@ -1332,6 +1332,37 @@ function padHit(g, x, y, w, h, pad){
     .attr('fill','transparent');
 }
 
+/* An irregular oval opening — a hole torn in a desktop. Two bugs lived in the two
+   hand-rolled copies of this and both are visible in a screenshot:
+
+   1. The path opened with `M` at the LEFT edge (cx - rx) and then its first `L` went to
+      the a=0 sample, which is the RIGHT edge. That drew a chord straight across the
+      middle of every shape — the slash through all six holes and all six fills.
+   2. The radius wobble used sin(a*2.3) and cos(a*1.7). Neither is periodic over the
+      loop, so the radius at a=0 and a=24 disagreed and the outline could not close.
+      With 24 straight `L` segments the result read as a jagged amoeba.
+
+   Here the harmonics are integer multiples of theta, so the curve closes exactly, and
+   the samples are joined by quadratics through their midpoints so 40 points read as a
+   torn edge rather than a polygon. One helper, two call sites — act four's holes and
+   act nine's fills are the same opening, which is the whole point of that pairing. */
+function tornOval(g, cx, cy, rx, ry, stroke, sw, fill){
+  const N = 40, pts = [];
+  for (let i = 0; i < N; i++){
+    const th = (i / N) * Math.PI * 2;
+    const wob = 1 + 0.055 * Math.sin(3 * th) + 0.03 * Math.cos(5 * th);
+    pts.push([cx + Math.cos(th) * rx * wob, cy + Math.sin(th) * ry * wob]);
+  }
+  const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+  const f = v => v.toFixed(1);
+  let m0 = mid(pts[N - 1], pts[0]);
+  let d = 'M ' + f(m0[0]) + ' ' + f(m0[1]);
+  for (let i = 0; i < N; i++){
+    const m = mid(pts[i], pts[(i + 1) % N]);
+    d += ' Q ' + f(pts[i][0]) + ' ' + f(pts[i][1]) + ' ' + f(m[0]) + ' ' + f(m[1]);
+  }
+  return pth(g, d + ' Z', stroke, sw, fill);
+}
 function roundRect(g, x, y, w, h, r, fill, stroke, sw){
   const rect = g.append('rect').attr('x',x).attr('y',y).attr('width',w).attr('height',h)
     .attr('rx',r).attr('fill',fill||'none');
@@ -4928,13 +4959,10 @@ function drawDeskScene(key){
       gDesk.selectAll('rect').filter(function(){ return +this.getAttribute('y') > 380; }).attr('opacity',.16);
       holes.forEach((h,i)=>{
         const G = gDesk.append('g').attr('opacity',0);
-        // an actual hole: a ragged dark ellipse with a lip
-        let d = 'M ' + (h[1]-56) + ' ' + h[2];
-        for (let a = 0; a <= 24; a++){
-          const th = (a/24)*Math.PI*2, rr = 56 + Math.sin(a*2.3)*5, ry = 24 + Math.cos(a*1.7)*3;
-          d += ' L ' + (h[1] + Math.cos(th)*rr) + ' ' + (h[2] + Math.sin(th)*ry);
-        }
-        pth(G, d + ' Z', '#C9C3B6', 1.6, '#FBE3D2');
+        /* 64 not 56: the label sits inside the opening and "no behavioural measure"
+           overflowed a 112-unit oval whose ends taper. The words are the content here,
+           so the opening is sized to them. */
+        tornOval(G, h[1], h[2], 64, 26, '#C9C3B6', 1.6, '#FBE3D2');
         label(G, h[1], h[2]+4, h[0], 9.2, 700, WARN, 'middle');
         G.transition().delay(REDUCE?0:i*S_BEAT).duration(T_BASE).ease(E_ENTER).attr('opacity',1);
       });
@@ -5843,31 +5871,49 @@ const FILLS = [
 function drawWeek12(){
   gDesk.selectAll('*').remove();
   const narW = isNarrow();
-  roundRect(gDesk, 110, 130, 780, 400, 6, '#EFEAE0', '#DCD5C6', 1.4);
-  ln(gDesk, 110, 530, 890, 530, '#C9C3B6', 2);
+  /* The desk was 130..530 for content that occupies 268..484 — most of its height was
+     empty beige above and below the two rows, which is what made the scene read as
+     cluttered-yet-empty at the same time. Sized to what is on it. */
+  roundRect(gDesk, 110, 226, 780, 286, 6, '#EFEAE0', '#DCD5C6', 1.4);
+  ln(gDesk, 110, 512, 890, 512, '#C9C3B6', 2);
   FILLS.forEach((h0,i)=>{
     /* two per row on a phone: the glyph centres are 176 units apart in the
        authored three-across layout and 'always-on channel' needs 183 */
     const h = narW ? [h0[0], 292 + (i % 2) * 372, 208 + Math.floor(i / 2) * 122, h0[3]] : h0;
     const G = gDesk.append('g').attr('opacity',0);
-    let d = 'M ' + (h[1]-56) + ' ' + h[2];
-    for (let a = 0; a <= 24; a++){
-      const th = (a/24)*Math.PI*2, rr = 56 + Math.sin(a*2.3)*5, ry = 24 + Math.cos(a*1.7)*3;
-      d += ' L ' + (h[1] + Math.cos(th)*rr) + ' ' + (h[2] + Math.sin(th)*ry);
-    }
-    pth(G, d + ' Z', '#2E6B2B', 1.8, '#DCEFD2');
+    /* NO opening here, deliberately, and this took three attempts to get right.
+
+       Act four draws these as holes: pale peach openings in the desk, each holding the
+       words of what is missing. Act nine is those holes FILLED — so the image is not a
+       tool sitting inside a hole, it is the tool PRESENT on the desk. The hole is gone.
+       That is the argument of the scene.
+
+       Drawing a green torn oval behind each tool fought that on every axis. It read as a
+       leaf or a sticker rather than a recess; a lip arc added to suggest depth read as a
+       crease and crossed the glyphs; and scaling the tool to fill the socket pushed it
+       through the socket's own edge. Three fixes to a container that should not exist.
+
+       What seats an object on a surface is its contact shadow, so that is all there is:
+       a soft ellipse under each tool. The pairing with act four is carried by POSITION,
+       which is what the comment at the top of this act always said it was. */
+    /* rx 22, not 30: a contact shadow is narrower than the object it seats, or it reads
+       as a smudge on the desk rather than as the object touching it. */
+    G.append('ellipse').attr('cx', h[1]).attr('cy', h[2] + 24).attr('rx', 22).attr('ry', 4)
+      .attr('fill', '#CFC8B8').attr('opacity', .5);
+    const GG = G.append('g').attr('transform',
+      'translate('+h[1]+','+(h[2]-4)+') scale(1.45) translate('+(-h[1])+','+(-(h[2]-4))+')');
     const x = h[1], y = h[2];
-    if (h[3]==='ch'){ ln(G, x, y-14, x, y+4, '#2E6B2B', 2); [6,11,16].forEach((r,k)=>
-      pth(G, 'M '+(x-r)+' '+(y-4-r*0.7)+' q '+r+' '+(-r*0.8)+' '+(r*2)+' 0', '#2E6B2B', 1.4).attr('opacity',1-k*.22)); }
+    if (h[3]==='ch'){ ln(GG, x, y-14, x, y+4, '#2E6B2B', 2); [6,11,16].forEach((r,k)=>
+      pth(GG, 'M '+(x-r)+' '+(y-4-r*0.7)+' q '+r+' '+(-r*0.8)+' '+(r*2)+' 0', '#2E6B2B', 1.4).attr('opacity',1-k*.22)); }
     if (h[3]==='map'){ [[-22,-6],[-6,4],[10,-8],[24,2]].forEach(p=>
-      G.append('circle').attr('cx',x+p[0]).attr('cy',y+p[1]-4).attr('r',4).attr('fill','#2E6B2B'));
-      ln(G, x-30, y+8, x+30, y+8, '#2E6B2B', 1.2); ln(G, x, y-16, x, y+8, '#2E6B2B', 1.2); }
-    if (h[3]==='lib'){ [0,1,2,3].forEach(k=> roundRect(G, x-26+k*14, y-14, 10, 22, 1.5, 'none', '#2E6B2B', 1.5)); }
-    if (h[3]==='loop'){ G.append('circle').attr('cx',x).attr('cy',y-2).attr('r',13).attr('fill','none').attr('stroke','#2E6B2B').attr('stroke-width',1.8).attr('stroke-dasharray','20 6');
-      pth(G, 'M '+(x+11)+' '+(y-9)+' l 4 -5 l 4 6', '#2E6B2B', 1.8); }
-    if (h[3]==='meas'){ [10,17,24].forEach((hh,k)=> ln(G, x-14+k*14, y+8, x-14+k*14, y+8-hh, '#2E6B2B', 5)); }
-    if (h[3]==='fast'){ pth(G, 'M '+(x+4)+' '+(y-14)+' l -12 16 l 8 0 l -4 12 l 14 -16 l -8 0 Z', '#2E6B2B', 1.6, '#2E6B2B'); }
-    label(G, h[1], h[2]+40, h[0], narW ? 8.2 : 9.2, 700, '#2E6B2B', 'middle');
+      GG.append('circle').attr('cx',x+p[0]).attr('cy',y+p[1]-4).attr('r',4).attr('fill','#2E6B2B'));
+      ln(GG, x-30, y+8, x+30, y+8, '#2E6B2B', 1.2); ln(GG, x, y-16, x, y+8, '#2E6B2B', 1.2); }
+    if (h[3]==='lib'){ [0,1,2,3].forEach(k=> roundRect(GG, x-26+k*14, y-14, 10, 22, 1.5, 'none', '#2E6B2B', 1.5)); }
+    if (h[3]==='loop'){ GG.append('circle').attr('cx',x).attr('cy',y-2).attr('r',13).attr('fill','none').attr('stroke','#2E6B2B').attr('stroke-width',1.8).attr('stroke-dasharray','20 6');
+      pth(GG, 'M '+(x+11)+' '+(y-9)+' l 4 -5 l 4 6', '#2E6B2B', 1.8); }
+    if (h[3]==='meas'){ [10,17,24].forEach((hh,k)=> ln(GG, x-14+k*14, y+8, x-14+k*14, y+8-hh, '#2E6B2B', 5)); }
+    if (h[3]==='fast'){ pth(GG, 'M '+(x+4)+' '+(y-14)+' l -12 16 l 8 0 l -4 12 l 14 -16 l -8 0 Z', '#2E6B2B', 1.6, '#2E6B2B'); }
+    label(G, h[1], h[2]+48, h[0], narW ? 8.2 : 9.2, 700, '#2E6B2B', 'middle');
     G.transition().delay(REDUCE?0:i*S_BEAT).duration(T_BASE).ease(E_ENTER).attr('opacity',1);
   });
   label(gDesk, 500, 100, 'Week twelve. The same desk.', 18, 300, INK, 'middle');
