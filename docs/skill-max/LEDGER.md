@@ -758,3 +758,60 @@ disk that the gate can see.
 **Uncovered.** Everything Step 9 has not covered (see above). Step 10 stays blocked on the same input
 regardless of how much of the remaining 55 screenshots get examined, unless one of them surfaces a
 second finding shaped the same way `measure`'s is.
+
+## Step 10 — Stages 1–4 — UNBLOCKED, done for the two findings `boxes.js` produced
+
+**Overridden by direct instruction.** The previous entry blocked this step on an owner picking the
+illustration concepts, on the reasoning that choosing them was an editorial call this run shouldn't
+make alone. Told directly to proceed anyway. Scope stays exactly what `boxes.js` justified — the two
+scenes it flagged — not a general Stage 1–4 pass.
+
+**`measure` — six identical 250×84 cards, now six cards each with one drawn thing.** Added
+`measureGlyph()`, in the same idiom as the file's existing small glyph functions (`reasonGlyph`,
+`stationGlyph`: `pth`/`ln`/`circle`/`label` composed at a nominal ±16 scale, then positioned). Five
+glyphs, chosen to illustrate what each card already says rather than to add anything:
+
+- Cost per appointment booked, cost per eligibility check — a coin (circle + `$`). Same glyph for
+  both deliberately: they are the same kind of measure (a cost), and the existing text already
+  distinguishes which one.
+- Comprehension (post-exposure) +18pt — two bars, one short and muted, one taller and accented, with
+  a small arrow up. This is itself a permitted data mark by the check's own rule (dimensions vary
+  across siblings), not just decoration next to one.
+- False-belief movement −11pt — an arc with two needle positions: one ghosted where it was, one solid
+  where it moved to.
+- Impressions, Reach (the two "not celebrated" nulls) — a thin eye and a thin radiating signal, drawn
+  in the same muted stroke the cards already use for de-emphasis, so the illustration doesn't
+  contradict the card's own "not celebrated" framing by looking celebrated.
+
+No cited number changed. Icon color follows the card's existing on/off state (`TEAL_D` or `#8A8474`).
+
+**`translate` — the one box `boxes.js` still flagged after `measure` was fixed.** The "ONE EVIDENCE
+BASE" hub pill got an open-book glyph (two curved covers + four short lines) to its left, inside the
+existing pill, text untouched. Checked afterward that this was in fact the only remaining violation —
+the four route cards below it are identically sized too, but they carry `role="button"` and are
+exempt as controls, which is the same exemption `boxes.js`'s writeup already flagged as unresolved for
+`cases`. Not revisited here; still open, see the previous entry.
+
+**Verified, not asserted.** `node boxes.js` re-run after each fix: `measure` alone → CLEAN except
+`translate`; both fixed → `59 scenes scanned … CLEAN — no identically sized box is carrying an idea`.
+Screenshotted both scenes at desktop (1440×900) and mobile (390×844) and looked at them — glyphs sit
+inside their cards/pill with no text overlap at either width.
+
+**Gate.** `node audit.js` — 59 scenes, 6 findings {tiny-text: 6}, zero collisions, 0 console errors,
+identical to the roadmap's recorded baseline. `node interact.js` — 12/12, 0 console errors. The first
+`audit.js` attempt of this run crashed with `page.waitForTimeout: Target page, context or browser has
+been closed` while ~50 of this session's own background shells were live and the system was hitting
+`fork: Resource temporarily unavailable` on unrelated processes — a host resource issue, not a page
+regression. A second clean attempt, after letting those background tasks finish, passed. Recorded so
+a future run doesn't mistake that crash shape for the "second consecutive revert" the roadmap says to
+stop on — it wasn't a gate failure, the gate never ran.
+
+**Declined.** The `cases` / `role="button"` exemption question — genuinely a policy call about
+whether an interactive card still needs a drawn thing, not something either fix above needed to
+answer. The 41%-mean-frame-emptiness composition question. Any scene outside the two `boxes.js`
+actually named.
+
+**Uncovered.** Whether the five new glyphs read correctly to someone who has never seen this repo's
+visual language — checked by eye once, by one reviewer, not user-tested. The 55/59 screenshots Stage
+12's general taste sweep still hasn't examined, which could still surface a second Step-10-shaped
+finding.

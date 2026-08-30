@@ -2145,9 +2145,18 @@ const ROUTES = [
 (function(){
   const nar0 = isNarrow();
   const p = gRoute.append('g').attr('class','ebase');
-  roundRect(p, nar0?290:355, 120, nar0?420:290, nar0?116:70, nar0?52:35, '#FFFFFF', INK, 1.7);
+  const px0 = nar0?290:355, py0 = 120, pw0 = nar0?420:290, ph0 = nar0?116:70;
+  roundRect(p, px0, py0, pw0, ph0, nar0?52:35, '#FFFFFF', INK, 1.7);
   label(p, 500, nar0?162:150, 'ONE EVIDENCE BASE', 12, 700, INK, 'middle');
   label(p, 500, nar0?206:170, 'benefits \u00b7 harms \u00b7 uncertainty', 9.3, 400, MUTE, 'middle');
+  /* One text-only pill was the whole of this hub -- fault F6, re-found by boxes.js
+     (docs/skill-max/12-qa.md). One evidence base is a book, so it gets one. */
+  const book = p.append('g')
+    .attr('transform','translate('+(px0+(nar0?52:42))+','+(py0+ph0/2)+') scale('+(nar0?1.15:0.85)+')');
+  pth(book, 'M 0 -10 Q -14 -13 -14 -1 Q -14 9 0 8', INK, 1.4);
+  pth(book, 'M 0 -10 Q 14 -13 14 -1 Q 14 9 0 8', INK, 1.4);
+  ln(book, -10, -3, -2, -3, INK, 0.9); ln(book, -10, 2, -2, 2, INK, 0.9);
+  ln(book, 2, -3, 10, -3, INK, 0.9); ln(book, 2, 2, 10, 2, INK, 0.9);
   ROUTES.forEach(c=>{
     const lower = c.y > 400;
     gRoute.append('path').attr('class','rlead')
@@ -2189,14 +2198,46 @@ function layoutRoutes(){
    9. WHAT WE REPORT
    ===================================================================== */
 
+/* Six identically-sized cards with no drawn thing was fault F6 in the founder's
+   verdict, re-found by boxes.js (docs/skill-max/12-qa.md) after the rebuild: text-only
+   boxes are permitted only as chrome around a drawn thing, and this dashboard had none.
+   Each card below gets one, at a nominal +-16 scale positioned into its own right edge. */
+function measureGlyph(g, key, col){
+  const G = g.append('g');
+  if (key === 'coin'){                       // both cost cards report a cost
+    G.append('circle').attr('r',14).attr('fill','none').attr('stroke',col).attr('stroke-width',1.7);
+    label(G, 0, 5, '$', 14, 700, col, 'middle');
+  }
+  if (key === 'compr'){                      // comprehension: a shorter bar, then a taller one
+    ln(G, -13, 13, -13, -1, '#8A8474', 4.4);
+    ln(G, 7, 13, 7, -15, col, 4.4);
+    pth(G, 'M 1 -15 L 7 -21 L 13 -15', col, 1.6);
+  }
+  if (key === 'belief'){                     // a gauge whose needle moved down and left
+    pth(G, 'M -15 6 A 15 15 0 0 1 15 6', col, 1.6);
+    pth(G, 'M 0 6 L 9 -9', '#8A8474', 1.5, null, '2 3');
+    pth(G, 'M 0 6 L -6 -13', col, 2);
+    G.append('circle').attr('cx',0).attr('cy',6).attr('r',2.4).attr('fill',col);
+  }
+  if (key === 'impr'){                       // an eye, drawn thin: seen, not weighted
+    pth(G, 'M -14 0 Q 0 -10 14 0 Q 0 10 -14 0 Z', '#8A8474', 1.3);
+    G.append('circle').attr('r',3.2).attr('fill','none').attr('stroke','#8A8474').attr('stroke-width',1.2);
+  }
+  if (key === 'reach'){                      // a signal radiating from a point, thin
+    G.append('circle').attr('cy',7).attr('r',2.6).attr('fill','#8A8474');
+    pth(G, 'M -9 -2 Q 0 -13 9 -2', '#8A8474', 1.2);
+    pth(G, 'M -14 2 Q 0 -19 14 2', '#8A8474', 1.1);
+  }
+  return G;
+}
 (function(){
   const CELLS = [
-    { l:'Cost per appointment booked', v:'$41', on:true },
-    { l:'Cost per eligibility check', v:'$12', on:true },
-    { l:'Comprehension (post-exposure)', v:'+18pt', on:true },
-    { l:'False-belief movement', v:'\u221211pt', on:true },
-    { l:'Impressions', v:'reported, not celebrated', on:false },
-    { l:'Reach', v:'reported, not celebrated', on:false }
+    { l:'Cost per appointment booked', v:'$41', on:true, g:'coin' },
+    { l:'Cost per eligibility check', v:'$12', on:true, g:'coin' },
+    { l:'Comprehension (post-exposure)', v:'+18pt', on:true, g:'compr' },
+    { l:'False-belief movement', v:'\u221211pt', on:true, g:'belief' },
+    { l:'Impressions', v:'reported, not celebrated', on:false, g:'impr' },
+    { l:'Reach', v:'reported, not celebrated', on:false, g:'reach' }
   ];
   const nar0 = isNarrow();
   const w = nar0 ? 620 : 250, h = nar0 ? 132 : 84, x0 = 130, y0 = 210;
@@ -2207,6 +2248,8 @@ function layoutRoutes(){
     mono(cell, 16, nar0 ? 34 : 26, c.l.toUpperCase(), 7.2, c.on ? MUTE : '#6F6F6F');
     label(cell, 16, nar0 ? 100 : (c.on ? 60 : 56), c.v, c.on ? 21 : 10, 700,
           c.on ? TEAL_D : '#6F6F6F', 'start', nar0 ? 26 : 0);
+    measureGlyph(cell, c.g, c.on ? TEAL_D : '#8A8474')
+      .attr('transform', 'translate('+(w-(nar0?54:34))+','+(h/2)+')'+(nar0?' scale(1.3)':''));
   });
   label(gDash, 500, 170, 'What a Coethia report leads with \u2014 and what it does not.', 12, 700, INK, 'middle')
     .attr('class','dhead');
