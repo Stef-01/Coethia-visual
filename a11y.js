@@ -80,7 +80,18 @@ const SURFACE = () => {
         els.forEach((e, i) => e.setAttribute('data-a11y-id', String(i)));
         return els.length;
       });
-      await page.evaluate(() => { document.activeElement?.blur?.(); document.body.focus?.(); });
+      /* Reset to a KNOWN point. Two earlier versions of this called .focus() on an
+         element that cannot take focus -- first #viz (role="group", no tabindex), then
+         document.body (also no tabindex). Both are silent no-ops, so the walk actually
+         started wherever the previous scene's walk had left focus, which after 40-odd
+         Tab presses is somewhere past #viz. Then Tab moves further away, not back.
+         That single mistake produced 78 false findings, then 27, then 1 -- each time
+         looking more plausible than the last.
+         Focus the first genuinely focusable element in the document instead. */
+      await page.evaluate(() => {
+        document.activeElement?.blur?.();
+        document.querySelector('a[href], button, input, [tabindex="0"]')?.focus();
+      });
       const tabbed = new Set();
       const CAP = total + 40;
       for (let i = 0; i < CAP && tabbed.size < total; i++) {
@@ -94,6 +105,8 @@ const SURFACE = () => {
       }
       await page.evaluate(() => document.querySelectorAll('#viz [data-a11y-id]')
         .forEach(e => e.removeAttribute('data-a11y-id')));
+      if (total !== s.focusable.length)
+        findings.push([view, k, `counted ${s.focusable.length} controls then tagged ${total}`, 'scene changed between the two reads']);
       if (tabbed.size === 0) findings.push([view, k, `${total} control(s) exist but Tab reached none`, '']);
       else if (tabbed.size < total)
         findings.push([view, k, `Tab reached ${tabbed.size} of ${total} controls`, '']);

@@ -100,9 +100,41 @@ is the correct pattern for a 59-scene document — the alternative is a tab orde
 long, most of it pointing at things nobody can see. Interactive groups also carry `role="button"` and
 an `aria-label` built from their own content rather than a generic string.
 
+## The keyboard tier — CLEAN, after four attempts at the instrument
+
+**Every one of the 260 focusable objects across 59 scenes, at both viewports, is reachable by Tab,
+carries an accessible name, and carries a role.** `a11y.js` in the repo root is the check.
+
+That result took four runs, and every finding in the first three was **my own test**:
+
+| run | findings | the bug |
+|---|---|---|
+| 1 | **289** | walk began with `#viz.focus()` — but `#viz` is `role="group"` with no `tabindex`, so `.focus()` is a silent no-op and the walk started from wherever focus already was. Budget of `controls + 4` presses. Reported 78 scenes with unreachable controls |
+| 2 | **27** | visited-set keyed on `aria-label`, which is not unique. Twelve controls sharing four labels collapsed to four entries: "Tab reached 4 of 12" for a scene where all twelve were reachable |
+| 3 | **1** | reset changed to `document.body.focus()` — **also a no-op**, `body` has no `tabindex` either. Focus stayed where the previous scene's 40-press walk had left it, past `#viz`, so Tab moved further away rather than back |
+| 4 | **0** | reset targets the first genuinely focusable element in the document |
+
+Runs 1 and 3 are the same root mistake twice: calling `.focus()` on something that cannot take focus.
+It fails silently, and the resulting numbers got *more* plausible each time — 289 is obviously wrong,
+27 looks like a finding, and 1 looks like a bug worth fixing. The third was the dangerous one.
+
+The check was also pointed at a sharper hypothesis and **refuted** it: focusable controls buried in
+`aria-hidden="true"` subtrees, which is a genuine defect pattern. 47 exposed, 0 buried — the
+`aria-hidden` list correctly covers chrome groups only.
+
+**The keyboard accessibility of this artifact was correct the whole time.** Four attempts at measuring
+it produced 317 findings between them, all false.
+
+### One real datum, reported and not asserted
+
+176 focusable objects render under 24×24 CSS px across 54 scenes — worst `cliff` at 15×15 and
+`descent` at 14×14. WCAG 2.2 SC 2.5.8 asks 24×24 of a pointer target, and it has exceptions (inline
+targets, equivalent function available elsewhere) that a script cannot decide. Counted and listed,
+deliberately not called failures.
+
 ## Not done
 
-The hands-on tier. `accessibility-scan` and `accessibility-inspect` drive a live page, and the
+The rest of the hands-on tier. `accessibility-scan` and `accessibility-inspect` drive a live page, and the
 measurement suite has been holding the browser; running two Chromium-driving tools at once is the one
 thing this repo's own notes forbid, because they contend and die silently, which reads as a pass.
 
