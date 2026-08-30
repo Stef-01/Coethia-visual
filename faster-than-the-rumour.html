@@ -3320,7 +3320,15 @@ function drawRoomScene(key, fresh){
     }
     if (REDUCE){
       hand.attr('transform','rotate(720,'+cx+','+cy+')'); readout.text('2:00');
-      label(roomAir, 500, 560, 'The particles are still here.', 11.5, 700, WARN, 'middle');
+      /* The same sentence the animated path ends on, not a shorter substitute. This
+         used to read "The particles are still here.", which is true but drops the
+         cited figure and the next-person framing that are the point of the scene --
+         so a reader who asked for reduced motion was the only reader who never saw
+         the number. Reduced motion is a request to remove movement, not evidence. */
+      label(roomAir, 500, 560, 'Fifty-five percent of it is still in the air when the next person walks in.',
+            11.5, 700, WARN, 'middle');
+      person(roomAir.append('g').attr('transform','translate(162,432) scale(1.5)'),
+             SKIN.a, CLOTH.dust, HAIR.brown);
       applyTypeScale(); return;
     }
     const SPAN = 13000;
