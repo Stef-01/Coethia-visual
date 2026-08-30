@@ -1,0 +1,8 @@
+# Canonical source for stef-skill-max. bootstrap.sh reads this file.
+# Change REF to a tag or commit SHA to pin; leave it as a branch to always track latest.
+OWNER=Stef-01
+REPO=stef-skill-max
+REF=main
+SUBDIR=plugins/stef-skill-max/skills/stef-skill-max
+# How long a cached copy is considered fresh, in hours. 0 = always re-fetch.
+TTL_HOURS=24

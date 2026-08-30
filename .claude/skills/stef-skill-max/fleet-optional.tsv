@@ -1,7 +1,0 @@
-# Optional. Present in some environments, absent in others. Never required.
-# A stage that names one of these must state its portable fallback.
-# stage	skill	source	fallback when absent
-12	design-review	gstack (local install)	audit-ai-design-slop + frontend-design-review
-12	review-animations	gstack (local install)	motion-design + optimize-web-animations
-11	improve-animations	gstack (local install)	optimize-web-animations
-2	dataviz	claude.ai skill catalog	frontend-design + visual-storytelling-design

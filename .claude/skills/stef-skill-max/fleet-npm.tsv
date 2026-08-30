@@ -1,4 +1,0 @@
-# Non-skill dependencies. Stage-scoped. Install into the target repo, not globally.
-# stage	package	role	caveat
-0	playwright	drives the verification suite	dev dependency; generate screenshot baselines in Docker, not macOS — font rendering differs
-5	avoid-overlap	automatic label placement via simulated annealing; choices + nudge techniques, built for D3	small project (single-digit stars); read it before depending on it
