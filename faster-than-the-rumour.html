@@ -1358,9 +1358,24 @@ function srcLink(g, x, y, txt, href, anchor){
   return a;
 }
 
+/* SOLVED FOR 24 CSS PX, not padded by a constant.
+   `pad` was in stage units, so a 16-unit control padded by 5 became 26 units: 27 CSS px
+   at desktop scale and 11.7 at mobile, because the padding shrinks with the stage while
+   the finger does not. WCAG 2.2 SC 2.5.8 asks for 24 CSS px of POINTER target, and CSS
+   px is a physical-ish unit that has nothing to do with the viewBox -- so a hit area
+   authored in stage units cannot satisfy it at more than one width. a11y.js was
+   reporting 13 controls under 24x24 and every one of them was at mobile.
+   Same defect class as the ten label positions and the Ad badge's height: a fixed
+   constant behind something that scales. renderScale() already exists and returns CSS
+   px per user unit, so ask it and solve. The authored `pad` stays as a FLOOR, so
+   desktop, where these already clear 24, is untouched. */
 function padHit(g, x, y, w, h, pad){
+  const sc = renderScale() || 1;
+  const need = 24 / sc;                       /* 24 CSS px, in user units */
+  const px = Math.max(pad, (need - w) / 2);
+  const py = Math.max(pad, (need - h) / 2);
   g.insert('rect', ':first-child')
-    .attr('x', x-pad).attr('y', y-pad).attr('width', w+2*pad).attr('height', h+2*pad)
+    .attr('x', x-px).attr('y', y-py).attr('width', w+2*px).attr('height', h+2*py)
     .attr('fill','transparent');
 }
 
@@ -3417,6 +3432,14 @@ function slider(g, x, y, w, o){
   const thumb = k.append('g').attr('class','thumb').style('cursor','ew-resize')
     .attr('tabindex',0).attr('role','slider').attr('aria-label', o.aria || 'value')
     .attr('aria-valuemin',min).attr('aria-valuemax',max);
+  /* The thumb's hit area, same reasoning as padHit and the reason it is a separate
+     transparent circle rather than a bigger visible one: r=14 paints at about 13 CSS px
+     across on a phone, which is a 13px target for a dragged control -- the hardest kind
+     to hit. Growing the VISIBLE thumb to 24px would put a 24px disc on a 5px-tall track
+     and make the slider look like a lollipop, so the target grows and the drawing does
+     not. Inserted first so it sits behind both visible circles. */
+  thumb.insert('circle', ':first-child')
+    .attr('r', Math.max(14, 12 / (renderScale() || 1))).attr('fill','transparent');
   thumb.append('circle').attr('r',14).attr('fill',PAPER).attr('stroke',GOLD).attr('stroke-width',2.2);
   thumb.append('circle').attr('r',5).attr('fill',GOLD);
   const read = label(k, x + w/2, y - 42, '', 19, 700, INK, 'middle');

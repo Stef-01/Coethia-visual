@@ -1529,3 +1529,81 @@ means extending the control-chrome exclusion to `occluded`, which would also hid
 occlusion inside any control. And the general lesson is unpaid: the 8x crop that settled this
 took forty seconds and would have killed four of the five wrong hypotheses immediately. The
 cheapest instrument was the last one reached, six times running.
+
+## SC 2.5.8: hit targets solved for CSS px, and a count turned into ten addresses
+
+`a11y.js` had been printing `13 focusable objects render under 24x24 CSS px` and then
+listing the worst four. **A count beside a truncated list is the shape that has already
+cost this project twice** -- findings sorted by severity and read through `tail`, so the
+number was a floor and the rest were never seen. It prints all of them now, and it prints
+`f.id`, which the first version of the check already collected and never showed.
+
+That one field is the difference between a number and an address:
+
+```
+  [mobile] k280         73x17    Now all of them
+  [mobile] twoclocks    42x16    Play
+  [mobile] arithmetic   23x23    confirmed cases
+  [mobile] lenses       19x108   Demographic
+  [mobile] lenses       19x114   Geographic          (and five more)
+```
+
+Before it was printed, locating these took a grep through twenty `padHit` call sites and
+produced a wrong guess about rounding. **The identifier was already in the array.**
+
+### The page fix: `padHit` was solving in the wrong unit
+
+```js
+.attr('x', x-pad).attr('width', w+2*pad)     /* pad is in STAGE units */
+```
+
+A 16-unit control padded by 5 is 26 units: 27 CSS px at desktop and **11.7 at mobile**,
+because the padding shrinks with the stage and the finger does not. SC 2.5.8 asks for 24
+*CSS* px of pointer target, and CSS px has nothing to do with the viewBox, so a hit area
+authored in stage units cannot satisfy it at more than one width. All 13 were at mobile.
+
+`renderScale()` already returns CSS px per user unit, so: `need = 24 / sc`, with the
+authored `pad` kept as a floor so desktop is untouched. **13 -> 10, gated.** The slider
+thumb got a separate transparent circle rather than a bigger visible one -- growing the
+drawn thumb to 24px would put a 24px disc on a 5px track and make it a lollipop, so the
+target grows and the drawing does not.
+
+Fourth instance of this defect class in this artifact, after the ten label positions, the
+Ad badge's height, and `mono()`'s container budget. **A fixed constant behind something
+that scales.**
+
+### And a wrong fix, made and reverted inside ten minutes
+
+`arithmetic` reported 23x23 -- one px under on both axes -- so I attributed it to my own
+arithmetic losing a fraction through the user-unit round trip and set `need = 24.5 / sc`
+with a comment explaining the rounding. Re-measured: **still 23x23.** The control does not
+route through `padHit` at all, so the rounding story was fiction and the epsilon was slack
+with a false explanation attached to it. Reverted. A change whose comment asserts a
+disproved mechanism is worse than no change, because the next reader inherits the fiction
+rather than the question.
+
+### Measured and open: the seven lens toggles
+
+```js
+const L = gRig.append('g')...attr('tabindex',-1).attr('role','button')
+padHit(L, x-22, cy-128, 44, 256, 2);
+```
+
+`padHit` inserts its rect as the first child of `L`, and `L` **is** the focusable element,
+so the 44x256 rect is inside the bbox `a11y.js` measures. It still reports 19 CSS px wide,
+and 19 is exactly 44 user units at this scale -- i.e. the padding is not landing at all.
+Two candidates, both testable and neither guessed at here:
+
+  1. `renderScale()` returns a different value during `drawLensScene` than at measure
+     time, so the rect was sized for the wrong scale and never recomputed on resize.
+     `padHit` runs once at draw; nothing re-runs it.
+  2. `a11y.js` measures the focusable element's bbox, and for 2.5.8 the right box is the
+     POINTER target. If those ever diverge the check is measuring the wrong rectangle.
+
+**Uncovered, and stated as a limit rather than a finding.** 2.5.8's spacing exception is
+not implemented: a target under 24x24 conforms if a 24px circle centred on it does not
+overlap another target's circle. Seven toggles in a row at 19px wide may already conform
+entirely on their gaps. So the ten are **undetermined, not failing** -- and widening them
+blindly risks making adjacent hit areas overlap, which is a worse defect than a small
+target and is exactly the trade `cliff` already punished. The count went down; the
+remainder is not closed, and the check saying so is it being honest.

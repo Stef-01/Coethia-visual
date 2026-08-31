@@ -198,7 +198,17 @@ const SURFACE = () => {
     console.log(`SC 2.5.8 target size: ${small.length} focusable objects render under 24x24 CSS px,`);
     console.log(`across ${Object.keys(byScene).length} scenes. Listed, not asserted -- 2.5.8's`);
     console.log('exceptions (inline targets, equivalent function elsewhere) need a human.');
-    console.log('  worst: ' + small.slice(0, 4).map(s => `${s[1]} ${s[2]}`).join(', '));
+    /* ALL of them, not the worst four. A count of 13 printed beside a list of 4 is the
+       shape that has already cost this project twice: findings sorted by severity and
+       read through `tail`, so the reported number was a floor and the rest were never
+       seen. If the list is long, the answer is to fix the controls, not to shorten the
+       list -- a human cannot apply 2.5.8's exceptions to rows nobody printed. */
+    /* And WHICH control, which was collected as `f.id` from the first version of this
+       check and never printed. A row reading "[mobile] lenses 19x108" is a number
+       without an address: it took a grep through 20 padHit call sites and a wrong guess
+       about rounding to not find it. The identifier costs one field. */
+    small.forEach(s => console.log(
+      `  [${s[0]}] ${String(s[1]).padEnd(12)} ${String(s[2]).padEnd(8)} ${s[3] || '(no id)'}`));
     console.log();
   }
   if (!findings.length) { console.log('CLEAN — every exposed control is reachable, named and roled'); return; }
