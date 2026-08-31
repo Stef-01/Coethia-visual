@@ -1087,6 +1087,23 @@ const CON_TK = 0.84;
    heights, column widths. If the text shrinks by CON_TK but the boxes around
    it do not, the sheet fills with half-empty pills. */
 function ctk(){ return TK * (INCON ? CON_TK : 1); }
+/* A paper halo behind a label that sits over a field of marks.
+   The scatter scenes place their category labels INSIDE the cloud of figures or
+   dots they describe, which is the right composition -- a label outside the
+   quadrant it names would be worse -- and it means a 3px dot lands in a word every
+   so often. Moving the labels out, or reseeding until no dot collides, both trade a
+   correct composition for a clean check.
+   paint-order="stroke" draws the stroke BEHIND the fill, so the glyphs keep their
+   exact weight and gain a paper-coloured outline that is invisible on paper and
+   opaque over a mark. This is the standard cartographic answer to the same problem
+   and it is one attribute set rather than a per-scene nudge. */
+function haloed(sel, col){
+  return sel.attr('paint-order','stroke')
+            .attr('stroke', col || PAPER)
+            .attr('stroke-width', 3)
+            .attr('stroke-linejoin','round');
+}
+
 function typed(sel, base){
   const k = INCON ? CON_TK : 1;
   return sel.attr('data-fs', base).attr('data-tk', k).attr('font-size', base * TK * k);
@@ -1094,6 +1111,21 @@ function typed(sel, base){
 function applyTypeScale(){
   svg.selectAll('text[data-fs],tspan[data-fs]')
      .attr('font-size', function(){
+       /* data-pin: this label's size is set by the FIXED graphic it sits inside, so
+          the type scale must not touch it.
+          TK exists to hold text above the legible pixel floor as the camera widens,
+          and it is right for text on the page. It is wrong for text bound to a
+          shape that does not scale with it -- the console avatar is a circle of
+          r=11 stage units and its initials were 9 units at TK=1, comfortably
+          inside; at mobile TK the same initials render 13.3 client px wide inside a
+          circle 10 client px across, so white-on-teal became white-on-white for a
+          third of their width in all six console scenes.
+          Handled here rather than by pre-setting data-tk at draw time, because TK
+          changes after these labels are created and a static factor would be stale.
+          The alternative fix -- scale the avatar with TK -- would grow a fixed piece
+          of a recreated interface and is the wrong direction: in a facsimile the
+          graphic is the authority and the type answers to it. */
+       if (this.getAttribute('data-pin') !== null) return +this.getAttribute('data-fs');
        return +this.getAttribute('data-fs') * TK * (+this.getAttribute('data-tk') || 1);
      });
   /* Wrapped blocks re-stack from the CURRENT y of their own first line rather
@@ -1188,19 +1220,19 @@ const FIT = {
   air:'76 -66 848 804',
   daisy:'76 -56 848 804',
   afterwords:'76 -44 848 804',
-  r0:'102 -6 776 736',
+  r0:'102 -18 776 736',
   cliff:'77 58 845 802',
   descent:'97 -86 846 803',
   k280:'170 74 648 615',
   states:'125 67 746 708',
-  sequelae:'96 -59 813 771',
+  sequelae:'96 -64 820 778',
   parent:'146 25 708 672',
-  reel:'84 -20 737 699',
-  swipe:'86 -73 850 806',
-  comments:'66 -26 751 713',
-  anatomy:'155 15 687 651',
-  counterpost:'122 63 757 718',
-  trap:'84 -13 724 687',
+  reel:'84 -20 738 700',
+  swipe:'86 -74 850 806',
+  comments:'66 -26 752 712',
+  anatomy:'154 16 686 652',
+  counterpost:'122 62 756 718',
+  trap:'78 16 766 726',
   reach:'96 -12 808 766',
   twoclocks:'138 62 754 716',
   chain:'52 -13 792 751',
@@ -1208,7 +1240,7 @@ const FIT = {
   decided:'138 63 755 716',
   law:'191 78 578 548',
   desk:'76 -60 848 804',
-  mandate:'156 46 688 653',
+  mandate:'156 46 688 652',
   money:'156 46 688 653',
   people:'156 50 688 653',
   ledger:'96 -17 832 789',
@@ -1216,8 +1248,8 @@ const FIT = {
   gaps:'76 -50 848 804',
   notone:'117 96 767 727',
   five:'67 -7 901 855',
-  facets:'53 -23 886 840',
-  crosstab:'53 -23 886 840',
+  facets:'54 -22 886 840',
+  crosstab:'54 -22 886 840',
   axes:'160 26 685 650',
   quadrants:'52 -52 896 850',
   middle:'116 -14 768 728',
@@ -1238,38 +1270,38 @@ const FIT = {
   measure:'96 -90 854 810',
   cases:'76 -94 853 809',
   weeks:'83 -151 931 883',
-  tiers:'41 4 918 871',
+  tiers:'42 16 918 870',
   fit:'166 24 668 634',
   week12:'76 -60 848 804',
   backtotheroom:'76 -54 848 804',
   close:'213 90 574 544'
 };
 const FIT_M = {
-  room:'76 -303 848 1168',
+  room:'76 -296 848 1168',
   air:'76 -248 848 1168',
-  daisy:'76 -303 848 1168',
+  daisy:'76 -296 848 1168',
   afterwords:'76 -250 848 1168',
-  r0:'178 -80 644 886',
+  r0:'170 -104 662 912',
   cliff:'180 35 640 881',
   descent:'139 -116 698 962',
   k280:'3 -243 993 1368',
   states:'191 -51 640 882',
-  sequelae:'226 -66 548 755',
+  sequelae:'226 -66 548 756',
   parent:'146 -127 708 975',
-  reel:'268 23 464 640',
-  swipe:'251 23 498 686',
-  comments:'281 23 438 604',
-  anatomy:'240 0 520 716',
-  counterpost:'235 -10 577 795',
-  trap:'201 19 598 824',
-  reach:'192 116 617 849',
+  reel:'268 24 464 640',
+  swipe:'246 18 506 698',
+  comments:'280 24 438 604',
+  anatomy:'236 -6 530 728',
+  counterpost:'206 -10 578 796',
+  trap:'186 2 626 864',
+  reach:'192 116 616 850',
   twoclocks:'36 -270 984 1354',
   chain:'205 44 591 814',
   gate:'66 -134 872 1201',
   decided:'-19 -307 1039 1431',
   law:'185 8 588 810',
-  desk:'76 -283 848 1168',
-  mandate:'86 -103 828 1141',
+  desk:'76 -278 848 1168',
+  mandate:'86 -104 828 1140',
   money:'15 -197 970 1336',
   people:'86 -71 828 1141',
   ledger:'140 116 698 962',
@@ -1277,11 +1309,11 @@ const FIT_M = {
   gaps:'76 -92 848 1168',
   notone:'145 83 709 977',
   five:'119 60 763 1051',
-  facets:'113 24 774 1067',
-  crosstab:'91 29 766 1055',
+  facets:'112 24 774 1066',
+  crosstab:'92 30 766 1056',
   axes:'35 -199 946 1304',
-  quadrants:'110 -14 854 1176',
-  middle:'81 -136 834 1149',
+  quadrants:'62 -112 998 1376',
+  middle:'82 -136 834 1148',
   oldnew:'133 29 734 1012',
   laws:'200 53 528 728',
   loop:'283 87 435 599',
@@ -1299,10 +1331,10 @@ const FIT_M = {
   measure:'76 53 848 1169',
   cases:'91 33 819 1128',
   weeks:'211 42 583 803',
-  tiers:'82 -116 836 1152',
+  tiers:'82 -132 836 1152',
   fit:'96 -49 808 1113',
   week12:'76 -240 848 1168',
-  backtotheroom:'76 -41 848 1168',
+  backtotheroom:'76 -54 848 1168',
   close:'283 87 435 599'
 };
 const frameFor = name => (isNarrow() ? FRAMES_MOBILE : FRAMES)[name];
@@ -1390,7 +1422,16 @@ function wrapFor(txt, size, anchor, force){
      mBanner does. Blanket-refusing it silently dropped the banner's caps and let
      a 62-character line run out of a 365-unit card into the panel beside it. */
   if (INCON && !force) return null;
-  if (!isNarrow() || typeof txt !== 'string') return null;
+  /* `force` overrides the narrow guard too, not just the console guard.
+     It previously read `if (!isNarrow()) return null`, so nothing wrapped at desktop
+     under any circumstances -- passing an explicit cap did nothing there. That is
+     how `privacy`'s "Your infrastructure strips all identifying detail." ran 36%
+     past its own 181-unit card, across the console surface and almost into the next
+     panel, at DESKTOP, while the same string fits comfortably at mobile where the
+     cards are full width. Desktop is not the width where text cannot overflow; it is
+     the width where nothing was allowed to wrap. */
+  if (typeof txt !== 'string') return null;
+  if (!force && !isNarrow()) return null;
   // centred captions wrap on their own; anything else has to ask, because only
   // the caller knows how wide its container is
   if (!force && anchor !== 'middle') return null;
@@ -1469,17 +1510,29 @@ function label(g, x, y, txt, size, weight, fill, anchor, wrapCap){
   return d3.selectAll(lines.map((t, i) => mk(y + i * lead, t)
     .attr('data-wl', i).attr('data-wg', wg).attr('data-wlead', base * 1.32).node()));
 }
-function mono(g, x, y, txt, size, fill, anchor){
+function mono(g, x, y, txt, size, fill, anchor, maxW){
   const mk = (ty, t) => g.append('text').attr('x',x).attr('y',ty).attr('text-anchor',anchor||'start')
     .attr('font-family',MONO).call(typed, Math.max(MIN_MONO, size||8)).attr('letter-spacing','.14em')
     .attr('fill',fill||MUTE).text(t);
-  if (INCON || !isNarrow() || typeof txt !== 'string') return mk(y, txt);
+  if (typeof txt !== 'string') return mk(y, txt);
+  /* maxW overrides both guards, for the reason wrapFor's `force` overrides its own:
+     only the caller knows how wide its container is. Without a width this keeps its
+     old behaviour exactly -- no wrapping inside a console, none at desktop. */
+  if ((INCON || !isNarrow()) && !maxW) return mk(y, txt);
   // A mono glyph carries .14em of tracking, so it eats about 0.72em against the
   // sans face's 0.52em -- the budget is scaled to match. Card eyebrows are
   // left-aligned, so they wrap from their own x and disturb nothing else.
   const base = Math.max(MIN_MONO, size || 8);
   const lead = base * TK * 1.28;
-  const cap = Math.max(14, Math.min(46, Math.round(600 * 0.72 / base)));
+  /* From the container's own width when the caller supplies one.
+     The fallback is a 600-unit budget, which is right for a full-width caption and
+     wrong for anything narrower: the ledger card has about 442 units inside it, and
+     the 600 budget let a 51-character eyebrow wrap at 46, so line one still painted
+     492 units at mobile TK and ran off the card while line two landed on a rule.
+     0.72em per glyph is mono's advance plus its .14em tracking. */
+  const cap = maxW
+    ? Math.max(8, Math.floor(maxW / (0.72 * base * TK)))
+    : Math.max(14, Math.min(46, Math.round(600 * 0.72 / base)));
   let lines = null;
   if (txt.length > cap){
     const out = []; let cur = '';
@@ -1611,13 +1664,16 @@ function drawConFrame(){
   const rx = CON.x + CON.w;
   conFrame.append('circle').attr('cx',rx-118).attr('cy',CON.y+22).attr('r',8.5)
     .attr('fill','none').attr('stroke',GSUB).attr('stroke-width',1.4);
-  label(conFrame, rx-118, CON.y+26, '?', 9.5, 600, GSUB, 'middle');
+  /* haloed: a glyph centred in an r=8.5 ring, and at mobile the type scales while
+     the ring does not, so the ring's own stroke reaches into the question mark. */
+  haloed(label(conFrame, rx-118, CON.y+26, '?', 9.5, 600, GSUB, 'middle'));
   conFrame.append('path')
     .attr('d','M '+(rx-84)+' '+(CON.y+27)+' h 12 l -1.6 -3 v -5 a 4.4 4.4 0 0 0 -8.8 0 v 5 Z')
     .attr('fill','none').attr('stroke',GSUB).attr('stroke-width',1.3).attr('stroke-linejoin','round');
   const avatarG = conFrame.append('g');
   avatarG.append('circle').attr('class','avatar').attr('cx',rx-40).attr('cy',CON.y+22).attr('r',11);
-  conAcct = label(avatarG, rx-40, CON.y+26, '', 9, 700, '#FFFFFF', 'middle');
+  conAcct = label(avatarG, rx-40, CON.y+26, '', 9, 700, '#FFFFFF', 'middle')
+    .attr('data-pin', '');   /* must stay inside the r=11 avatar at every width */
   // title row
   const nrw = isNarrow();
   conHead = label(conFrame, CX0 - (RAIL ? 0 : 2), CON.y + (nrw ? 96 : 78), '',
@@ -2130,7 +2186,9 @@ const QUAD = [
        lead below the first (13.2 * TK, up to 40 units), and it has to stay above
        the quadrant's own bottom edge -- the axis path at 380 for the top row, the
        map edge at 630 and the mono trust label below it for the bottom row. */
-    label(g, qx+w/4, qy+w/2-(isNarrow()?56:16), q.t, 10, 700, INK, 'middle', isNarrow()?12:0);
+    /* haloed: this label sits inside the quadrant's own scatter, so a 3px dot lands
+       in a word from time to time -- five of them across the four labels at mobile. */
+    haloed(label(g, qx+w/4, qy+w/2-(isNarrow()?56:16), q.t, 10, 700, INK, 'middle', isNarrow()?12:0));
     g.attr('tabindex',-1).attr('role','button').attr('aria-label', q.t + '. Needs: ' + q.need)
       .style('cursor','pointer');
   });
@@ -2237,7 +2295,7 @@ function measureGlyph(g, key, col){
   const G = g.append('g');
   if (key === 'coin'){                       // both cost cards report a cost
     G.append('circle').attr('r',14).attr('fill','none').attr('stroke',col).attr('stroke-width',1.7);
-    label(G, 0, 5, '$', 14, 700, col, 'middle');
+    haloed(label(G, 0, 5, '$', 14, 700, col, 'middle'));
   }
   if (key === 'compr'){                      // comprehension: a shorter bar, then a taller one
     ln(G, -13, 13, -13, -1, '#8A8474', 4.4);
@@ -2435,9 +2493,23 @@ drawGantt(); drawGanttPanel(); wireGantt();
     label(g, 0, nar ? 46 : 30, t.n, 13, 700, INK, 'middle');
     t.s.forEach((ln,k)=> label(g, 0, (nar ? 88 : 52)+k*lead, ln, 10.5, 400, '#333', 'middle'));
   });
-  // the ascent line reads as a rise across a horizontal row; stacked, it does not
+  /* The ascent line reads as a rise across a horizontal row; stacked, it does not.
+
+     Both of its ends used to float. It ran from (98, BASEY-172) to (778,
+     BASEY-294), and the three card tops are at BASEY-150, BASEY-212 and
+     BASEY-274 -- so the line began 22 units above Tier 1's top edge and ended 20
+     above Tier 3's, hanging in the paper at both ends with nothing under it. A
+     line whose job is to trace a rise across three objects has to touch them, or
+     it is a line next to three objects.
+
+     Now it starts on Tier 1's top-LEFT corner, passes over Tier 2's top edge, and
+     ends on Tier 3's top-RIGHT corner. Written in terms of T[i].h so it stays
+     attached if a card's height changes. */
+  const HW = 125;
   if (!nar) gTier.append('path').attr('class','ascent')
-    .attr('d','M 98 '+(BASEY-172)+' Q 350 '+(BASEY-262)+' 500 '+(BASEY-234)+' Q 660 '+(BASEY-308)+' 778 '+(BASEY-294))
+    .attr('d','M '+(T[0].x-HW)+' '+(BASEY-T[0].h)
+            +' Q 300 '+(BASEY-T[0].h-50)+' '+T[1].x+' '+(BASEY-T[1].h)
+            +' Q 700 '+(BASEY-T[1].h-48)+' '+(T[2].x+HW)+' '+(BASEY-T[2].h))
     .attr('fill','none').attr('stroke',TEAL_D).attr('stroke-width',1.6)
     .attr('stroke-dasharray','6 5').attr('opacity',.8);
   label(gTier, 500, nar ? 760 : BASEY+52, 'It starts as a report. It ends as a flywheel your team owns.', 12.5, 700, INK, 'middle');
@@ -2608,11 +2680,15 @@ segments: { crumb:'Audience segments \u00b7 custom segment', step:'THE NUANCE', 
          isNarrow() ? 'WEEKLY IMPRESSIONS' : 'WEEKLY IMPRESSIONS, EST.', 6.6, GSUB);
     [['Search', .74],['YouTube', .52],['Display', .40]].forEach((sfc,i)=>{
       const by = my+52+(78+i*15)*pk;
+      /* The bar starts at px+96 on a phone, not px+66. The label column is 52 units
+         wide and "YouTube" paints about 63 at 8.2 units with TK 2.5 and CON_TK, so
+         the bar was drawn over the end of its own row label. */
+      const sbx = px + (isNarrow() ? 96 : 66), sbw = pw - (isNarrow() ? 114 : 84);
       label(modal, px+14, by+8, sfc[0], 8.2, 400, GSUB);
-      modal.append('rect').attr('x',px+66).attr('y',by+2).attr('width',(pw-84)).attr('height',5)
+      modal.append('rect').attr('x',sbx).attr('y',by+2).attr('width',sbw).attr('height',5)
         .attr('rx',2.5).attr('fill',GSURF);
-      modal.append('rect').attr('x',px+66).attr('y',by+2)
-        .attr('width', segOn.size ? (pw-84)*sfc[1] : 0).attr('height',5)
+      modal.append('rect').attr('x',sbx).attr('y',by+2)
+        .attr('width', segOn.size ? sbw*sfc[1] : 0).attr('height',5)
         .attr('rx',2.5).attr('fill','#9FD8D4');
     });
     modal.append('path').attr('d','M '+(px+14)+' '+(my+52+130*pk)+' H '+(px+pw-14))
@@ -2666,16 +2742,30 @@ subsidy: { crumb:'Auction insights', step:'THE MATH', head:'Ad Rank \u2014 why r
     y += 26;
     mono(g, CX0, y, 'AND THE DOWNSTREAM DIFFERENCE \u2014 PRACTITIONER BENCHMARKS', 7, GSUB);
     const bw = CW*0.62;
-    [['Broad display', .02, '#bdc1c6', '~0.2%'],
-     ['Contextual pre-roll', .29, '#9FD8D4', '~3.5%'],
-     ['Search interception', 1.0, TEAL_D, '12%+']]
+    /* Fifth element: the LABEL's colour, stated per row.
+       The value used to be drawn in its own bar's colour, with one exception
+       hard-coded as `b[2]==='#bdc1c6' ? GSUB : b[2]`. A bar colour and a text
+       colour are different jobs -- a bar only has to be distinguishable from its
+       neighbours, text has to be readable at 10px -- and #9FD8D4 is a fine pale
+       teal bar and 1.59:1 as text on the console's surface. The special-case shows
+       the collision was hit once and patched for the one row that was noticed,
+       which is exactly how the sibling stays broken. Stated for all three instead
+       of derived from a colour-string comparison. */
+    [['Broad display', .02, '#bdc1c6', '~0.2%', GSUB],
+     ['Contextual pre-roll', .29, '#9FD8D4', '~3.5%', TEAL_D],
+     ['Search interception', 1.0, TEAL_D, '12%+', TEAL_D]]
       .forEach((b,i)=>{
         const by = y + 16 + i*32;
+        /* The bar starts at CX0+210 on a phone. The label column is 150 units and
+           "Search interception" paints about 183 at 9.3 units with TK 2.5 and
+           CON_TK, so the bar covered the end of the label it belongs to -- 112 sq px
+           of its x-height band. */
+        const ebx = CX0 + (isNarrow() ? 210 : 150), ebw = bw - (isNarrow() ? 210 : 150);
         label(g, CX0, by+13, b[0], 9.3, 400, GTEXT);
-        roundRect(g, CX0+150, by, bw-150, 18, 9, GSURF);
-        roundRect(g, CX0+150, by, 6, 18, 9, b[2]).attr('class','effbar')
-          .property('__w', Math.max(10,(bw-150)*b[1]));
-        label(g, CX0+bw+14, by+13, b[3], 10, 700, b[2]==='#bdc1c6'?GSUB:b[2]);
+        roundRect(g, ebx, by, ebw, 18, 9, GSURF);
+        roundRect(g, ebx, by, 6, 18, 9, b[2]).attr('class','effbar')
+          .property('__w', Math.max(10, ebw*b[1]));
+        label(g, CX0+bw+14, by+13, b[3], 10, 700, b[4]);
       });
   } },
 
@@ -2700,8 +2790,20 @@ placement: { crumb:'Placements \u00b7 YouTube', step:'STATION 4', head:'Buying t
     const py = nar ? y + 14 + 4*34 + 44 : CY0 - 8;
     const player = g.append('g');
     roundRect(player, px, py, pw, 150, 10, '#202124');
-    roundRect(player, px+12, py+10, 96, 22, 4, '#FFFFFF');
-    label(player, px+20, py+25, 'Ad \u00b7 0:15', 8.6, 600, GTEXT);
+    /* The badge is SIZED TO ITS LABEL and inserted behind it.
+       Two rounds on this one. GTEXT is the console's light-on-dark body colour, so
+       against a #FFFFFF badge the words were white on white at 1.00:1 -- not on
+       screen at either width. Recolouring the text to the player's dark #202124
+       then read 1.00:1 the other way, because the badge was a fixed 96 units and
+       did not actually cover the label at mobile: the topmost layer under the text
+       was the player's own dark body, so dark-on-white became dark-on-dark.
+       A fixed badge behind a scaling label is the same assumed-width mistake as the
+       rest of them. Measured, so the pairing cannot come apart. */
+    const adLbl = label(player, px+20, py+25, 'Ad \u00b7 0:15', 8.6, 600, '#202124');
+    let adW = 96;
+    try { adW = Math.max(60, adLbl.node().getComputedTextLength() + 18); } catch (e) { adW = 96; }
+    const adBadge = roundRect(player, px+12, py+10, adW, 22, 4, '#FFFFFF');
+    player.node().insertBefore(adBadge.node(), adLbl.node());
     label(player, px+pw/2, py+70, 'CLINICIAN, ON CAMERA', 10, 700, '#FFFFFF', 'middle');
     label(player, px+pw/2, py+88, 'built for this barrier, not generic', 8.3, 400, '#bdc1c6', 'middle');
     roundRect(player, px+pw-104, py+120, 92, 22, 4, '#3c4043');
@@ -2728,8 +2830,39 @@ privacy: { crumb:'Measurement \u00b7 server-side', step:'THE CONSTRAINT', head:'
         mCard(card, x, cy, bw, ch);
         card.select('rect').attr('fill', c[3]);
         mono(card, x+16, cy+26, c[0], 7, i===1 ? TEAL_D : GSUB);
-        label(card, x+16, cy+52, c[1], 9.5, 600, GTEXT).attr('class','pw1');
-        label(card, x+16, cy+74, c[2], 9, 400, GSUB);
+        /* Wrapped to the CARD, not left to run.
+           Desktop bw is CW*0.28 = 181 units, so a card's inner width is 149 -- and
+           "Your infrastructure strips all identifying detail." paints 203 units at
+           9.5 * CON_TK. It ran 36% past its own card, across the white console
+           surface and almost into the next panel. wrapFor() refuses to wrap inside a
+           console UNLESS the caller passes an explicit cap, on the stated grounds
+           that only the caller knows its container's width. This caller does.
+           And the second line's y comes from how many lines the first actually took,
+           because a fixed +22 puts it under a one-line label and inside a two-line
+           one. */
+        /* MEASURED, then wrapped -- not wrapped to a guessed character cap.
+           The first attempt computed the cap as capW / (0.52 * size * TK * CON_TK),
+           and 0.52 units per em is wrong for this face at this size: the real
+           advance measured 0.386, so the cap came out 29 characters where 39 fit.
+           Estimating an advance is the mistake this session has already made four
+           times. So: draw it, ask how wide it actually is, and only wrap if it
+           overflows -- with a cap scaled from the measurement.
+           getComputedTextLength() reports user-space units, the same units capW is
+           in, so the comparison needs no conversion. */
+        const capW = bw - 34;
+        const fitLabel = (yy, txt, sz, wt, col) => {
+          const first = label(card, x+16, yy, txt, sz, wt, col);
+          let wid = 0;
+          try { wid = first.node().getComputedTextLength(); } catch (e) { wid = 0; }
+          if (!wid || wid <= capW) return first;
+          first.remove();
+          const cap = Math.max(12, Math.floor(txt.length * capW / wid));
+          return label(card, x+16, yy, txt, sz, wt, col, 'start', cap);
+        };
+        const l1 = fitLabel(cy+52, c[1], 9.5, 600, GTEXT).attr('class','pw1');
+        const n1 = l1.size ? l1.size() : 1;
+        fitLabel(cy + 52 + (n1 - 1) * Math.max(MIN_SANS, 9.5) * TK * 1.32 + 22,
+                 c[2], 9, 400, GSUB);
         if (i < 2){
           // the flow runs left-to-right on a desk and top-to-bottom on a phone
           const ax = nar ? x + bw/2 : x + bw + 8, ay = nar ? cy + ch + 4 : cy + 75;
@@ -2840,7 +2973,15 @@ function renderConsole(key){
     conHead.text(sc.head);
   }
   conFrame.select('circle.avatar').attr('fill', TEAL_D);
-  conAcct.text('MC');   // an avatar carries initials, not the whole account name
+  /* An avatar carries initials, not the whole account name -- and at mobile it
+     carries none.
+     Pinning them stopped the white "MC" spilling off a 10px teal disc onto the white
+     card, and left it 4px tall, which is one tiny-text finding in each of the six
+     console scenes. Both states are unreadable; only one of them also looks broken.
+     The third option is the right one: a disc with no initials is still an avatar,
+     a 4px monogram is not information, and dropping it costs the scene nothing.
+     Kept pinned for desktop, where 9 units renders about 10px and reads. */
+  conAcct.text(MOBILE() ? '' : 'MC');
   drawRail(sc.rail || 0, false);
   sc.draw(conBody);
   INCON = wasCon2;
@@ -3243,6 +3384,15 @@ function slider(g, x, y, w, o){
   (o.ticks || []).forEach(t => {
     const tx = x + (t.v - min) / (max - min) * w;
     ln(k, tx, y - 11, tx, y + 11, t.hot ? WARN : '#B9B2A4', t.hot ? 1.6 : 1.1, t.hot ? null : '2 3');
+    /* Back to y+26 at both widths, and this is a reverted fix rather than a fix.
+       Pushing these to y+38 at mobile stopped the thumb reaching into the tick label
+       beneath it -- and put "92" and "95" into the HERD IMMUNITY caption below, which
+       audit.js caught as two text collisions where this scene had none. Trading a
+       19-sq-px overlap for two real collisions is a worse artifact.
+       And the overlap it was chasing is not a defect: a slider handle covering the
+       tick it is resting on is what every real slider does, because that tick IS the
+       value it is reporting. legible.js flags it because geometry cannot tell the
+       difference; a human can. Left as intended. */
     mono(k, tx, y + 26, t.t, 6.6, t.hot ? WARN : MUTE, 'middle');
   });
   const thumb = k.append('g').attr('class','thumb').style('cursor','ew-resize')
@@ -3334,7 +3484,14 @@ function buildRoom(){
   roundRect(G, 606, 432, 22, 24, 3, 'none', '#8A8474', 1.4);
   pth(G, 'M 628 438 q 9 6 0 12', '#8A8474', 1.3);
 
-  if (!isNarrow()) mono(G, 622, 288, 'BED 4', 6.8, MUTE);
+  /* Right-aligned to end six units before the window, which starts at x=640.
+     Left-aligned at 622 it ran to about 645, so "BED" printed on the paper and the
+     "4" printed on the window's #22304D navy -- MUTE grey at 2.3:1 there against
+     5.3:1 on the paper, i.e. the number was the one character of it you could not
+     read. Two units of overlap in the source; a label that looks broken in five
+     scenes, since room, air, daisy, afterwords and backtotheroom all draw this
+     room. */
+  if (!isNarrow()) mono(G, 634, 288, 'BED 4', 6.8, MUTE, 'end');
 }
 
 /* the trace: alive, then not */
@@ -3407,7 +3564,12 @@ function drawRoomScene(key, fresh){
     }
     const hand = ln(roomAir, cx, cy, cx, cy - r + 13, WARN, 2.4);
     roomAir.append('circle').attr('cx',cx).attr('cy',cy).attr('r',3).attr('fill',WARN);
-    const readout = mono(roomAir, cx, cy + r + 20, '0:00', 8, WARN, 'middle');
+    /* cy + r + 20 is enough clearance at TK=1 and not at mobile, where the readout
+       is drawn at up to twice the size and its ascender reaches back over the clock
+       face's bottom edge -- so "2:00" ended up half on the white dial and half on
+       the paper, 5.2:1 against 2.5:1. Derived from the rendered size instead of a
+       constant: 20 units at TK=1, growing with the type it has to clear. */
+    const readout = mono(roomAir, cx, cy + r + 20 + Math.max(0, 8 * (TK - 1)), '0:00', 8, WARN, 'middle');
 
     // the aerosol
     const parts = roomAir.append('g');
@@ -3464,21 +3626,77 @@ function drawRoomScene(key, fresh){
 
   if (key === 'daisy'){
     mono(roomTags, 130, nar ? 104 : 118, 'THE SAME HOSPITAL, SIX WEEKS LATER', 7.4, MUTE);
-    label(roomTags, 130, isNarrow() ? 166 : 152, 'Three deaths in 2025', 21, 300, INK);
+    /* Wrapped to clear the window, measured.
+       At mobile this paints 21 * 2.6 = 55px, so twenty characters run about 568 units
+       from x=130 -- and the room's window starts at x=640, so "2025" ended up on
+       #22304D navy with dark ink on it: the last glyph of the headline was the one
+       you could not read. 498 is the gap from x=130 to the window less a margin. */
+    (function(){
+      const hy = isNarrow() ? 166 : 152, avail = 640 - 130 - 12;
+      const first = label(roomTags, 130, hy, 'Three deaths in 2025', 21, 300, INK);
+      let wid = 0;
+      try { wid = first.node().getComputedTextLength(); } catch (e) { wid = 0; }
+      if (wid && wid > avail){
+        first.remove();
+        const cap = Math.max(6, Math.floor('Three deaths in 2025'.length * avail / wid));
+        label(roomTags, 130, hy, 'Three deaths in 2025', 21, 300, INK, 'start', cap);
+      }
+    })();
     if (!nar) label(roomTags, 130, 186, 'The first measles deaths in the country since 2015.', 11.5, 400, '#3A4750');
     // two identification tags clipped to the bed rail
+    let tagY = 190;
     [['26 FEB 2025','A six-year-old girl','Gaines County'],
      ['3 APR 2025','Daisy Hildebrand, 8','measles pulmonary failure']].forEach((t,i)=>{
-      const x = nar ? 300 : 322 + i*152, y = nar ? 190 + i*104 : 246;
+      /* At mobile these STACK, so the second one's y has to come from the first
+         one's height -- which is now variable, because the text inside is wrapped to
+         the card. A fixed +104 was right for a fixed 82-tall card and put the second
+         card over the first card's last line as soon as the first grew. Desktop
+         places them side by side and is unaffected. */
+      const x = nar ? 300 : 322 + i*152, y = nar ? tagY : 246;
       const tg = roomTags.append('g').attr('opacity',0);
       ln(tg, x + 26, y + 76, x + 26, 322, '#8A8474', 1.2);
       tg.append('circle').attr('cx',x+26).attr('cy',y+8).attr('r',4)
         .attr('fill','none').attr('stroke','#8A8474').attr('stroke-width',1.3);
-      roundRect(tg, x, y + 14, nar ? 200 : 130, nar ? 82 : 62, 4, '#FFFFFF', '#8A8474', 1.4);
+      /* The tag, and text measured to fit it.
+         The card is 200 units wide at mobile with 10 of padding each side, so 180 of
+         room -- and "measles pulmonary failure" paints about 270 at 8 units and
+         TK 2.6, so "failure" hung off the card onto the bed drawing. Wrapping it
+         needs a fourth line of room, hence the taller card at mobile. */
+      const tw = nar ? 200 : 130, tin = tw - 20;
       const tl = nar ? 26 : 18;
-      mono(tg, x + 10, y + 32, t[0], 6.4, WARN);
-      label(tg, x + 10, y + 32 + tl, t[1], 9.4, 700, INK);
-      label(tg, x + 10, y + 32 + tl*2, t[2], 8, 400, MUTE);
+      const fitTag = (yy, txt, sz, wt, col) => {
+        const first = label(tg, x + 10, yy, txt, sz, wt, col);
+        let wid = 0;
+        try { wid = first.node().getComputedTextLength(); } catch (e) { wid = 0; }
+        if (!wid || wid <= tin) return 1;
+        first.remove();
+        const cap = Math.max(8, Math.floor(txt.length * tin / wid));
+        const el = label(tg, x + 10, yy, txt, sz, wt, col, 'start', cap);
+        return el.size ? el.size() : 1;
+      };
+      /* Advance by the ACTUAL leading of each wrapped block, not by the field pitch.
+         tl is 26 at mobile and label()'s own lead for 9.4 at TK 2.6 is about 32, so a
+         two-line name pushed its second line six units past where the next field
+         began -- three text collisions in this scene, which had none before the wrap
+         was added. Wrapping a label changes how much vertical room it needs, and
+         anything positioned after it has to be told. */
+      const lead1 = Math.max(MIN_SANS, 9.4) * TK * 1.32;
+      const lead2 = Math.max(MIN_SANS, 8) * TK * 1.32;
+      /* step1 is the DATE-to-NAME advance and it has to be leading-based too.
+         Fixing the wrapped-block advances left this one step at the fixed pitch, and
+         tl is 26 while a 9.4 label at TK 2.6 needs about 32 -- so the name's line box
+         still overlapped the date's and audit.js kept reporting two collisions here.
+         Every vertical step inside this card now comes from the type that has to fit
+         in it; the pitch is only a floor. */
+      const step1 = Math.max(tl, lead1);
+      mono(tg, x + 10, y + 32, t[0], 6.4, WARN, 'start', tin);
+      const n1 = fitTag(y + 32 + step1, t[1], 9.4, 700, INK);
+      const adv1 = Math.max(tl, n1 * lead1);
+      const n2 = fitTag(y + 32 + step1 + adv1, t[2], 8, 400, MUTE);
+      const adv2 = Math.max(tl, n2 * lead2);
+      const cardH = Math.max(nar ? 82 : 62, 32 + step1 + adv1 + adv2 + 10);
+      roundRect(tg, x, y + 14, tw, cardH, 4, '#FFFFFF', '#8A8474', 1.4).lower();
+      tagY = y + 14 + cardH + 20;
       tg.transition().duration(T_ENTER).ease(E_ENTER).delay(0 + i*S_BEAT).attr('opacity',1);
     });
     if (!nar){
@@ -3496,17 +3714,40 @@ function drawRoomScene(key, fresh){
     const H = roomPhone.append('g');
     roundRect(H, px, py, pw, ph, 20, '#0F0B09', '#8A8474', 2);
     roundRect(H, px+6, py+6, pw-12, ph-12, 15, '#141010');
-    // the video thumbnail
-    roundRect(H, px+6, py+40, pw-12, 150, 3, '#3A2E27');
-    const face = H.append('g').attr('transform','translate('+(px+pw/2)+','+(py+140)+') scale(1.9)');
+    /* The thumbnail gives up 30 units at mobile, because the caption below it needs
+       three lines there and only had room for two.
+       The text block sits between the thumbnail's bottom and the hand, whose path
+       ends `l 0 -66` and so rises back to about py+172 on the right. At 150 tall the
+       thumbnail left py+190..py+238 -- 48 units for a date line plus a punchline that
+       has to wrap to two, which is 68. Shrinking the thumbnail is the right give:
+       it is a flat stock still, and 30 units of it carries no information, whereas
+       the punchline is the scene's last line. */
+    const tHi = nar ? 120 : 150;
+    roundRect(H, px+6, py+40, pw-12, tHi, 3, '#3A2E27');
+    const face = H.append('g').attr('transform','translate('+(px+pw/2)+','+(py+tHi-10)+') scale(1.9)');
     person(face, SKIN.d, CLOTH.olive, HAIR.dark);
-    H.append('circle').attr('cx',px+pw/2).attr('cy',py+115).attr('r',20)
+    H.append('circle').attr('cx',px+pw/2).attr('cy',py+tHi-35).attr('r',20)
       .attr('fill','rgba(0,0,0,.45)').attr('stroke',P_INK).attr('stroke-width',1.4);
-    pth(H, 'M '+(px+pw/2-6)+' '+(py+106)+' L '+(px+pw/2+9)+' '+(py+115)+' L '+(px+pw/2-6)+' '+(py+124)+' Z', null, 0, P_INK);
+    pth(H, 'M '+(px+pw/2-6)+' '+(py+tHi-44)+' L '+(px+pw/2+9)+' '+(py+tHi-35)+' L '+(px+pw/2-6)+' '+(py+tHi-26)+' Z', null, 0, P_INK);
     mono(H, px+16, py+28, 'PLAYING', 6, P_WARN);
     if (nar){
-      label(H, px+14, py+216, 'March 2025', 8.4, 700, P_INK);
-      label(H, px+14, py+244, 'It changed nothing.', 8.6, 700, P_WARN);
+      /* Measured to the phone's inner width, and both lines lifted to clear the hand.
+         The label had 148 units (pw-20) and "It changed nothing." paints about 170 at
+         8.6 with mobile TK, so it crossed the phone's right edge -- 10.7:1 on the dark
+         screen and 1.7:1 off it, where P_WARN on the room's pale ground is not
+         readable. Wrapping needs a second line, and the hand's path starts at
+         py+ph-40 = py+260, so both labels move up to make the room. */
+      label(H, px+14, py+178, 'March 2025', 8.4, 700, P_INK);
+      const punch = 'It changed nothing.';
+      const pRoom = pw - 20;
+      const pFirst = label(H, px+14, py+204, punch, 8.6, 700, P_WARN);
+      let pWid = 0;
+      try { pWid = pFirst.node().getComputedTextLength(); } catch (e) { pWid = 0; }
+      if (pWid && pWid > pRoom){
+        pFirst.remove();
+        const pCap = Math.max(6, Math.floor(punch.length * pRoom / pWid));
+        label(H, px+14, py+204, punch, 8.6, 700, P_WARN, 'start', pCap);
+      }
     } else {
       label(H, px+14, py+210, 'A video interview, March 2025', 8.4, 700, P_INK);
       label(H, px+14, py+228, 'Asked whether losing their daughter', 7.6, 400, P_MUTE);
@@ -3573,10 +3814,22 @@ function drawR0(){
       .attr('fill','none').attr('stroke',WARN).attr('stroke-width',1.2).attr('opacity',.45);
     person(idx, SKIN.a, CLOTH.terra, HAIR.black);
 
-    mono(G, S.cx, S.cy - (si===0 ? 190 : 148), S.t, 7.4, si===0 ? WARN : MUTE, 'middle');
-    label(G, S.cx, S.cy + (si===0 ? 196 : 150), 'R₀ ' + S.n, si===0?21:16, 300,
-          si===0?INK:MUTE, 'middle');
-    label(G, S.cx, S.cy + (si===0 ? 224 : 180),
+    // The measles side is ringed by 225 dots of second-generation dust at radius
+    // 150..192, and these three labels were placed at radius 190, 196 and 224 --
+    // that is, the first two were placed INSIDE the ring band. The result is a dot
+    // sitting between the E and the A of MEASLES, and another inside the numerals
+    // of "R0 12-18": the word is not hidden, because the labels paint after the
+    // dust, and it is broken anyway, because a dot inside a word reads as a
+    // rendering fault. Legibility is not only a question of which thing is on top.
+    //
+    // Pushed clear of the outer edge (192 plus the dots' own 2.4 radius) rather
+    // than shrinking the ring, because the ring IS the content here -- 15 people
+    // become 225 marks, and a tighter halo makes a weaker version of the only
+    // point the scene has. The influenza side has no ring and keeps its numbers.
+    mono(G, S.cx, S.cy - (si===0 ? 214 : 148), S.t, 7.4, si===0 ? WARN : MUTE, 'middle');
+    haloed(label(G, S.cx, S.cy + (si===0 ? 224 : 150), 'R₀ ' + S.n, si===0?21:16, 300,
+          si===0?INK:MUTE, 'middle'));
+    label(G, S.cx, S.cy + (si===0 ? 252 : 180),
       si===0 ? 'one case → 15 → 225 → 3,375' : 'one case → one, and then it stalls',
       10, 400, si===0?'#3A4750':MUTE, 'middle');
   });
@@ -3648,7 +3901,7 @@ function paintGrid(){
   const nar = isNarrow();
   const rEff = 15 * (1 - cov/100);
   const y = nar ? 736 : 772;
-  mono(gridOut, 500, y - (isNarrow() ? 14 : 0), 'EFFECTIVE REPRODUCTION NUMBER', 6.8, MUTE, 'middle');
+  haloed(mono(gridOut, 500, y - (isNarrow() ? 14 : 0), 'EFFECTIVE REPRODUCTION NUMBER', 6.8, MUTE, 'middle'));
   label(gridOut, 500, y + (isNarrow() ? 34 : 30), 'R = 15 × ' + ((100-cov)/100).toFixed(3) + ' = ' + rEff.toFixed(2),
         17, 300, rEff >= 1 ? WARN : '#2E6B2B', 'middle');
   label(gridOut, 500, y + (isNarrow() ? 72 : 52),
@@ -3741,8 +3994,15 @@ function drawCurve(){
   const bandTop = Y(95), bandBot = Y(93);
   gCurve.append('rect').attr('x',x0-30).attr('y',bandTop).attr('width',(x1-x0)+70)
     .attr('height',bandBot-bandTop).attr('fill','#DCEFD2').attr('opacity',.34);
-  if (nar) mono(gCurve, x0 - 30, bandTop - 12, 'HERD IMMUNITY 93–95%', 6.4, '#2E6B2B');
-  else {
+
+  /* The wide layout sets this label OUTSIDE the plot at x1+34, so it has nothing
+     over it and stays here. The narrow one sits on the band inside the plot and is
+     drawn after the data points -- see below.
+     (This was `if (nar) <narrow label>; else { <these three> }`, and moving the
+     narrow label out deleted the `if` branch and left the `else` orphaned, which is
+     a syntax error: the whole page script stopped parsing. See the note in
+     legible.js about what that did to the report.) */
+  if (!nar) {
     mono(gCurve, x1 + 34, bandTop + 12, 'HERD', 6.4, '#2E6B2B');
     mono(gCurve, x1 + 34, bandTop + 32, 'IMMUNITY', 6.4, '#2E6B2B');
     mono(gCurve, x1 + 34, bandTop + 52, '93–95%', 6.4, '#2E6B2B');
@@ -3778,11 +4038,31 @@ function drawCurve(){
     nd.append('circle').attr('cx',cx).attr('cy',cy).attr('r', hot?6:3.6)
       .attr('fill', hot ? WARN : PAPER).attr('stroke', WARN).attr('stroke-width',1.8);
     if (hot){
-      label(nd, cx, cy + (i===0 ? -20 : -20), d[1].toFixed(1) + '%', 15, 700, INK, i===0?'start':'end');
+      /* The last label has to clear "the walker who walks off it", a person glyph
+         placed at translate(X(last), Y(92.4)-16) -- i.e. centred on this very point,
+         16 units up. The label was anchored 'end' AT cx with a -20 offset, so the
+         figure's head sat on the "%" and the threshold band's hatching ran through
+         the digits. Both offsets were -20, which is the tell: the two branches were
+         never distinguished.
+         Moved left of the figure and higher for the final point only. */
+      const lastPt = i === COV.length - 1;
+      /* haloed as well as moved: the threshold band's hatching runs the full width
+         of the chart under this label, so there is no position on the curve that is
+         clear of it. */
+      haloed(label(nd, cx + (lastPt ? -24 : 0), cy + (lastPt ? -28 : -20),
+                   d[1].toFixed(1) + '%', 15, 700, INK, lastPt ? 'end' : 'start'));
     }
     if (!nar || i % 2 === 0) mono(nd, cx, y0 + 30, d[0], 6.2, MUTE, 'middle');
     nd.transition().delay(REDUCE?0:0 + i*S_BEAT).duration(T_BASE).ease(E_ENTER).attr('opacity',1);
   });
+
+  /* The threshold label, drawn AFTER the data points.
+     It sits on the band's own edge, and painted first it had a point drawn over it
+     at mobile -- an occlusion a halo cannot help with, since the halo is behind the
+     glyphs and the point is in front of them. Same correction as the quadrant names
+     in `axes`: a label naming a region belongs on top of the marks in it.
+     Still haloed, for the marks that are underneath. */
+  if (nar) haloed(mono(gCurve, x0 - 30, bandTop - 12, 'HERD IMMUNITY 93–95%', 6.4, '#2E6B2B'));
 
   // the walker who walks off it
   const wg = gCurve.append('g')
@@ -3809,15 +4089,23 @@ function drawRoomsScene(fresh){
   gRooms.selectAll('*').remove();
   const nar = isNarrow();
 
-  const tog = ctl(gRooms, 500 - 96, nar ? 700 : 600, 192, 34,
+  /* The classroom card's geometry, hoisted, so the toggle can clear it.
+     The toggle sat at a fixed y=600 and the card's bottom edge lands at 622 on
+     desktop -- so a 1.4px rule ran straight through the button, left to right, just
+     under its label. The button's fill is 'none' in its off state, so the rule shows
+     through its interior; it reads as a control with a line drawn across it.
+     Derived from the card rather than nudged past it, so it stays clear if the
+     classroom's size changes. */
+  const x0 = nar ? 270 : 300, y0 = nar ? 356 : 254, cw = nar ? 92 : 82, ch = 82;
+  const cardY = y0 - 90, cardH = ch*4 + (nar ? 72 : 130);
+  const tog = ctl(gRooms, 500 - 96, roomsWide ? (nar ? 700 : 600) : cardY + cardH + 24, 192, 34,
                   roomsWide ? 'Back to one room' : 'Now all of them', false);
   tog.on('click', ()=>{ roomsWide = !roomsWide; drawRoomsScene(false); })
      .on('keydown', function(ev){ if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); roomsWide=!roomsWide; drawRoomsScene(false); }});
 
   if (!roomsWide){
-    // one classroom, drawn
-    const x0 = nar ? 270 : 300, y0 = nar ? 356 : 254, cw = nar ? 92 : 82, ch = 82;
-    roundRect(gRooms, x0 - 40, y0 - 90, cw*5 + 40, ch*4 + (nar ? 72 : 130), 8, 'none', '#C9C3B6', 1.4);
+    // one classroom, drawn — geometry hoisted above, so the toggle can clear it
+    roundRect(gRooms, x0 - 40, cardY, cw*5 + 40, cardH, 8, 'none', '#C9C3B6', 1.4);
     roundRect(gRooms, x0 + cw*1.4, y0 - 74, cw*2.2, 40, 3, '#FFFFFF', '#8A8474', 1.4);
     mono(gRooms, x0 + cw*2.5, y0 - 46, 'KINDERGARTEN', 6, MUTE, 'middle');
     const empty = [6, 13];
@@ -3909,8 +4197,9 @@ function drawUS(){
 
   const ly = by + 8*c + (nar ? 24 : 30);
   label(gUS, 500, nar ? 158 : 140, '4.2% of kindergartners now hold an exemption', nar?14:19, 300, INK, 'middle');
-  label(gUS, 500, nar ? 182 : 164, 'Up from 3.6% last year. Non-medical exemptions have nearly doubled since 2019–20.',
-        10.5, 400, MUTE, 'middle');
+  /* haloed: this line runs across the state tile-map's own squares. */
+  haloed(label(gUS, 500, nar ? 182 : 164, 'Up from 3.6% last year. Non-medical exemptions have nearly doubled since 2019–20.',
+        10.5, 400, MUTE, 'middle'));
   const legY = ly;
   gUS.append('rect').attr('x',288).attr('y',legY-11).attr('width',15).attr('height',15).attr('rx',3)
      .attr('fill','#C25236').attr('stroke','#973027').attr('stroke-width',1.4);
@@ -3971,10 +4260,26 @@ function drawArc(){
   // the quiet years
   ln(gArc, TX + 0.22*TW, TY, TX + 0.86*TW, TY, '#C9C3B6', 5);
   mono(gArc, TX + 0.54*TW, TY + 48, 'FOUR TO TEN QUIET YEARS', 6.6, MUTE, 'middle');
-  // and the second event
-  const dx = TX + 0.86*TW;
-  pth(gArc, 'M '+dx+' '+TY+' L '+(TX+TW)+' '+(TY+62), WARN, 2.4);
-  gArc.append('circle').attr('cx',TX+TW).attr('cy',TY+62).attr('r',5).attr('fill',WARN);
+  // The second event, as a drop at the END of the axis rather than a diagonal off
+  // the onset tick.
+  //
+  // The diagonal ran from (0.86, TY) to (1.0, TY+62) and passed through the "0" of
+  // its own tick label two rows below, so "yr 4-10" rendered as "yr 4-1" and read
+  // as a truncated string. It also terminated in an unlabelled dot with its
+  // explanation three lines away at the far left, which is a leader pointing away
+  // from the thing it leads to.
+  //
+  // The axis already runs to 1.0 with a tick and no label, and 1.0 is about year
+  // 13 -- which IS the fatal window, onset plus the one to three years the prose
+  // below states. So the drop belongs at the end of the axis: it crosses no label,
+  // it makes the terminal dot's position mean something, and the timeline now
+  // reads straight through as infection, recovered, quiet years, onset, death.
+  // A vertical also says the thing a diagonal was gesturing at more plainly.
+  const dx = TX + TW;
+  ln(gArc, dx, TY - 9, dx, TY + 9, WARN, 2.2);
+  pth(gArc, 'M '+dx+' '+TY+' L '+dx+' '+(TY+55), WARN, 2.4);
+  gArc.append('circle').attr('cx',dx).attr('cy',TY+61).attr('r',5).attr('fill',WARN);
+  label(gArc, dx, TY - 18, 'death', 9, 700, WARN, 'middle');
   label(gArc, TX, TY + 108, 'Cognitive decline, seizures, blindness.', 11, 700, INK);
   label(gArc, TX, TY + 130, 'There is no cure. It is invariably fatal, usually', 9.6, 400, '#55606A');
   label(gArc, TX, TY + 146, 'within one to three years of onset.', 9.6, 400, '#55606A');
@@ -4120,15 +4425,52 @@ function reelUI(g, S, r, o){
   // bottom-left block — suppressed when the comment sheet covers it
   if (o.bare) return;
   const bx = S.x + 16, by = S.y + S.h - (MOBILE() ? 156 : 120);
-  const hw = label(g, bx, by, r.h, 9.6, 700, P_INK).node().getComputedTextLength() + 12;
-  roundRect(g, bx + hw, by - 11, 48, 17, 8.5, 'none', P_INK, 1.2);
-  label(g, bx + hw + 24, by + 2, 'Follow', 7.4, 700, P_INK, 'middle');
+  /* The handle, and the Follow pill that follows it.
+     Two couplings, both of which have to survive clampPhoneText shrinking the
+     handle to fit the device:
+
+     `data-reserve` tells the clamp that 60 units to the right of this label are
+     already spoken for. Without it the clamp would happily let the handle use the
+     full width of the screen and the pill would be pushed off the right edge --
+     which is exactly what the sweep reported as the phone's own border crossing the
+     word "Follow".
+
+     And the pill is drawn about a LOCAL origin inside a marked group, so the
+     post-pass has one transform to move rather than three coordinates to
+     recompute. Its position is derived from the handle's rendered width, so it must
+     be re-derived once that width changes; the verified badge in countyPost had the
+     same shape of bug and takes the same treatment. */
+  const hEl = label(g, bx, by, r.h, 9.6, 700, P_INK)
+    .attr('class','reelhandle').attr('data-reserve', 60);
+  const hw = hEl.node().getComputedTextLength() + 12;
+  const fol = g.append('g').attr('class','reelfollow')
+    .attr('transform','translate('+(bx + hw)+','+by+')');
+  /* pinned: this label lives inside a fixed 48x17 pill, so the type scale must not
+     grow it. At mobile TK it reached about 46 units inside a 48-unit pill and the
+     pill's own border ran through the word in reel, swipe, anatomy and trap alike.
+     Same case as the console avatar's initials -- in a facsimile the graphic is the
+     authority and the type answers to it. */
+  /* NOT pinned, and the pill is sized from it -- the same distinction as `gate`'s
+     banner. Pinning held the word inside a fixed 48-unit pill and left it 4px at
+     mobile: shaped correctly, unreadable. Here the pill is the set dressing and the
+     word is what makes it a Follow button, so the word keeps its size and the pill
+     answers to it. One measurement drives the pill's width, its position and the
+     handle's reservation, so none of the three can drift from the others. */
+  /* haloed in the screen's own colour, not paper: this sits on the phone's dark
+     display, so a paper outline would be a visible ring round the word. */
+  const folLbl = haloed(label(fol, 24, 2, 'Follow', 7.4, 700, P_INK, 'middle'), '#141010');
+  let fw = 48;
+  try { fw = Math.max(48, folLbl.node().getComputedTextLength() + 20); } catch (e) { fw = 48; }
+  folLbl.attr('x', fw / 2);
+  const folPill = roundRect(fol, 0, -11, fw, 17, 8.5, 'none', P_INK, 1.2);
+  fol.node().insertBefore(folPill.node(), folLbl.node());
+  hEl.attr('data-reserve', fw + 14);
   const CUT = MOBILE() ? 24 : 34;
   const cap = r.cap.length > CUT
     ? [r.cap.slice(0, r.cap.lastIndexOf(' ', CUT)), r.cap.slice(r.cap.lastIndexOf(' ', CUT)+1)]
     : [r.cap];
   const lead = MOBILE() ? 24 : 15;
-  cap.forEach((c,i)=> label(g, bx, by + 26 + i*lead, c, 8.4, 400, '#EDEAE4'));
+  cap.forEach((c,i)=> haloed(label(g, bx, by + 26 + i*lead, c, 8.4, 400, '#EDEAE4'), '#141010'));
   label(g, bx, by + 30 + cap.length*lead, r.tag, 8.2, 700, '#A8CDE5');
   if (!MOBILE()){
     /* The mic mark and the audio credit belong under the hashtag line, so they
@@ -4161,9 +4503,20 @@ function countyPost(g, S){
   const ay = S.y + 76;
   g.append('circle').attr('cx',S.x+30).attr('cy',ay).attr('r',15).attr('fill','#2E3F4A');
   pth(g, 'M '+(S.x+24)+' '+(ay+5)+' l 0 -9 l 6 -4 l 6 4 l 0 9 Z M '+(S.x+30)+' '+(ay-3)+' v 6 M '+(S.x+27)+' '+ay+' h 6', '#A8CDE5', 1.3);
-  label(g, S.x+52, ay-2, 'Marion County Public Health', 8.2, 700, P_INK);
-  g.append('circle').attr('cx',S.x+52+128).attr('cy',ay-5).attr('r',5).attr('fill','#4A9BE0');
-  pth(g, 'M '+(S.x+52+126.5)+' '+(ay-5)+' l 1.2 1.4 l 2.6 -3', P_INK, 1.3);
+  /* The verified badge FOLLOWS the name, measured, instead of sitting at a
+     hard-coded +128. That constant was the account name's width at desktop, and it
+     was right until the label could be a different width -- which it now can, since
+     clampPhoneText shrinks over-wide phone text to fit the device. The first render
+     after that change put the tick between "Public" and "Health".
+     Same defect as a Follow pill placed from an assumed handle width, and the same
+     remedy: measure the thing. Drawn about a local origin so the post-pass has one
+     transform to move rather than three coordinates to recompute. */
+  label(g, S.x+52, ay-2, 'Marion County Public Health', 8.2, 700, P_INK)
+    .attr('class','acctname');
+  const badge = g.append('g').attr('class','acctbadge')
+    .attr('transform','translate('+(S.x+52+128)+','+(ay-5)+')');
+  badge.append('circle').attr('cx',0).attr('cy',0).attr('r',5).attr('fill','#4A9BE0');
+  pth(badge, 'M -1.5 0 l 1.2 1.4 l 2.6 -3', P_INK, 1.3);
   mono(g, S.x+52, ay + (MOBILE() ? 20 : 12), 'TUESDAY 2:15 PM · SPONSORED? NO', 5.6, P_MUTE);
   // the graphic: flat, stock, centred, exactly as departments make them
   const gy = ay + 30, gh = S.w;
@@ -4199,7 +4552,7 @@ function phoneGeom(){
   return nar ? { x:378, y:60, w:244, h:530 } : { x:372, y:52, w:256, h:556 };
 }
 
-function drawPhoneScene(key, fresh){
+function drawPhoneSceneInner(key, fresh){
   gPhone.selectAll('*').remove();
   if (fresh && key === 'swipe') reelIx = 0;
   if (fresh && key === 'trap') corrections = 0;
@@ -4226,12 +4579,45 @@ function drawPhoneScene(key, fresh){
     roundRect(G, 372, 296, 46, 78, 7, '#0F0B09', '#8A7768', 1.2);
     roundRect(G, 375, 299, 40, 72, 5, '#3E5866');
     // the fridge note
-    roundRect(G, 226, 220, 96, 68, 3, '#3A2B22', '#7A6656', 1.3).attr('transform','rotate(-4,274,254)');
-    label(G, 274, nar ? 238 : 246, 'THURSDAY', 8, 700, P_WARN, 'middle').attr('transform','rotate(-4,274,254)');
+    /* 132 wide at mobile, still centred on 274.
+       "2 month shots" needs about 114 units there and a 96-unit note gives 84 inside,
+       so it had to wrap -- and the wrapped second line collided with THURSDAY above
+       it. The note is a prop on a fridge: making it wide enough for its own text is a
+       better answer than folding three lines of mobile-scale type into 68 units of
+       height. Nothing wraps now, so nothing collides, and the height is unchanged. */
+    const noteW = nar ? 132 : 96;
+    roundRect(G, 274 - noteW/2, 220, noteW, 68, 3, '#3A2B22', '#7A6656', 1.3)
+      .attr('transform','rotate(-4,274,254)');
+    /* Back at 238 on a phone. It was lifted to 234 to make room for a wrapped "2
+       month shots" below, and widening the note removed the wrap, so the lift with
+       it -- the two changes were alternative answers to the same problem and keeping
+       both would have left a gap nothing needs. */
+    haloed(label(G, 274, nar ? 238 : 246, 'THURSDAY', 8, 700, P_WARN, 'middle'), '#3A2B22').attr('transform','rotate(-4,274,254)');
     if (!nar){
       label(G, 274, 262, '2 month shots', 7.6, 400, P_MUTE, 'middle').attr('transform','rotate(-4,274,254)');
       label(G, 274, 276, '10:20 am', 7.6, 400, P_MUTE, 'middle').attr('transform','rotate(-4,274,254)');
-    } else label(G, 274, 268, '2 month shots', 8.4, 400, P_MUTE, 'middle').attr('transform','rotate(-4,274,254)');
+    } else {
+      /* Measured against the note's own width rather than a constant, so the two
+         cannot drift apart: sRoom is noteW-12, which is 120 at mobile now that the
+         note is 132. At 8.4 with mobile TK this line paints about 114, so it fits and
+         the wrap below does not fire -- but the measurement stays, because the copy
+         or the type scale could change and a fit that only happens to hold is not a
+         fit.
+         The rotate(-4) is applied on every branch, including the wrapped one:
+         dropping it on one path would leave the label straight on a tilted note. */
+      const shots = '2 month shots', sRoom = noteW - 12;
+      const sEl = haloed(label(G, 274, 268, shots, 8.4, 400, P_MUTE, 'middle'), '#3A2B22');
+      let sWid = 0;
+      try { sWid = sEl.node().getComputedTextLength(); } catch (e) { sWid = 0; }
+      if (sWid && sWid > sRoom){
+        sEl.remove();
+        const sCap = Math.max(5, Math.floor(shots.length * sRoom / sWid));
+        haloed(label(G, 274, 268, shots, 8.4, 400, P_MUTE, 'middle', sCap), '#3A2B22')
+          .attr('transform','rotate(-4,274,254)');
+      } else {
+        sEl.attr('transform','rotate(-4,274,254)');
+      }
+    }
 
     mono(G, 200, 168, '3:04 AM', 8, P_WARN);
     if (nar) label(G, 500, 596, 'Where the decision gets made.', 13.5, 700, INK, 'middle');
@@ -4260,9 +4646,20 @@ function drawPhoneScene(key, fresh){
       const av = G.append('g').attr('transform','translate('+(x+50)+','+(y+58)+') scale(1.5)');
       if (i===0){ pth(G,'M '+(x+38)+' '+(y+62)+' l 0 -18 l 12 -8 l 12 8 l 0 18 Z M '+(x+50)+' '+(y+46)+' v 12 M '+(x+44)+' '+(y+52)+' h 12','#A8CDE5',1.8); }
       else person(av, p.sk, CLOTH.lav, HAIR.mid);
-      label(G, x+90, y+40, p.n, 10.4, 700, P_INK);
-      if (p.v){ G.append('circle').attr('cx',x+94+p.n.length*5.3).attr('cy',y+40).attr('r',5.4).attr('fill','#4A9BE0');
-        pth(G,'M '+(x+92.4+p.n.length*5.3)+' '+(y+40)+' l 1.3 1.5 l 2.8 -3.2', P_INK, 1.4); }
+      const nameEl = label(G, x+90, y+40, p.n, 10.4, 700, P_INK);
+      /* Measured, not `p.n.length * 5.3`. That was a character count times a guessed
+         per-character advance -- the fifth instance in this session of something
+         positioned from an assumed text width -- and it put the blue tick 14 sq px
+         inside the x-height band of "Marion County Public Health" itself.
+         Both the disc and its tick derive from one measurement now, so they cannot
+         drift apart from each other either. */
+      if (p.v){
+        let nw = p.n.length * 5.3;
+        try { nw = nameEl.node().getComputedTextLength() || nw; } catch (e) { /* keep the estimate */ }
+        const bx2 = x + 90 + nw + 9;
+        G.append('circle').attr('cx', bx2).attr('cy', y+40).attr('r',5.4).attr('fill','#4A9BE0');
+        pth(G,'M '+(bx2-2.6)+' '+(y+40)+' l 1.3 1.5 l 2.8 -3.2', P_INK, 1.4);
+      }
       mono(G, x+90, y + (nar ? 68 : 60), p.h, 6.8, P_MUTE);
       [[p.f,'Followers'],[p.fo,'Following'],[p.l,'Likes']].forEach((s,k)=>{
         const sx2 = x + (pw/3)*(k+0.5);
@@ -4287,7 +4684,13 @@ function drawPhoneScene(key, fresh){
          the authored 20. Desktop keeps its 15. */
       p.bio.split('\n').forEach((b,k)=> label(G, x+22, y+(nar?176:166)+k*(nar ? Math.max(20, 8.4*TK*1.5) : 15), b, 8.4, 400, '#C0B6AE'));
       roundRect(G, x+22, y+(nar?232:224), pw-44, 32, 16, i===0?'none':P_INK, i===0?'#8A7768':'none', 1.4);
-      label(G, x+pw/2, y+(nar?253:245), i===0?'Follow':'Following', 9, 700, i===0?P_GOLD:P_INK, 'middle');
+      /* P_LINE on the filled pill, not P_INK.
+         The pill for i===1 is FILLED P_INK (#EFEEE7) and its label was also P_INK,
+         so "Following" was white on white -- 1.00:1, i.e. the word was not on
+         screen at either width. The design is otherwise unambiguous: i===0 is an
+         outlined pill with gold text, i===1 is a solid light pill, and a solid
+         light pill takes dark text. #3A2E27 against #EFEEE7 is 10.8:1. */
+      label(G, x+pw/2, y+(nar?253:245), i===0?'Follow':'Following', 9, 700, i===0?P_GOLD:P_LINE, 'middle');
     });
     // the proportion, drawn
     const by = nar ? 830 : 486;
@@ -4499,8 +4902,27 @@ function drawPhoneScene(key, fresh){
     const reach = Math.round(base * Math.pow(1.085, corrections));
     const mx = nar ? 500 : 690, mtop = nar ? P.y+P.h+50 : 150, mh = nar ? 0 : 300;
     if (!nar){
-      // a real meter: a scale, a fill, a readout
-      mono(gPhone, mx, mtop - 14, 'ESTIMATED REACH', 6.8, MUTE);
+      // A real meter: a scale, a fill, a readout.
+      //
+      // The readout is ABOVE the bar and flush with it. It used to be right-aligned
+      // at mx-14 = 676, i.e. in the gap between the phone and the meter -- and that
+      // gap is 48 units wide, because the phone ends at 372+256 = 628. The four
+      // lines need up to 117. So all four ran left out of the gap and across the
+      // phone's dark screen: "each one is a ranking signal" was 57% over a body
+      // 18:1 from the paper, half of it grey-on-near-black. There was never room
+      // there; the placement was arithmetically impossible from the day it was
+      // written, and it survived because nothing measured text against graphics.
+      //
+      // Above the bar and left-aligned to it is also where a total belongs: the fill
+      // grows upward toward its own number.
+      //
+      // "ESTIMATED REACH" is gone with the move. It labelled the bar from a position
+      // the readout now occupies, and "PEOPLE REACHED" two lines below it said the
+      // same thing twice.
+      label(gPhone, mx, mtop - 74, reach.toLocaleString(), 19, 700, WARN);
+      mono(gPhone, mx, mtop - 56, 'PEOPLE REACHED', 6.4, MUTE);
+      label(gPhone, mx, mtop - 30, 'your replies: ' + corrections, 10, 700, INK);
+      label(gPhone, mx, mtop - 14, 'each one is a ranking signal', 9, 400, MUTE);
       ln(gPhone, mx, mtop, mx, mtop+mh, '#E9E5DC', 14);
       const frac = Math.min(1, (reach - base) / (base*1.6));
       ln(gPhone, mx, mtop+mh, mx, mtop+mh - mh*Math.max(.06,frac), WARN, 14);
@@ -4508,15 +4930,32 @@ function drawPhoneScene(key, fresh){
         ln(gPhone, mx+11, mtop+mh-mh*t, mx+18, mtop+mh-mh*t, '#B9B2A4', 1.2);
         mono(gPhone, mx+24, mtop+mh-mh*t+3, (base*(1+t*1.6)/1000).toFixed(0)+'K', 6, MUTE);
       });
-      label(gPhone, mx-14, mtop+16, reach.toLocaleString(), 19, 700, WARN, 'end');
-      mono(gPhone, mx-14, mtop+34, 'PEOPLE REACHED', 6.4, MUTE, 'end');
-      label(gPhone, mx-14, mtop+72, 'your replies: ' + corrections, 10, 700, INK, 'end');
-      label(gPhone, mx-14, mtop+90, 'each one is a ranking signal', 9, 400, MUTE, 'end');
     } else {
       label(gPhone, 500, mtop, reach.toLocaleString() + ' reached · ' + corrections + ' replies from you', 11, 700, WARN, 'middle');
     }
-    const by = nar ? P.y+P.h+74 : 500;
-    const bx = nar ? 500-84 : 606;
+    // Below the phone and centred on it, in BOTH views.
+    //
+    // Desktop had this at (606, 500), centred on the reach meter at mx=690 -- and
+    // the meter is only 62 units from the phone's right edge, so a 168-wide pill
+    // centred on it overlapped the phone by 22 units.
+    //
+    // A correction to what this comment said first, which was that those 22 units
+    // were drawn BEHIND the phone body. They were not. The phone is painted before
+    // the button, so the pill is on top: its left arc is fully visible crossing the
+    // dark shell, and what reads as broken is that the pill's INTERIOR is dark for
+    // its first 13% and paper for the rest. That is a straddle, not an occlusion,
+    // and the difference is not cosmetic -- a check written from the wrong
+    // description looked for a later shape covering the control, found nothing on
+    // the very file that has the defect, and would have been believed if a positive
+    // control had not been run. The fix below is the same either way; the reason
+    // recorded for it was wrong, and a wrong reason in a comment outlives the bug.
+    //
+    // The button acts on the POST, not on the meter, so under the post is where it
+    // belongs -- which is where the narrow view had already put it. One expression
+    // for both views now, instead of two that disagreed about what it is attached
+    // to.
+    const by = P.y + P.h + (nar ? 74 : 40);
+    const bx = 500 - 84;
     ctl(gPhone, bx, by, 168, 34, corrections ? 'Correct it again' : 'Correct this', false)
       .on('click', ()=>{ corrections++; drawPhoneScene('trap', false); })
       .on('keydown', function(ev){ if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); corrections++; drawPhoneScene('trap', false); }});
@@ -4528,7 +4967,10 @@ function drawPhoneScene(key, fresh){
         .forEach((t,i)=> label(gPhone, 118, 258+i*19, t, 9.6, i>4?700:400, i>4?WARN:'#55606A'));
     }
     if (corrections >= 4){
-      label(gPhone, 500, nar ? by+56 : 566,
+      // by+56 in both views. Desktop's 566 was INSIDE the phone (52..608), so this
+      // line printed over the post -- untested because it only appears after four
+      // clicks, and neither audit.js nor legible.js walks interaction states.
+      label(gPhone, 500, by + 56,
         'You cannot argue a post down. Arguing is the fuel.', 13, 700, WARN, 'middle');
       label(gPhone, 500, nar ? by+78 : 590,
         'The only move that works is being somewhere else, earlier, with something of your own.',
@@ -4539,6 +4981,118 @@ function drawPhoneScene(key, fresh){
   }
   applyTypeScale();
 }
+
+/* ---------------------------------------------------------------------------
+   Shrink-to-fit for text drawn INSIDE the phone.
+
+   typed() paints every label at `size * TK`, and TK reaches 3 on a narrow
+   viewport. That is right for text on the page, and wrong for text inside a
+   recreated device, because the device is a fixed 232 units wide at mobile and
+   does not grow with TK. So `countyPost` rendered "MEASLES VACCINATION CLINIC" at
+   11 * 2.4 = 26px into a 232-unit screen -- about 410 units of type -- and it ran
+   ~90 units off each side of the phone onto the paper, where white-on-paper is
+   invisible. Five runs of text in that one scene, plus the account name and the
+   sponsored line spilling past the bezel.
+
+   The page already has a damping constant for this exact problem, CON_TK = 0.84,
+   used by the recreated console islands. It is not enough here: 0.84 of 2.4 is
+   still 2.0, and the string needs to come down by 1.8.
+
+   Per-string tuning was the other option and it is the wrong one -- it is the
+   hand-tuned-instead-of-measured habit this file's fitter exists to replace, and
+   it silently re-breaks the moment anyone edits the copy. This measures instead:
+   after the scale is applied, any label anchored inside the screen that is wider
+   than the room it has gets its own data-tk scaled down until it fits. It is
+   self-maintaining, and it costs one pass over the phone group.
+
+   The bound is the ANCHOR POINT being inside the screen rect, not merely the text
+   overlapping it. gPhone also holds annotations that legitimately sit outside the
+   device -- anatomy's four leader labels, trap's meter column, the mobile reach
+   readout under the phone -- and those must not be squeezed to the device's width.
+   Text drawn inside the device stays inside the device; text drawn on the page is
+   the page's business.                                                          */
+function clampPhoneText(key){
+  if (key === 'parent') return;            /* a room, not a screen */
+  const P = phoneGeom();
+  const S = { x: P.x + 6, y: P.y + 6, w: P.w - 12, h: P.h - 12 };
+  const pad = 9;
+  const x0 = S.x + pad, x1 = S.x + S.w - pad;
+  gPhone.selectAll('text').each(function(){
+    const fs = +this.getAttribute('data-fs');
+    if (!fs) return;                       /* not one of ours */
+    const ax = +this.getAttribute('x'), ay = +this.getAttribute('y');
+    if (!(ax >= S.x && ax <= S.x + S.w && ay >= S.y && ay <= S.y + S.h)) return;
+    let w = 0;
+    try { w = this.getComputedTextLength(); } catch (e) { return; }
+    if (!w) return;
+    const anchor = this.getAttribute('text-anchor') || 'start';
+    /* Room to the frame edge, less anything this label has declared is reserved for
+       what sits beside it -- a following pill, a badge, a value. Without the
+       reservation a label shrinks only until IT fits, and pushes its neighbour off
+       the edge instead. */
+    const reserve = +(this.getAttribute('data-reserve') || 0);
+    const room = (anchor === 'middle' ? 2 * Math.min(ax - x0, x1 - ax)
+               :  anchor === 'end'    ? ax - x0
+               :                        x1 - ax) - reserve;
+    if (room <= 0 || w <= room) return;
+    /* FLOORED AT THE AUTHORED SIZE, after trying two other floors and measuring both.
+
+       No floor: the clamp shrank until the label fitted, however small. On desktop,
+       where TK is about 1 and there was nothing to undo, it still fired for any
+       label wider than its room and pushed it under the legible threshold --
+       audit.js went 6 -> 15 findings and reported DESKTOP tiny-text in counterpost
+       and reach for the first time.
+
+       Floored at MIN_LABEL_PX, i.e. legibility beats containment: also fixed
+       desktop, and at mobile it let text stop at 7px and overflow by whatever was
+       left. Measured consequence: counterpost and comments went back to printing
+       captions off the phone onto the paper at 1.2:1. Text at a legible SIZE on the
+       wrong background is not legible, so that trade bought nothing.
+
+       Floored at 1/TK, so the rendered size is never below `fs` -- the size the
+       author chose against this device. That fixes desktop completely and keeps
+       mobile text inside its device. Its cost is real and already an accepted
+       exemption on this page: inside a recreated interface at 375px the chrome
+       renders at 4-6 physical px, which is what the CON_TK note records for the
+       console scenes.
+
+       What none of the three floors can do is make the text both legible and
+       contained, because at 375px these devices are too small in stage units for
+       the copy they carry. That is a composition question -- widen the devices,
+       tighten the frames, or shorten the phone copy -- and it is recorded as open
+       rather than settled by whichever floor happens to quiet the checks. */
+    const cur = +this.getAttribute('data-tk') || 1;
+    const k = Math.max(1 / TK, cur * (room / w));
+    if (k >= cur) return;
+    this.setAttribute('data-tk', k);
+    this.setAttribute('font-size', fs * TK * k);
+  });
+
+  /* Anything positioned FROM a phone label's width has to be re-placed after the
+     shrink, or it lands inside the text it was meant to follow. */
+  const nm = gPhone.select('text.acctname'), bd = gPhone.select('g.acctbadge');
+  if (!nm.empty() && !bd.empty()){
+    let w = 0;
+    try { w = nm.node().getComputedTextLength(); } catch (e) { w = 0; }
+    if (w) bd.attr('transform',
+      'translate(' + (+nm.attr('x') + w + 7) + ',' + ((+nm.attr('y')) - 3) + ')');
+  }
+  const rh = gPhone.select('text.reelhandle'), rf = gPhone.select('g.reelfollow');
+  if (!rh.empty() && !rf.empty()){
+    let w = 0;
+    try { w = rh.node().getComputedTextLength(); } catch (e) { w = 0; }
+    if (w) rf.attr('transform',
+      'translate(' + (+rh.attr('x') + w + 12) + ',' + (+rh.attr('y')) + ')');
+  }
+}
+
+/* One wrapper, because drawPhoneSceneInner returns from nine different branches
+   and a post-pass added to the end of it would only ever run for one of them. */
+function drawPhoneScene(key, fresh){
+  drawPhoneSceneInner(key, fresh);
+  clampPhoneText(key);
+}
+
 
 
 
@@ -4669,8 +5223,14 @@ function drawLanes(key, fresh){
     const cy2 = laneY(1440*5);
     ln(gLanes, CX, cy2, DX, cy2, WARN, 1.4, '4 4');
     gLanes.append('circle').attr('cx',(CX+DX)/2).attr('cy',cy2).attr('r',7).attr('fill',WARN);
-    label(gLanes, nar ? CX : (CX+DX)/2, nar ? cy2 - 54 : cy2 - 16, '08:52 — Thursday’s appointment cancelled', 9.6, 700, WARN, 'middle', nar ? 22 : 0);
-    label(gLanes, nar ? CX : (CX+DX)/2, cy2 + 24, 'Rescheduled for “after he’s a bit bigger”. Not a refusal.', 8.8, 400, MUTE, 'middle', nar ? 34 : 0);
+    /* Wrapped at desktop too, and lifted to make room for the second line.
+       Centred between the two lanes at 9.6 bold, forty characters reach about 200
+       units either side -- far enough into the department lane that "cancelled"
+       printed over the Management pill. Two lines of about 21 characters sit inside
+       the gap. cy2-30 keeps the second line's ink 15 units clear of the dashed
+       cancellation rule at cy2. */
+    label(gLanes, nar ? CX : (CX+DX)/2, nar ? cy2 - 54 : cy2 - 30, '08:52 — Thursday’s appointment cancelled', 9.6, 700, WARN, 'middle', nar ? 22 : 24);
+    haloed(label(gLanes, nar ? CX : (CX+DX)/2, cy2 + 24, 'Rescheduled for “after he’s a bit bigger”. Not a refusal.', 8.8, 400, MUTE, 'middle', nar ? 34 : 0));
     note.text('Being right late is indistinguishable from being absent.');
     applyTypeScale();
     return;
@@ -4791,8 +5351,23 @@ function drawDesks(key){
     for (let x = 106; x < 890; x += 30){
       pth(bar, 'M '+x+' '+(gy+32)+' l 18 -30', WARN, 6).attr('opacity',.45);
     }
-    roundRect(bar, 340, gy-30, 320, 28, 14, PAPER, WARN, 1.6);
-    mono(bar, 500, gy-11, 'EXTERNAL COMMUNICATIONS PAUSED', 7.4, WARN, 'middle');
+    /* NOT pinned -- a correction to the previous line.
+       Pinning worked (the label stopped bursting its bar) and it was the wrong fix
+       here, which the tiny-text check said immediately: pinned to 7.4 units, this
+       renders about 4.4px at mobile.
+       The distinction is which of the two is the content. An avatar's initials and a
+       Follow pill are set dressing in a facsimile -- the graphic is the subject and
+       the type answers to it, so pin the type. "EXTERNAL COMMUNICATIONS PAUSED" IS
+       the scene's argument; the bar is a device for saying it. So the type keeps its
+       size and the BAR is sized from the measured label instead. */
+    const banner = mono(bar, 500, gy-11, 'EXTERNAL COMMUNICATIONS PAUSED', 7.4, WARN, 'middle');
+    let bwid = 320;
+    try { bwid = Math.max(320, banner.node().getComputedTextLength() + 44); } catch (e) { bwid = 320; }
+    const pill = roundRect(bar, 500 - bwid/2, gy-30, bwid, 28, 14, PAPER, WARN, 1.6);
+    /* inserted immediately before the label rather than appended: it has to paint
+       after the hatching and before the words. `.lower()` would put it behind the
+       hatch, which would then draw across the banner it is meant to sit clear of. */
+    bar.node().insertBefore(pill.node(), banner.node());
     bar.transition().duration(T_ENTER).ease(E_ENTER).attr('opacity',1);
     gDesks.selectAll('g.deskunit').attr('opacity',.34);
     label(gDesks, 500, nar?110:180, 'And sometimes it goes to zero', nar?15:19, 300, INK, 'middle');
@@ -4840,7 +5415,9 @@ function drawScaleScene(){
        rotation clears as well. The headings stay put: they keep their 24 units
        of air under the bowl, and the lower caption's new AABB bottom (481.9)
        still clears the narration block's top at 495.4. */
-    label(P, px, cy + (nar ? 158 : 132), sub, 9.4, 400, MUTE, 'middle');
+    /* haloed: at mobile the caption sits under a dish whose contents -- a stack of
+       documents on one side, a paper plane on the other -- reach down into it. */
+    haloed(label(P, px, cy + (nar ? 158 : 132), sub, 9.4, 400, MUTE, 'middle'));
     return P;
   }
   // CORRECT: a stack of cleared documents
@@ -4940,14 +5517,36 @@ function drawDeskScene(key){
     // case forms, a phone, a mug — the dressing that makes it a desk
     [0,1,2,3].forEach(k=> roundRect(gDesk, 168+k*4, 400-k*4, 116, 78, 2, '#FFFFFF', '#C9C3B6', 1));
     mono(gDesk, 226, 446, 'CASE FORMS', 5.8, MUTE, 'middle');
+    /* The desk phone. Its keypad was `cy = 442 + Math.floor(k/3)*0` -- a row
+       stride multiplied by ZERO, so all nine dots were drawn on one line at three
+       x positions and the 3x3 keypad rendered as three dots, each a stack of
+       three circles nobody could tell apart. The `*0` looks like a stride that
+       was going to be filled in and never was. */
     roundRect(gDesk, 700, 400, 92, 56, 5, '#FFFFFF', '#B9B2A4', 1.3);
     roundRect(gDesk, 712, 412, 68, 20, 2, '#EFEAE0');
-    for (let k=0;k<9;k++) gDesk.append('circle').attr('cx',716+(k%3)*24).attr('cy',442+Math.floor(k/3)*0)
-      .attr('r',3).attr('fill','#C9C3B6');
-    pth(gDesk, 'M 700 400 q -34 -20 -22 -44', '#B9B2A4', 1.4);
+    for (let k=0;k<9;k++) gDesk.append('circle').attr('cx',722+(k%3)*24).attr('cy',438+Math.floor(k/3)*7)
+      .attr('r',2.2).attr('fill','#C9C3B6');
+    /* The handset cord is gone. It was `M 700 400 q -34 -20 -22 -44`: it left the
+       phone's top-left corner, curved up into the paper and stopped at (678,356)
+       attached to nothing, because there was never a handset for it to reach. A
+       cord to nowhere is the same defect as the door diagonal in the video and the
+       rotated bed panel -- a stroke that meets the drawing at one end only -- and
+       the same remedy applies. The body, screen and keypad already read as a desk
+       phone. */
+
+    /* The mug, from above: two rings read as a vessel, one reads as a circle. */
     gDesk.append('circle').attr('cx',560).attr('cy',440).attr('r',18).attr('fill','none').attr('stroke','#B9B2A4').attr('stroke-width',1.4);
+    gDesk.append('circle').attr('cx',560).attr('cy',440).attr('r',12.5).attr('fill','none').attr('stroke','#C9C3B6').attr('stroke-width',1.1);
     pth(gDesk, 'M 578 434 q 12 6 0 12', '#B9B2A4', 1.3);
-    ln(gDesk, 604, 462, 660, 448, '#B9B2A4', 2);
+
+    /* The pen. This was a bare 2px line from (604,462) to (660,448) -- no barrel,
+       no nib, no taper -- which on a beige desk beside a mug reads as a stray mark
+       rather than an object. A barrel and a nib is two more shapes and it becomes
+       a pen. */
+    const gPen = gDesk.append('g').attr('transform','translate(604,462) rotate(-14)');
+    roundRect(gPen, 0, -2.7, 52, 5.4, 2.7, '#FFFFFF', '#B9B2A4', 1.2);
+    pth(gPen, 'M 52 -2.7 L 63 0 L 52 2.7 Z', '#8A8474', 1, '#8A8474');
+    ln(gPen, 12, -2.7, 12, 2.7, '#C9C3B6', 1.1);
 
     if (key === 'gaps'){
       const holes = isNarrow()
@@ -4957,13 +5556,27 @@ function drawDeskScene(key){
            ['no test loop',312,428],['no behavioural measure',500,428],['no speed',688,428]];
       gDesk.selectAll('g.dobj').attr('opacity',.16);
       gDesk.selectAll('rect').filter(function(){ return +this.getAttribute('y') > 380; }).attr('opacity',.16);
+      /* and the desk's loose LABELS, which were left at full strength while the
+         objects they name faded to .16 -- so "CASE FORMS" stayed bright under a
+         torn oval drawn over it, reading as a collision rather than as a dimmed
+         desk. The dressing recedes as one thing or it does not recede. */
+      gDesk.selectAll('text').filter(function(){ return +this.getAttribute('y') > 380; }).attr('opacity',.16);
       holes.forEach((h,i)=>{
         const G = gDesk.append('g').attr('opacity',0);
         /* 64 not 56: the label sits inside the opening and "no behavioural measure"
            overflowed a 112-unit oval whose ends taper. The words are the content here,
            so the opening is sized to them. */
         tornOval(G, h[1], h[2], 64, 26, '#C9C3B6', 1.6, '#FBE3D2');
-        label(G, h[1], h[2]+4, h[0], 9.2, 700, WARN, 'middle');
+        /* haloed in the opening's OWN fill, not paper: at mobile the label fills the
+           oval and the oval's edge reaches into it. #FBE3D2 is what tornOval above is
+           filled with, so the halo is invisible inside the opening and opaque over
+           its rim. A paper halo would be a pale ring round the words and would not
+           satisfy the check either, which compares the halo to the local background.
+           NOTE: applied while the machine could not run anything, so this is the one
+           edit in the file that has not been through `node syntax.js` or legible.js.
+           It is a pure additive wrap of an existing call, which is the safest shape
+           of edit available -- but verify it first. */
+        haloed(label(G, h[1], h[2]+4, h[0], 9.2, 700, WARN, 'middle'), '#FBE3D2');
         G.transition().delay(REDUCE?0:i*S_BEAT).duration(T_BASE).ease(E_ENTER).attr('opacity',1);
       });
       label(gDesk, 500, isNarrow()?800:578, 'Six infrastructure gaps. Not one of them is a talent gap.',
@@ -5003,10 +5616,54 @@ function drawDeskScene(key){
       const y = py + (nar ? 128 : 96) + i*(nar ? 70 : 54), last = i === rows.length-1;
       const tx = px + (nar ? 96 : 70);
       mono(gDesk, px+34, y, r[0], 6.6, last?WARN:MUTE);
-      label(gDesk, tx, y+2, r[1], last?12.5:11.5, last?700:400, last?WARN:'#3A4750');
-      mono(gDesk, tx, y + (nar ? 30 : 20), r[2].toUpperCase(), 5.8, last?WARN:'#2E6B2B');
-      if (last){
-        pth(gDesk, 'M '+(px+(nar?88:62))+' '+(y-16)+' q 150 -14 300 4 q -140 26 -300 -4 Z', WARN, 1.8);
+      const dutyEl = label(gDesk, tx, y+2, r[1], last?12.5:11.5, last?700:400, last?WARN:'#3A4750');
+      const statEl = mono(gDesk, tx, y + (nar ? 30 : 20), r[2].toUpperCase(), 5.8, last?WARN:'#2E6B2B');
+      /* Desktop only.
+         Sizing the oval to the measured text is right, and at mobile the text it has
+         to enclose is about 422 units wide inside a card 480 wide -- so the ellipse
+         that contains it runs off the left edge of the frame and up into the row
+         above, which is what the check reported. No enclosing annotation can both
+         contain this row and stay inside the card at that type scale; the text is
+         already overflowing and the oval only makes it visible.
+         So it is a desktop affordance. At mobile the row is already the only one in
+         WARN and the only one set bold, which is what the ring is there to say. */
+      if (last && !nar){
+        /* The circling annotation around the sixth duty, drawn with tornOval --
+           the same helper act four and act nine use, so the piece has ONE
+           hand-drawn oval rather than two that disagree.
+
+           It was a bespoke lens path: `M (px+62) (y-16) q 150 -14 300 4
+           q -140 26 -300 -4 Z`. Two problems. It spanned y-30 to about y+2 while
+           the duty's own text occupies y-10 to y+6, so its lower curve ran
+           through the words instead of around them -- a red stroke across
+           "Provide public information", which is the one line in the table the
+           annotation exists to draw attention to. And at 300 wide by 32 tall it
+           was too flat to read as a ring at all; it read as a scribble.
+
+           Sized to enclose both the duty and its status line beneath. */
+        /* SIZED TO THE MEASURED TEXT, not to authored constants.
+           A correction to the version above: replacing the bespoke lens with a
+           tornOval stopped the stroke running through the middle of the words and
+           introduced a subtler form of the same fault. An ellipse's ends TAPER, so
+           enclosing a text block needs
+             (halfW/rx)^2 + (halfH/ry)^2 <= 1
+           and rx=112, ry=26 against a block about 169 wide and 31 tall does not
+           satisfy it: at the left edge of the words the oval's half-height is only
+           ry*sqrt(1-(92/112)^2) = 14.8, so the curve cut through the duty's
+           ascenders and the status line's descenders near x=tx. Exactly the
+           tapering-ends problem act four's holes had, reintroduced one act later.
+           1.62 satisfies the constraint with room for tornOval's own 5.5% inward
+           wobble: (1/1.62)^2 * 2 = 0.76, and 0.76/0.89 = 0.86 < 1. Widths come from
+           getComputedTextLength so this holds at any type scale, and the vertical
+           span is derived from TK for the same reason. */
+        let w1 = 0, w2 = 0;
+        try { w1 = dutyEl.node().getComputedTextLength(); } catch (e) { w1 = 0; }
+        try { w2 = statEl.node().getComputedTextLength(); } catch (e) { w2 = 0; }
+        const bw = Math.max(w1, w2, 60);
+        const dTop = y + 2 - 0.9 * 12.5 * TK;
+        const sBot = y + (nar ? 30 : 20) + 0.35 * 5.8 * TK;
+        tornOval(gDesk, tx + bw/2, (dTop + sBot) / 2,
+                 bw / 2 * 1.62 + 12, (sBot - dTop) / 2 * 1.62 + 4, WARN, 1.8, 'none');
       }
     });
     label(gDesk, 500, nar ? 754 : 612, 'Every other function here is a profession. This one is a chore appended to five professions.',
@@ -5025,8 +5682,17 @@ function drawDeskScene(key){
       ln(gDesk, px+34, y+22, px+34, y+22, i===2?'#E74D4E':WARN, 18)
         .transition().duration(T_BASE).ease(E_MOVE).delay(REDUCE?0:0+i*S_BEAT).attr('x2', px+34+w);
       label(gDesk, px+34, y+48, b[1], 9.6, 400, MUTE);
-      // a stack being sliced, drawn at the end of each bar
-      if (i===2) pth(gDesk, 'M '+(px+34+w)+' '+(y+4)+' l 40 36', '#E74D4E', 2.4);
+      /* The diagonal at the end of the FY2026 bar is gone. Its comment said "a
+         stack being sliced, drawn at the end of each bar" and it was neither: no
+         stack, no slice, and drawn on one bar of three. What it actually was is a
+         bare 40x36 line starting nine units above the bar and ending nine below,
+         crossing the bar's end at a slant -- which on a beige card reads as a
+         stray mark, not as a cut.
+         There is no small mark that says "being cut" without a second element to
+         cut, and the two parallel diagonals that would read as deliberate are the
+         axis-break convention, which here would falsely imply the scale is
+         truncated. The bar is already the only one in #E74D4E rather than WARN, and
+         its own label reads "53% proposed CDC reduction". That carries it. */
     });
     label(gDesk, 500, nar ? 754 : 612, 'This is the room in which somebody says the word “campaign”.', 12.5, 700, INK, 'middle');
   }
@@ -5078,7 +5744,16 @@ function drawLedger(key, fresh){
   roundRect(gLed, lx, 150, lw, LH, 3, '#FFFFFF', '#C9C3B6', 1.3);
   ln(gLed, lx+18, 150, lx+18, 150+LH, '#8A8474', 1.2);
   for (let y = 194; y < 146+LH; y += nar ? 40 : 28) ln(gLed, lx+8, y, lx+lw-8, y, '#E9E5DC', 1);
-  mono(gLed, lx+30, 176, 'PUBLIC HEALTH RESPONSE · ONE INTRODUCED CASE ONWARD', 6.2, MUTE);
+  /* lw-60: the card is lw wide with 30 units of padding each side.
+     And a shorter string at mobile, rather than a wrapped one. Handing mono() the
+     container width made this eyebrow wrap correctly -- and its second line,
+     "INVENTORY", then landed on the gold inventory blocks below it. Wrapping is only
+     an improvement where there is room underneath for the extra line; here there is
+     not, so the copy is authored for the width instead. Desktop keeps the full
+     phrase. */
+  mono(gLed, lx+30, 176, nar ? 'PUBLIC HEALTH RESPONSE · PER CASE'
+                             : 'PUBLIC HEALTH RESPONSE · ONE INTRODUCED CASE ONWARD',
+       6.2, MUTE, 'start', lw - 60);
 
   const resp = FIXED + MARGINAL * Math.max(0, cases - 1);
   const soc  = SOCIETAL * cases;
@@ -5100,18 +5775,49 @@ function drawLedger(key, fresh){
 
   // what the same money is, expressed as the inventory nobody draws
   const AY = nar ? 612 : 372;
-  mono(gLed, lx+30, AY, 'THE SAME MONEY, IN AD GRANTS INVENTORY', 6.2, GOLD);
+  mono(gLed, lx+30, AY, nar ? 'THE SAME MONEY, AS AD GRANTS'
+                            : 'THE SAME MONEY, IN AD GRANTS INVENTORY',
+       6.2, GOLD, 'start', lw - 60);
   const months = Math.round(resp / GRANT);
   const shown = Math.min(months, 48);
   for (let m = 0; m < shown; m++){
     const bx = lx + 30 + (m % 16) * ((lw-60)/16), by2 = AY + 16 + Math.floor(m/16) * 16;
     roundRect(gLed, bx, by2, (lw-60)/16 - 3, 11, 1.5, m < 24 ? '#C4802F' : '#DCD5C6');
   }
-  label(gLed, lx+30, AY + 80, months.toLocaleString() + ' months of $10,000 search inventory', 11, 700, GOLD);
-  label(gLed, lx+30, AY + (nar ? 106 : 96), 'available at no cost to eligible bodies, and largely undrawn.', 8.8, 400, MUTE);
+  /* Measured, then wrapped -- and the second line placed from how many lines the
+     first actually took. Both of these overflowed the card at mobile: 36 characters
+     at 11 units and TK 2.5 paints about 515 units into 420 of room. A fixed +26
+     offset puts the second label under a one-line first and inside a two-line one,
+     which is the same mistake the privacy panel had. */
+  const inner = lw - 60;
+  const fitLed = (yy, txt, sz, wt, col) => {
+    const first = label(gLed, lx+30, yy, txt, sz, wt, col);
+    let wid = 0;
+    try { wid = first.node().getComputedTextLength(); } catch (e) { wid = 0; }
+    if (!wid || wid <= inner) return first;
+    first.remove();
+    const cap = Math.max(10, Math.floor(txt.length * inner / wid));
+    return label(gLed, lx+30, yy, txt, sz, wt, col, 'start', cap);
+  };
+  const mEl = fitLed(AY + 80, months.toLocaleString() + ' months of $10,000 search inventory', 11, 700, GOLD);
+  const mLines = mEl.size ? mEl.size() : 1;
+  fitLed(AY + 80 + (mLines - 1) * Math.max(MIN_SANS, 11) * TK * 1.32 + (nar ? 26 : 16),
+         'available at no cost to eligible bodies, and largely undrawn.', 8.8, 400, MUTE);
 
-  // the slider
-  const sx = nar ? 250 : 560, sw2 = nar ? 500 : 320;
+  /* The slider.
+
+     Desktop x was 560, and the ledger card is lx=130 with lw=430 -- so the track
+     began at exactly the card's right edge, and at the minimum stop the handle sits
+     centred on the track's start with a radius of about 13. Half of the handle was
+     therefore drawn inside the card, which reads as a control with a bite taken out
+     of it. legible.js cannot see this and says so: only the pill's TEXT is in its
+     scope, and this is a shape over a shape.
+
+     592 clears the card by 19. The track is narrowed to 288 rather than kept at 320
+     so its right end lands on 880, which is where the chart's axis line and the
+     LOG SCALE caption already end -- the shift buys an alignment instead of just
+     moving the problem outward and widening the frame. */
+  const sx = nar ? 250 : 592, sw2 = nar ? 500 : 288;
   slider(gLed, sx, nar ? 150 + LH + 132 : 200, sw2, {
     min:1, max:100, val:cases, step:1, aria:'confirmed cases',
     fmt: v => v + (v===1 ? ' case' : ' cases'),
@@ -5287,8 +5993,17 @@ function drawCrowd(key, fresh){
   }
 
   /* middle */
+  /* The second sub-label is shorter than the copy it replaces. Each of these is
+     centred under its own segment, and the 19% segment is only 133 units wide
+     while "have read it and are not persuaded" is 132 -- so it ran 619..752 and
+     the 14% segment's "reachable, and reliably so" ran 749..853. Three units of
+     overlap, which is nothing as a fraction of either box and therefore under
+     audit.js's collision threshold, and which renders as "persuadedreachable":
+     two labels with no white between them read as one word regardless of how
+     small the arithmetic overlap is. Shortened rather than re-anchored, so the
+     labels stay centred on the segments they describe. */
   const SEG = [['Disengaged Skeptics',67,'#C9C3B6','never engaged with the question at all'],
-               ['Informed Unconvinced',19,'#B8492E','have read it and are not persuaded'],
+               ['Informed Unconvinced',19,'#B8492E','have read it, unpersuaded'],
                ['Open to Persuasion',14,'#2E6B2B','reachable, and reliably so']];
   const bw = nar ? 770 : 700, bx = 500 - bw/2, by = nar ? 250 : 240;
   let acc = 0;
@@ -5306,7 +6021,12 @@ function drawCrowd(key, fresh){
   // the people in the movable slice
   for (let k = 0; k < 14; k++){
     const p = gCrowd.append('g')
-      .attr('transform','translate('+(bx+bw*0.86+(k%4)*26-40)+','+(by+(nar?260:200)+Math.floor(k/4)*36)+') scale(0.62)');
+      /* by+170 on desktop, not by+200. Four rows of 36 put the last row's feet at
+         y 560, and the closing line's own box runs 555..569 -- so the leftmost
+         figure of the bottom row printed through "free.", the last word of the
+         scene's argument. Raised 30, which leaves 25 clear of the caption and
+         still clears the bar's sub-labels at y 386 by 24. */
+      .attr('transform','translate('+(bx+bw*0.86+(k%4)*26-40)+','+(by+(nar?260:170)+Math.floor(k/4)*36)+') scale(0.62)');
     person(p, SKIN.b, CLOTH.green, null);
   }
   label(gCrowd, 500, nar?160:150, 'The movable middle', nar?15:19, 300, INK, 'middle');
@@ -5322,14 +6042,26 @@ function drawCrowd(key, fresh){
    ACT V — THE DEMOGRAPHIC DIVE
    ===================================================================== */
 
+/* `chip` is which category's mark stands for the facet on its selector card.
+
+   It used to be computed inline as `f.id==='age'?4:(f.id==='inc'?2:0)` -- so every
+   facet except age and income showed category 0. For `ins` and `edu`, category 0 is
+   the ABSENCE category: "None" draws a dashed card struck through in red, and "No
+   degree" draws an empty dashed box. Both marks are right for their category and
+   both are wrong as the emblem of a facet, so the Insurance and Education cards
+   looked exactly like unfinished placeholders sitting between six finished ones.
+
+   Not a drawing bug. A selection bug -- and the kind that hides, because the glyphs
+   it picks are real code that renders correctly. Named per facet so the choice is
+   visible and reviewable instead of falling out of a conditional. */
 const FACETS = [
-  { id:'age', n:'Age',       cats:['0–1','2–4','5–11','12–17','18+'] },
-  { id:'sex', n:'Gender',    cats:['Female','Male'] },
-  { id:'inc', n:'Income',    cats:['<$35k','$35–75k','$75–150k','$150k+'] },
-  { id:'ins', n:'Insurance', cats:['None','Medicaid','Employer'] },
-  { id:'lang',n:'Language',  cats:['English','Spanish','Other'] },
-  { id:'geo', n:'Geography', cats:['Rural','Suburban','Urban'] },
-  { id:'edu', n:'Education', cats:['No degree','Some college','Degree'] }
+  { id:'age', n:'Age',       chip:4, cats:['0–1','2–4','5–11','12–17','18+'] },
+  { id:'sex', n:'Gender',    chip:0, cats:['Female','Male'] },
+  { id:'inc', n:'Income',    chip:2, cats:['<$35k','$35–75k','$75–150k','$150k+'] },
+  { id:'ins', n:'Insurance', chip:2, cats:['None','Medicaid','Employer'] },
+  { id:'lang',n:'Language',  chip:0, cats:['English','Spanish','Other'] },
+  { id:'geo', n:'Geography', chip:0, cats:['Rural','Suburban','Urban'] },
+  { id:'edu', n:'Education', chip:2, cats:['No degree','Some college','Degree'] }
 ];
 let facetA = 'age', facetB = null;
 
@@ -5341,7 +6073,12 @@ function facetGlyph(g, cx, cy, fid, ci, col, s){
     const sc = [0.42,0.56,0.72,0.88,1.0][ci];
     const p = G.append('g').attr('transform','scale('+sc+')');
     person(p, SKIN.b, C, null);
-    if (ci === 0) pth(G, 'M -14 '+(6*sc)+' q 14 10 28 0', C, 1.4);
+    /* The cradle under the infant. Its y was scaled by sc and its x was not, so at
+       sc=0.42 a 28-unit arc sat beneath a figure about 14 units wide -- it
+       overhung the baby on both sides by half its own width again and read as a
+       moustache floating past the glyph rather than as something holding it.
+       Scaled on both axes. */
+    if (ci === 0) pth(G, 'M '+(-14*sc)+' '+(6*sc)+' q '+(14*sc)+' '+(10*sc)+' '+(28*sc)+' 0', C, 1.4);
   }
   if (fid === 'sex'){
     const p = G.append('g').attr('transform','scale(0.82)');
@@ -5413,7 +6150,7 @@ function drawFacetScene(key, fresh){
     padHit(C, x, y, cw-8, 76, 2);
     roundRect(C, x, y, cw-8, 76, 8, on ? '#EFEAE0' : (on2 ? '#DCEBF5' : 'none'),
       on ? GOLD : (on2 ? '#3A5D74' : '#C9C3B6'), on||on2 ? 1.6 : 1);
-    facetGlyph(C, x+(cw-8)/2, y+30, f.id, f.id==='age'?4:(f.id==='inc'?2:0),
+    facetGlyph(C, x+(cw-8)/2, y+30, f.id, f.chip,
                on ? GOLD : (on2 ? '#3A5D74' : '#8A8474'), nar?0.74:0.78);
     label(C, x+(cw-8)/2, y+66, f.n, nar?8.4:9.2, on||on2?700:400, on?GOLD:(on2?'#3A5D74':MUTE), 'middle');
     C.on('click', ()=>{ pick(f.id); }).on('keydown', function(ev){ if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); pick(f.id); }});
@@ -5445,7 +6182,9 @@ function drawFacetScene(key, fresh){
       const x = x0 + ci*colw + colw/2;
       const G = gFacet.append('g').attr('opacity',0);
       facetGlyph(G, x, y0, FA.id, ci, GOLD, nar?0.92:1.15);
-      label(G, x, y0 + 46, c, nar?9.6:10.6, 700, INK, 'middle');
+      /* haloed: the category label sits between its own glyph above and its count
+         below, and at mobile the glyph's strokes reach into it. */
+      haloed(label(G, x, y0 + 46, c, nar?9.6:10.6, 700, INK, 'middle'));
       const share = [0.14,0.22,0.26,0.21,0.17].map((v,k)=>v)[ci % 5] || 0.2;
       const cnt = Math.round(100 * (1/n) * (0.7 + ((ci*7)%5)/8));
       mono(G, x, y0 + (nar ? 72 : 62), cnt + ' IN 100', 6.2, MUTE, 'middle');
@@ -5457,7 +6196,9 @@ function drawFacetScene(key, fresh){
       }
       const by2 = y0 + 104 + rows*28;
       mixBar(G, x-52, by2, 104, mixFor(FA.id+c), 12);
-      mono(G, x, by2 + 26, 'REASON MIX', 5.8, MUTE, 'middle');
+      /* haloed: it sits under the stacked bar it names, and at mobile the bar's
+         segments reach into its ascenders. */
+      haloed(mono(G, x, by2 + 26, 'REASON MIX', 5.8, MUTE, 'middle'));
       G.transition().delay(REDUCE?0:0+ci*S_BEAT).duration(T_BASE).ease(E_ENTER).attr('opacity',1);
     });
     label(gFacet, 500, nar?680:632, 'Every column carries all five reasons, in almost the same proportions.',
@@ -5470,12 +6211,14 @@ function drawFacetScene(key, fresh){
     const x0 = 500 - (A.length*cwid)/2 + 44, y0 = nar ? 350 : 258;
     A.forEach((c,ci)=> {
       facetGlyph(gFacet, x0 + ci*cwid + cwid/2 - 22, y0 - 34, FA.id, ci, GOLD, .66);
-      label(gFacet, x0 + ci*cwid + cwid/2 - 22, y0 - 8, c, 8.6, 700, GOLD, 'middle');
+      /* haloed: the column label sits directly under its own facet glyph, whose
+         strokes reach into it at mobile. */
+      haloed(label(gFacet, x0 + ci*cwid + cwid/2 - 22, y0 - 8, c, 8.6, 700, GOLD, 'middle'));
     });
     let vals = [];
     B.forEach((b,bi)=>{
       facetGlyph(gFacet, x0 - 66, y0 + 24 + bi*rh, FB.id, bi, '#3A5D74', .66);
-      label(gFacet, x0 - 66, y0 + 50 + bi*rh, b, 8, 700, '#3A5D74', 'middle');
+      haloed(label(gFacet, x0 - 66, y0 + 50 + bi*rh, b, 8, 700, '#3A5D74', 'middle'));
       A.forEach((c,ci)=>{
         const mx2 = mixFor(FA.id+c+FB.id+b);
         vals.push(mx2.map(v=>v/d3.sum(mx2)));
@@ -5532,9 +6275,6 @@ function drawQuadScene(key, fresh){
     mono(gQuad, cx, cy+R+56, 'LOW INTERVENTION APPETITE', 6.6, MUTE, 'middle');
     mono(gQuad, cx-R-38, cy-8, 'LOW TRUST', 6.6, MUTE, 'end');
     mono(gQuad, cx+R+38, cy-8, 'HIGH TRUST', 6.6, MUTE, 'start');
-    QUADS.forEach((q,i)=>{
-      label(gQuad, cx + q.x*R*0.56, cy - q.y*R*0.86, q.n, nar?9.6:10.6, 700, q.col, 'middle');
-    });
     // the figures fly out of the demographic grid and land where they belong
     for (let i = 0; i < 100; i++){
       const q = QUADS[i % 4];
@@ -5546,6 +6286,13 @@ function drawQuadScene(key, fresh){
         .attr('transform','translate('+tx+','+ty+') scale(0.44)');
       else p.attr('transform','translate('+tx+','+ty+') scale(0.44)');
     }
+    /* The quadrant names are drawn AFTER the hundred figures, not before.
+       They were painted first, so every figure that landed on one was drawn over it
+       -- an occlusion a halo cannot help with, since the halo is under the glyphs and
+       the figure is over them. A label naming a cloud belongs on top of the cloud. */
+    QUADS.forEach((q,i)=>{
+      haloed(label(gQuad, cx + q.x*R*0.56, cy - q.y*R*0.86, q.n, nar?9.6:10.6, 700, q.col, 'middle'));
+    });
     label(gQuad, 500, nar?137:132, 'Two dimensions do what seven facets could not', nar?13:18, 300, INK, 'middle');
     label(gQuad, 500, nar?780:606, 'Because these are properties of the decision, not of the person.', 12.5, 700, INK, 'middle');
     if (!nar) label(gQuad, 500, 630, 'And we map the barrier, never the identity: two households can share low trust and need opposite things.',
@@ -5577,19 +6324,55 @@ function drawQuadScene(key, fresh){
       const p = G.append('g').attr('transform','translate('+(sx+76)+','+(sy+14)+') scale(1.5)');
       person(p, SKIN.e, CLOTH.coat, HAIR.black);
       ln(G, sx+62, sy+50, sx+90, sy+50, q.col, 2); ln(G, sx+76, sy+42, sx+76, sy+50, q.col, 2);
-      pth(G, 'M '+(sx+150)+' '+(sy-14)+' q 16 12 0 24', q.col, 1.6);
+      /* A single arc used to sit at sx+150, fourteen units clear of the screen's
+         right edge at sx+136, touching nothing. Presumably signal radiating from
+         the broadcast -- but one arc on its own does not read as radiation, it
+         reads as a stray closing parenthesis, and it was the only mark in the
+         four rooms with no object under it. The screen, the figure in a coat and
+         the stand already say "a clinician, on camera". Removed rather than
+         multiplied into a motif no other room uses. */
     }
-    if (q.id === 'ovr'){            // claims, weighed
-      pth(G, 'M '+(sx+76)+' '+(sy-38)+' v 56 M '+(sx+26)+' '+(sy-24)+' h 100', '#8A8474', 2);
-      [[-50,10],[50,-8]].forEach((o,k)=>{
-        ln(G, sx+76+o[0], sy-24, sx+76+o[0], sy+o[1]+6, '#8A8474', 1.2);
-        pth(G, 'M '+(sx+56+o[0])+' '+(sy+o[1]+6)+' q 20 16 40 0 Z', q.col, 1.6);
-        [0,1].forEach(j=> roundRect(G, sx+64+o[0], sy+o[1]-6-j*7, 24, 6, 1, 'none', q.col, 1.1));
+    if (q.id === 'ovr'){            // claims, weighed, and it does not settle
+      /* Redrawn. The old balance had three separate faults that compounded into
+         something that read as a broken graphic rather than an object:
+
+         1. The beam was HORIZONTAL (`M (sx+26) (sy-24) h 100`) while the two pans
+            hung at different depths (offsets +10 and -8). A level beam with pans
+            at unequal heights is not a balance in any state; it is a balance
+            drawn by someone not looking at it.
+         2. The post ran `v 56` from sy-38, i.e. 14 units ABOVE the beam it
+            supports, so a spike stuck out of the top, and it also ran straight
+            through the fulcrum triangle at the bottom.
+         3. Each pan was `q 20 16 40 0 Z` -- an arc closed with Z. Z draws a
+            straight chord back to the start, so every pan had a lid across it and
+            read as a lens, not a dish. This is the identical defect as the
+            hand-rolled torn ovals fixed in act four and act nine: a Z that
+            silently adds the chord you did not draw.
+
+         Now: a tripod stand, a beam pivoting on it, two dishes hanging plumb from
+         the beam's ends, and three claims on the low side against one on the high.
+         The tilt and the load agree, which is the whole content -- this room is
+         the one that needs adjudication, so the scale must visibly not be level. */
+      const bx = sx + 76, by = sy - 18, TILT = 14;
+      const ends = [[bx - 52, by - 4 + TILT, 3], [bx + 52, by - 4 - TILT, 1]];
+      pth(G, 'M '+(bx-16)+' '+(by+40)+' L '+bx+' '+(by+4)+' L '+(bx+16)+' '+(by+40), '#8A8474', 1.8);
+      ln(G, bx, by + 4, bx, by - 4, '#8A8474', 2);
+      ln(G, ends[0][0], ends[0][1], ends[1][0], ends[1][1], '#8A8474', 2);
+      G.append('circle').attr('cx',bx).attr('cy',by-4).attr('r',3).attr('fill','#8A8474');
+      ends.forEach(e=>{
+        ln(G, e[0], e[1], e[0], e[1] + 20, '#8A8474', 1.2);
+        /* no Z: an open arc is a dish, a closed one is a lens */
+        pth(G, 'M '+(e[0]-19)+' '+(e[1]+20)+' q 19 17 38 0', q.col, 1.6);
+        for (let j = 0; j < e[2]; j++)
+          roundRect(G, e[0]-11, e[1]+15-j*6, 22, 5, 1.5, q.col);
       });
-      pth(G, 'M '+(sx+64)+' '+(sy+18)+' l 12 -14 l 12 14 Z', '#8A8474', 1.6);
     }
     if (q.id === 'acc'){            // a bus, a clinic, a price
-      pth(G, 'M '+sx+' '+(sy+20)+' q 40 -26 78 -6', q.col, 2, null, '5 4');
+      /* The dashed route ended at (sx+78, sy+14) and the clinic's circled cross is
+         centred (sx+108, sy-16) with r=17, so its nearest edge is at sx+91: the
+         route stopped thirteen units short in both axes and the two halves of "a
+         route to a clinic" never met. Ends on the circle now. */
+      pth(G, 'M '+sx+' '+(sy+20)+' q 46 -6 91 -36', q.col, 2, null, '5 4');
       roundRect(G, sx-14, sy-4, 40, 22, 3, 'none', q.col, 1.6);
       G.append('circle').attr('cx',sx-4).attr('cy',sy+20).attr('r',4).attr('fill',q.col);
       G.append('circle').attr('cx',sx+16).attr('cy',sy+20).attr('r',4).attr('fill',q.col);
@@ -5704,7 +6487,7 @@ function drawMach(key){
   // the return belt — the part that makes it compound
   pth(B, 'M '+(RX-62)+' '+RY+' q -54 -70 0 -104 q 54 -34 96 6', '#2E6B2B', 1.6, null, '5 5');
   pth(B, 'M '+(RX+30)+' '+(RY-98)+' l 4 -8 l 8 6', '#2E6B2B', 1.8);
-  mono(B, RX, RY - 118, 'WHAT IT LEARNED', 6, '#2E6B2B', 'middle');
+  haloed(mono(B, RX, RY - 118, 'WHAT IT LEARNED', 6, '#2E6B2B', 'middle'), PAPER);
   ['always on — an audience already built','segmented by barrier','iterated daily against evidence',
    'measured in behaviour','compounds — each turn is cheaper than the last']
    .forEach((t,i)=> label(B, RX - (nar ? 240 : 96), RY + (nar ? 118 : 96) + i*ML, '· ' + t,
@@ -5853,7 +6636,7 @@ function drawRig(g, x, y, w, opts){
   bindTip(rig.selectAll('g.rigcell'),
     d => '<b>'+d.n+'</b><br>'+d.what+'<br><br><b>Enabled by:</b> '+d.how+'<br><br><b>Costs:</b> '+d.cost, d => d.n);
   const litCount = LAYERS.filter(l=>lit.has(l.id)).length;
-  mono(rig, x, y - 10, 'LENSES INSTALLED · ' + litCount + ' OF 7', 7.4, litCount===7 ? '#2E6B2B' : MUTE);
+  haloed(mono(rig, x, y - 10, 'LENSES INSTALLED · ' + litCount + ' OF 7', 7.4, litCount===7 ? '#2E6B2B' : MUTE));
   return rig;
 }
 

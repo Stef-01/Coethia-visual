@@ -815,3 +815,348 @@ actually named.
 visual language — checked by eye once, by one reviewer, not user-tested. The 55/59 screenshots Stage
 12's general taste sweep still hasn't examined, which could still surface a second Step-10-shaped
 finding.
+
+---
+
+## Step 12 — The Remotion video, and the token module under it
+
+**Asked for, and missing.** The brief included a Remotion accessory video. What existed was a token
+probe and a handful of PNG stills; no video had ever been rendered. Now: `ColdOpen`, 750 frames,
+1920×1080, h264, 25.045s.
+
+**`video/src/tokens.ts` is the substance of the change.** Colours, easings and stagger steps are copied
+from `faster-than-the-rumour.html` and imported everywhere, so the claim that this is an artefact OF
+the piece rather than a video that shares its palette is checkable rather than asserted. The cubics are
+written out as polynomials instead of mapped onto Remotion's `Easing.bezier` approximations of them:
+d3's `easeCubicOut` is exactly `1-(1-t)³`, Remotion's bezier of it is close and not equal, and an
+approximation is the one thing that cannot be allowed here — a curve that is nearly the page's looks
+right while being wrong, and every later comparison inherits the error.
+
+**Two content decisions, both the second answer.**
+
+- **No person appears in the room, at any point.** The scene it is built from is titled "What Was in
+  the Room After She Left It" and the obvious staging is a small figure walking out through the door.
+  That is a misrepresentation: the six-year-old in Lubbock did not walk out of the room. The page uses
+  the empty room to explain a property of the virus — it stays infectious in a room "a case walked
+  through ninety minutes ago" — and the emptiness is not a frame around the subject, it is the subject.
+- **Nothing thins out over the two hours.** Decaying the particles gives the clock something to do and
+  reads as progress, and it inverts the argument: the force of the two-hour figure is that the air does
+  *not* clear on any timescale a person in the room could act on. The dust holds undiminished and the
+  clock is the only thing that moves, which is precisely the complaint.
+
+**Five defects found by probing stills before rendering — which is why stills were rendered first.**
+
+| defect | what it was |
+|---|---|
+| every beat drew nothing | `Sequence` wraps children in an `AbsoluteFill` — a `<div>` — unless given `layout="none"`. A `<div>` inside `<svg>` is not an error, it is simply not an SVG element. Eight probe frames came back with **two** distinct hashes: frame 40, and "every other frame", differing only in the page chrome's fade sitting at 0.9993 rather than 1 |
+| the clock blinked out twice | the sweep was `(minutes/120)*720 % 360`, two revolutions of a real clock face. That expression is zero at minutes=60 **and** at minutes=120 — so the arc vanished at the end of the first hour and at the exact instant the two hours completed. The two frames the shot exists to deliver were the two frames with nothing drawn |
+| a label never landed with its number | "STILL INFECTIOUS" was gated on `swept >= 1`, true only on the final frame or two, because cubicOut approaches 1 asymptotically. The counter reads 120 for about a second first. Gated on the readout instead |
+| the bed floated | its legs stopped 78 units above the floor |
+| strike-throughs overshot | `s.length * 20.5` — characters times a guessed average advance — overshot past the full stop on two of three lines, because an estimate cannot know that `l` is narrow and `m` is wide. Now `measureText`. Same reason the page has a fitter instead of a hand-tuned size |
+
+**And one defect introduced while fixing another, in the same commit, by the comment that claimed to
+rule it out.** The bed needed a raised head panel — without one the object is a flat slab on four legs,
+which is a table. It was drawn as a `<rect>` with `rotate(-24)` about its bottom-left corner, and this
+comment was written next to it: *"it cannot float, because it meets the mattress along its entire lower
+edge."* Rotation does not do that. It fixes one **point**; the rest of the edge swings off the line it
+started on. The near corner stayed and the far corner lifted 25 units clear, so the panel hung in the
+air off the end of the bed — the same defect as the door diagonal deleted four lines earlier for
+meeting the drawing at one end only. It is now a quadrilateral with two vertices on the mattress top,
+where the contact is in the coordinates instead of in an argument about the transform. **Stating an
+invariant is not the same as having it.**
+
+**A figure that overstated the source.** The third statistic read "0 — of those three had been
+vaccinated". The page records the two Lubbock children as unvaccinated and says only that the third
+death was "an adult in New Mexico", with no status given. Zero-across-three invents the missing data
+point to complete the pattern, which is the move this piece is an argument against. Replaced with the
+two the page documents.
+
+**Verified by pulling frames back OUT of the encoded mp4** rather than re-rendering them: h264,
+1920×1080, 750 frames, 30fps, 25.045s, and frame 330 of the file matches frame 330 of the design.
+`out/` stays gitignored; the video is reproducible from source.
+
+---
+
+## Step 13 — `legible.js`, and the 55 screenshots Step 9 left unexamined
+
+The previous entry's own "Uncovered" note said the 55/59 unexamined screenshots *"could still surface a
+second Step-10-shaped finding"*. They did, and the reason they did is worth more than the fixes.
+
+**The suite measured one of two failure modes and was trusted for both.** `audit.js` has a
+text-collision check and it reported **zero collisions across 59 scenes**. That check compares text
+boxes against **other text boxes**. Three scenes then examined by hand had, between them: a dust-ring
+dot inside the word MEASLES; another inside the numerals of "R₀ 12–18"; four annotations straddling the
+edge of a dark phone body; and a red leader drawn through the "0" of "yr 4–10" so the label read as
+truncated. Every one is invisible to a text-vs-text comparison, and every one is what "clunky,
+overlapping and ugly" means in a screenshot. **The gap was not taste and it was not diligence in
+reading screenshots. It was an instrument.**
+
+`legible.js` measures the other mode, in four kinds — `occluded`, `speckled`, `straddled`,
+`low-contrast` — reported separately because the fixes differ, and with the same self-verify pass
+`boxes.js` uses.
+
+**Building it cost four full 59-scene runs, one per wrong idea:**
+
+| run | what was wrong |
+|---|---|
+| found only `trap` | shapes were admitted at `cover >= 0.55`, on the reasoning that anything sheerer cannot hide text. True, and it disqualified the pale ring dots the check was written for. "Can this hide a glyph" and "is this visible enough to break a word" are different questions; one threshold can only ask one. One floor per mode |
+| missed `sequelae` entirely | strokes were excluded, **and the exclusion was documented in the file**, because a diagonal's bbox is its whole diagonal extent and a bbox test would flag every leader against every label in its quadrant. Correct about bbox tests. The next scene examined had a leader through a label. Now sampled with `getPointAtLength`, with the bbox demoted to a prefilter — which, being a superset, cannot produce a false negative. **Documenting a gap is not the same as it being reasonable to have one** |
+| ~30 false low-contrast | the background of a label is the **topmost** layer under it, not the largest. Picked by intersection area, and when text sits inside two nested shapes both intersections equal the text's own area exactly — so a `>` comparison keeps the first, and first in document order is the outermost. Every white avatar initial in the console scenes was measured against the white card 792 units wide *behind* the 20-unit teal circle it was printed on, and reported at 1.00:1 |
+| 25 false straddles | "does this shape cover between 10% and 90% of the label" is a proxy for "does the label span its edge", and a text box includes leading the glyphs do not use — so a label sitting comfortably inside a dark card measured as 89% covered. Test the edge. And a straddle only matters if the label survives on one side and not the other, so both contrasts are compared rather than inventing a shape-versus-paper threshold |
+
+**Progression: 100+ findings → 14 → 2, artifact unchanged throughout.** The two survivors were both
+real and both had been confirmed by eye first. The 100+ run *contained* those two; acting on it would
+have meant editing forty things that were not broken. Also added: a modal is not an occlusion — content
+a sheet deliberately covers is off-screen, not illegible, so full coverage skips the label.
+
+**A debug path that is not the code path.** One finding could not be adjudicated from the report, so a
+throwaway script was written to explain it. That script walked `svg.querySelectorAll('*')` where the
+real check walks only the visible scene groups — so it "found" a circle from the loop diagram and a
+dust dot from `r0`, neither of which the check had ever considered, and sent half an hour after a
+cross-scene leak that does not exist. The remedy was to put the offending element's box into the
+finding itself. **Recorded because the wrong answer was confident and cost more than the bug.**
+
+
+### Step 13, continued — two more instrument errors, and the control that caught them
+
+**The scrim the check could not see.** After the fixes above, `legible.js` reported eight findings
+across `reel`, `swipe`, `anatomy`, `counterpost` and `trap`: the post caption and handle straddling the
+figure's shoulder at 1.8:1. The phone already draws a black scrim at `opacity .42` across the bottom of
+its screen, *precisely so* a white caption can sit over a figure. At 0.42 that scrim failed the check's
+opacity floor, was discarded as "too sheer to hide anything", and the contrast was computed against the
+raw purple underneath — 1.8:1 reported where the screen actually shows about 7:1. **The fix the report
+invited was to add a scrim that was already there.**
+
+A background is not one layer; it is what you get by painting all of them. The check now composites
+every covering layer in paint order, and the straddle test composites both sides — so a scrim above a
+shape applies to both, which is the point. Two hand-coded special cases dissolved into that: the
+"nearest layer wins" rule and the "skip shapes behind the topmost opaque background" guard are both
+just what alpha compositing does, because an opaque layer's alpha zeroes whatever is under it.
+
+**Then the findings hit zero, and that was the moment to stop trusting them.** 100+ → 14 → 2 → 0 is the
+progression this repo's own gate notes describe as the dangerous one: *the numbers got more plausible as
+they got smaller, and no more true.* "Clean" and "blind" produce identical output.
+
+So `LEGIBLE_URL` was added and the current instrument was pointed at the artifact **as it was before the
+fixes**, extracted from `git show HEAD:`. It found 13 findings there — `sequelae`'s leader through
+"yr 4–10", both `r0` ring dots, all four `trap` straddles with correct on/off contrasts, `room`'s
+"BED 4" at 2.3:1 on the window against 5.3:1 on the paper, and `middle`'s glyph through "free.".
+13 on the old file, 0 on the new one, same instrument, same run. That is a fixed artifact, not a broken
+check — and it is the only form of evidence that distinguishes the two.
+
+**And the positive control immediately failed for the mode added last.** `clipped-control` was written
+to catch two defects found by eye: `trap`'s "Correct this" pill and the ledger slider's handle. Against
+the pre-fix file it found **neither**.
+
+- It tested for a control partly covered by a shape painted *after* it, because the commit message and
+  the code comment both said the pill was "behind the phone body". **It is not.** Rendering the pre-fix
+  scene and looking at it settles it: the pill is painted on top of the phone, its left arc is fully
+  visible crossing the dark shell, and what looks broken is that its *interior* is dark for the first
+  13% and paper for the rest. A straddle, not an occlusion. The artifact comment has been corrected.
+- And it matched only `role="button"`, so the ledger slider — whose thumb is `role="slider"` — was never
+  collected at all. The defect that motivated half the mode was invisible to it.
+
+Reframed as a straddle-plus-stroke-through test over every interactive role. Both now reproduce on the
+pre-fix file: `trap` "Correct this", right edge through the control, 13% on a ground 18.1:1 from the
+paper; `arithmetic` "confirmed cases", a 1.3px stroke running through the control, which is the ledger
+card's own border cutting the handle. **A check whose positive control has never been run is a check
+that works once, on the example you wrote it from.**
+
+**Also fixed, structurally:** `audit.js --shots` wrote desktop screenshots only. That one condition is
+why the mobile view had been examined a fraction as much — there was never a mobile screenshot to look
+at — and it showed up as 27 of 30 findings being mobile on an artifact whose desktop composition has
+been through a dozen passes. Both widths now.
+
+**A false alarm of my own, recorded.** From a downscaled mobile contact sheet I read the handle
+`@themindfulmother_` as colliding with the Follow pill in four scenes and started looking for the cause.
+Measuring it gave an 8.8px gap at mobile and 13.9px at desktop — the "collision" was thumbnail
+resampling merging two adjacent runs of text. The code had measured the handle correctly with
+`getComputedTextLength()` all along. **A contact sheet is for deciding what to look at, never for
+deciding what is wrong.**
+
+### Step 13, mobile — the type scale versus a fixed-width device
+
+Once `audit.js` started writing mobile screenshots, `counterpost` at 375px turned out to be the worst
+thing in the piece, and badly so: **five separate runs of text spilled off the phone onto the paper**,
+where white-on-paper is invisible. The account name lost its last two letters, "TUESDAY 2:15 PM ·
+SPONSORED? NO" ran most of its length onto the page, and "MEASLES VACCINATION CLINIC" overflowed the
+device by about 90 units on each side.
+
+**One cause, and it is structural.** `typed()` paints every label at `size * TK`, and TK reaches 3 on a
+narrow viewport. That is correct for text on the page — it is what keeps type above the legible pixel
+floor when the camera is wide — and wrong for text inside a *recreated device*, because the device is a
+fixed 232 units across at mobile and does not grow with TK. So an 11-unit headline became 26 units of
+type inside a 232-unit screen.
+
+The page already has a damping constant for exactly this, `CON_TK = 0.84`, used by the console islands.
+It is not enough here: 0.84 of 2.4 is still 2.0, and the string needed to come down by 1.8.
+
+**Not fixed by tuning the strings.** Shortening five labels, or adding mobile variants of them, is the
+hand-tuned-instead-of-measured habit that the camera fitter in this repo exists to replace, and it
+re-breaks the moment anyone edits the copy. `clampPhoneText()` measures instead: after the scale is
+applied, any label anchored inside the screen rect that is wider than the room it has gets its own
+`data-tk` scaled down until it fits. One pass over the phone group, self-maintaining.
+
+Two details that are the whole correctness of it:
+
+- **The bound is the anchor point being inside the screen, not the text overlapping it.** `gPhone` also
+  holds annotations that legitimately sit outside the device — `anatomy`'s four leader labels, `trap`'s
+  meter column, the mobile reach readout under the phone — and squeezing those to the device's width
+  would be a new defect. Text drawn inside the device stays inside the device; text drawn on the page is
+  the page's business.
+- **It runs in a wrapper, not at the end of the draw.** `drawPhoneSceneInner` returns from nine
+  branches, so a post-pass appended to its end would have run for exactly one of them.
+
+**And the fix immediately exposed a bug of the same family.** The verified badge was drawn at
+`S.x + 52 + 128` — the account name's width at desktop, hard-coded. Correct until the label could be a
+different width, which it now can, so the first render after the clamp put the blue tick between
+"Public" and "Health". Measured and re-placed in the same post-pass. This is the third instance today of
+one thing positioned from an assumed text width (the strike-throughs in the video, the Follow pill I
+wrongly accused, this badge) and the remedy is the same every time.
+
+**Three "weak glyph" findings withdrawn.** Reading the 59 desktop screenshots as a downscaled contact
+sheet produced a list of illustrations that looked broken: three of the six `measure` dashboard glyphs,
+two of the five `five` reason glyphs, and the `@themindfulmother_` handle apparently colliding with the
+Follow pill in four phone scenes. Every one of those dissolved on inspection at full resolution — the
+`measure` gauge and arrow are legible, `five`'s "Could not" reads clearly as a blocked route to a
+clinic, and the handle has an 8.8px gap from the pill which `getComputedTextLength()` had been
+maintaining correctly all along. Resampling had merged adjacent strokes and adjacent runs of text.
+
+The contact sheet was still the right tool: it is how `counterpost`'s genuine mobile breakage was found
+in the first place, out of 118 screenshots nobody was going to open one at a time. **It decides what to
+look at. It cannot decide what is wrong.** Both defects it pointed at that survived full-resolution
+inspection — `counterpost` and `desk` — were confirmed before anything was edited, and the five that
+did not survive would have cost five unnecessary rewrites of working illustration.
+
+### Step 13, round three — six more wrong ideas in one check, and what found each
+
+The first full run of the corrected instrument reported 30 findings: 28 mobile, 2 desktop. Both desktop
+findings were checked at full resolution before any edit and **both were false** — the BUDGET paper's
+top corner sits below the desk title's baseline, clear of every letter, and `afterwords` prints a white
+caption on a dark panel with nothing crossing it. Chasing those two produced six corrections, and the
+sequence is the point: **not one of them was found by reading the code. Every one was found by the
+positive control failing.**
+
+| # | wrong idea | what exposed it |
+|---|---|---|
+| 1 | the glyph band is a fixed fraction of the line box | 70% reported the desk paper's corner as crossing the title. Tightening to 50% fixed that and **lost `sequelae`'s leader**, a real defect. A line box carries leading, which is a property of the leading and not of the type size, so no single fraction locates glyphs at both 6.4px and 13px. Modelling it from cap-height and descender ratios was better and still a model, and still did not restore the leader. SVG's `getBBox()` on a `<text>` simply returns where the ink is. |
+| 2 | a stroke is visible if it contrasts with the PAPER | `afterwords`'s caption sits on a dark card whose own border runs behind the text. A dark stroke on a dark fill cannot break a word. Same error as picking a background by area instead of paint order: measuring against a global constant instead of the local composite. Moved to the point of use. |
+| 3 | `closest('[role]')` finds a control | **The svg root carries `role="group"`.** So it is the nearest role-bearing ancestor of every text AND every stroke in the document, the equality held everywhere, and every stroke was skipped against every label. The check reported CLEAN without throwing. It survived one run because it did *not* hold in the single case involving a real control — the desk's clickable papers resolve to their own `role="button"` — so the exclusion permitted exactly the case it was written for and suppressed everything else. A textbook silent no-op, and the reason the gate notes say to hunt them. |
+| 4 | samples in the band mean the stroke crosses the word | A stroke running ALONG a line of type at descender depth is an underline; one crossing it is a broken word. Both put samples in the band, so no count distinguishes them, which is why the BUDGET paper kept reporting however the band was defined. The distinguishing quantity is vertical penetration — a graze spans almost none of the band's height, a crossing spans most of it. |
+| 5 | a stroke overlapping a control clips it | Paint order was never checked, so the desk surface's border reported as running through all three paper controls lying ON the desk and covering its edge. |
+| 6 | compositing handles buried strokes | It handles buried FILLS — an opaque layer's alpha zeroes what is beneath it — but a stroke is tested by sampling geometry, and geometry knows nothing about what was painted over it. `afterwords`'s video card sits behind an opaque caption panel and is narrower than the caption, so its two vertical edges passed through the label's band. |
+
+**A capability given up, on purpose.** Adding paint order to the control test means the ledger slider's
+defect is no longer detected: a control straddling the boundary of a panel it does not belong to, where
+both grounds are near-white so there is no contrast signal, is a COMPOSITIONAL problem and this file
+cannot see it. The earlier version appeared to catch it, by way of the card's border passing invisibly
+behind an opaque handle. **Better an instrument with a stated blind spot than one that seems to cover a
+case through a line nobody can see** — the first kind gets checked by eye, the second does not.
+
+Final positive control across the nine scenes verified by eye: every real defect reproduced on the
+pre-fix file (`sequelae`'s leader, both `r0` dots, `room`'s "BED 4", `middle`'s glyph, all four `trap`
+annotations, `trap`'s pill), and zero false positives in `desk`, `afterwords` or `cliff`.
+
+### Step 13, round four — the reporting pipe hid the worst findings
+
+Every sweep in this session was read through `node legible.js --all-views 2>&1 | tail -30` (later
+`tail -40`), because the runs are long and backgrounded and the interesting part is at the end. It is
+not at the end. The findings are printed sorted by severity, `occluded` first — so `tail` discarded
+exactly the entries that matter most, along with the `findings: N {...}` header that would have shown
+the total and made the loss obvious.
+
+The counts reported from those runs — "30 findings", "41 findings" — were **floors, not totals**. The
+first sweep after an unrelated fix surfaced three occlusions that had never appeared: `privacy`
+"Your infrastructure strips all identifying" under a 159x131 panel at **358 sq px** of its x-height
+band on DESKTOP, `subsidy` "Contextual pre-roll" under a bar at 93 sq px, and `segments` "YouTube" at
+12. None were caused by that fix; they had been in every run and cut off every time.
+
+Two things to carry:
+
+- **A summariser that sorts by severity and a reader that takes the tail are a bad pair.** Either print
+  a total the truncation cannot remove, or write the full output to a file and query it. The count line
+  existed and `tail` ate it, which is the whole failure in one sentence.
+- **This is the same shape as the silent no-op.** No error, no warning, a plausible number, and the
+  thing it was hiding was the thing worth knowing. The gate notes say to ask what the output would look
+  like if the instrument were broken; the same question has to be asked of the *reporting path*, not
+  just the check.
+
+Recorded because the instrument was right every time and the pipe was wrong every time, and the pipe is
+not something a self-verify pass or a positive control can catch — both of those exercise the check.
+### One defect class, five instances: positioned from an assumed text width
+
+Found separately, in five places, over one session:
+
+| where | the assumption |
+|---|---|
+| the Remotion cold open | strike-throughs at `s.length * 20.5` — characters times a guessed average advance. Overshot the full stop on two of three lines, because an estimate cannot know that `l` is narrow and `m` is wide |
+| `countyPost`'s verified badge | `S.x + 52 + 128`, where 128 was the account name's width **at desktop**. Correct until the name could be a different width, which it became the moment `clampPhoneText` started shrinking over-wide phone text |
+| `reelUI`'s Follow pill | placed after the handle from a measurement taken *before* the clamp shrank the handle, so the pill kept the old gap and pushed off the screen edge |
+| `reach`'s verified badge | `x + 94 + p.n.length * 5.3` — character count times a guessed per-character width |
+| `mandate`'s circling oval | `rx=112, ry=26` chosen by eye against a text block about 169 wide. An ellipse's ends taper, so it needs `(halfW/rx)² + (halfH/ry)² ≤ 1`, and this did not satisfy it |
+
+**The remedy is the same every time and it is not "pick a better constant".** Measure the thing
+(`getComputedTextLength`, `measureText`, `getBBox`), and if anything downstream depends on that width,
+re-derive it whenever the width can change — which on this page means after `applyTypeScale` and after
+any clamp, not at draw time.
+
+Two structural helpers came out of it rather than five patches:
+
+- **`data-pin`** — a label whose size is set by the FIXED graphic it sits inside is exempt from the type
+  scale. Three instances: the console avatar's initials (spilling off a 10px circle at mobile), the
+  reel's Follow pill, `gate`'s bar label. In a facsimile the graphic is the authority and the type
+  answers to it; the alternative, scaling the graphic with TK, grows a fixed piece of a recreated
+  interface and is the wrong direction.
+- **`data-reserve`** — a label declares how much room to its right is already spoken for, so a clamp
+  shrinks it enough for its neighbour too instead of shrinking only until *it* fits and pushing the
+  neighbour off the edge.
+
+Worth stating plainly: **three of these five were introduced or exposed by a fix made earlier the same
+day.** A measured fix that leaves an unmeasured dependency downstream has moved the bug, not removed it.
+### Step 13, round five — the check passed a blank page
+
+The worst failure of the session, and the one every other lesson here was supposed to prevent.
+
+An edit to `descent` moved a label so it would paint after the data points instead of before. The line it
+moved was the `if` branch of an `if (nar) ... else { ... }`, so removing it left the `else` orphaned.
+That is a syntax error: **the page's entire inline script stopped parsing.** `#viz` got no viewBox and
+no children. Nothing was drawn at all.
+
+`legible.js` then walked all 59 scenes — the `.step[data-key]` elements are static HTML, so the walk
+succeeded — found zero painted labels, had nothing to report, and printed:
+
+```
+scenes: 59
+CLEAN - every label is readable against what is behind it
+```
+
+with exit code 0. It was reported as "CLEAN across all 59 scenes at both widths, 87 findings → 0".
+
+`audit.js` and `interact.js` crashed outright on the same page about a minute later, which is the only
+reason it was caught. **The sweep that was supposed to be the verification was the one instrument that
+did not notice.**
+
+**And the positive control did not save it.** That control points at a copy of the artifact taken from
+`git show HEAD:` before the fixes; it duly found its 20 findings and exited 1. The file was fine, the
+instrument was fine, and the file under test was rubble. *A control that exercises the CHECK cannot tell
+you the SUBJECT arrived.* Two different questions:
+
+| question | answered by |
+|---|---|
+| does this check still detect defects? | positive control against a known-bad copy |
+| did the thing under test actually render? | **nothing, until now** |
+
+`legible.js` now collects page errors, counts painted labels, and refuses to grade a page that did not
+render — printing `NOT MEASURED - the page did not render, so nothing here is a verdict` and exiting 2.
+Verified by deliberately re-breaking a throwaway copy the same way: exit 2 on the broken page, exit 0 on
+the good one. **An instrument's most dangerous output is a pass it was not entitled to give.**
+
+Two things generalise beyond this file:
+
+- **Every check needs a liveness assertion, not just a correctness one.** "Zero defects found" and
+  "nothing was there to look at" are the same output unless the check is made to distinguish them. The
+  cheapest form is a plausibility floor on what it measured — labels seen per scene, nodes walked,
+  bytes read — printed on every run so a collapse is visible even when the verdict is not.
+- **A syntax error in a bundled artifact is silent to anything that does not execute it.** `node --check`
+  on the extracted inline script would have caught this in under a second, and nothing in the suite did
+  that. It is now the first thing to run after any edit to the page, before any browser starts.

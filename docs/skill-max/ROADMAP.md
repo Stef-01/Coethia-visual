@@ -61,9 +61,11 @@ is a real outcome and must not be relabelled; `BLOCKED` when it cannot proceed a
 | 6 | Finish the fitter's review | DONE |
 | 7 | The four scenes that do not converge | DONE — all four at residual ≈0 |
 | 8 | Stage 11 — accessibility | PARTIAL — colour, reduced motion and keyboard all CLEAN; screen-reader tree and zoom outstanding |
-| 9 | Stage 12 — adversarial taste QA | PARTIAL — 4 of 59 examined for general taste, 2 defects fixed, 41% mean frame emptiness quantified; all 59 scanned for the F6 rounded-rect rule (`boxes.js`), `measure` is the clear violation — see ledger |
+| 9 | Stage 12 — adversarial taste QA | SUPERSEDED by Step 13, which examined all 59 at desktop. Was: 4 of 59 examined, 2 defects fixed, 41% mean frame emptiness quantified |
 | 10 | Stages 1–4, only if 9 justifies them | DONE — for the two findings `boxes.js` justified (`measure`, `translate`); `boxes.js` now reports CLEAN; see ledger |
 | 11 | Close out | DONE — see RESULT.md |
+| 12 | Remotion accessory video | DONE — `ColdOpen`, 750 frames, 1920x1080 h264, 25.045s; verified by decoding frames back out of the mp4 |
+| 13 | `legible.js` — text against graphics, and the 55 screenshots Step 9 left | DONE for desktop; **PARTIAL for mobile.** All 59 examined by eye at desktop; 12 defects fixed across 11 scenes. Desktop legible.js down to 1 finding, mobile still has ~27 — see ledger |
 
 ---
 

@@ -1,7 +1,7 @@
 /* Scene audit for faster-than-the-rumour.html
    Walks every scene at two widths and reports: console errors, empty stages,
    content that overflows its own camera frame, and NaN geometry.
-   Run: node audit.js [--shots] [--only=key1,key2]                             */
+   Run: node audit.js [--shots] [--only=key1,key2]   (--shots writes both widths)                           */
 const { chromium } = require('playwright');
 const path = require('path');
 const fs = require('fs');
@@ -179,10 +179,19 @@ const VIEWS = [
       if (r.maxY > r.box.y + r.box.h + PAD) over.push('B' + Math.round(r.maxY - r.box.y - r.box.h));
       if (over.length) findings.push({ view: view.name, key, kind: 'frame-overflow', detail: over.join(' ') });
 
-      if (SHOTS && view.name === 'desktop') {
-        await page.locator('.graphic').screenshot({
-          path: path.join(SHOT_DIR, String(scenes.indexOf(key)).padStart(2, '0') + '-' + key + '.png')
-        });
+      /* BOTH views, not just desktop.
+         This said `view.name === 'desktop'` and that one condition is why the
+         mobile view had been examined far less than the desktop one: there was
+         never a mobile screenshot to look at. It showed up the moment a
+         text-against-graphics check was pointed at both widths -- 27 of its 30
+         findings were mobile and 3 were desktop, on an artifact whose desktop
+         composition has been through a dozen passes.
+         Desktop keeps its existing NN-key.png filename so nothing referring to
+         these paths breaks; mobile lands beside it as NN-key.mobile.png. */
+      if (SHOTS) {
+        const stem = String(scenes.indexOf(key)).padStart(2, '0') + '-' + key
+                   + (view.name === 'desktop' ? '' : '.' + view.name) + '.png';
+        await page.locator('.graphic').screenshot({ path: path.join(SHOT_DIR, stem) });
       }
     }
     await page.close();
