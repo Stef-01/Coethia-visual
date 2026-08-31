@@ -1467,3 +1467,65 @@ One run with request interception settles it. If it does, every cross-run compar
 carries a caveat and the fix is to vendor the two faces next to `d3.v7.min.js` -- which is
 also the only way this piece renders identically offline, and there is a font-licensing
 question attached to redistributing them that is the owner's to answer, not mine.
+
+## `comments`, on the sixth diagnosis: it was paint order, and it was never the mark
+
+Five wrong answers, all of them about the MARK, all of them derived by reading the source:
+
+| # | hypothesis | how it died |
+|---|---|---|
+| 1 | the mark is beside the text, not in it | the probe: it overlaps the ink box by 179 sq px |
+| 2 | `ovCore >= 5` is too permissive, require the centre in the band | control 20 → 19: it deleted `middle`'s person glyph, a true positive |
+| 3 | `covering` filters on the line box, not the ink box | did not clear it; added a false `cliff` finding |
+| 4 | the mark is invisible against the sheet (`PAPER` vs `bgAll`) | TRUE and worth fixing -- #241c18 on #1b1512 is 1.08:1 -- but did not clear it, because a second, visible mark was also in range |
+| 5 | the ink box overhangs the drawn glyphs, so a gap counts as "inside" | `getExtentOfChar` on all 44 characters: the box ends **-0.0px** past the final glyph |
+
+**Sixth, and measured rather than reasoned.** The two circles overlapping that label are at
+paint indices 1621 and 1622. The sheet covering the whole label is idx **1626**. They are
+behind it. Cropped at 8x at the reported coordinates, "nt along with it" is perfectly clean,
+because there is nothing there to see -- `docs/skill-max/evidence/crop-comments-8x-clean.png`.
+
+`legible.js` already computes the thing that decides this, and its own comment is where the
+error lives:
+
+```
+/* The paint index of the topmost effectively-opaque layer under this label.
+   Compositing handles buried FILLS on its own -- an opaque layer's alpha zeroes
+   whatever is beneath it -- but a stroke is tested by sampling its geometry... */
+const opaqueIdx = covering.reduce((m, sh) => sh.cover >= 0.9 ? Math.max(m, sh.idx) : m, -1);
+```
+
+"Compositing handles buried fills on its own" is true of building `bgAll` and false of the
+`speckled` test, which walks `unders` directly and never consults `opaqueIdx`. One condition,
+`sh.idx > opaqueIdx`, and it is gone.
+
+### The pattern, now with two instances, which is what makes it a pattern
+
+Both `legible.js` bugs found today are the same shape: **a rule written for STROKES and
+skipped for FILLS**, with the correct reasoning documented in the stroke path both times.
+
+  contrast against the local composite   `ratio(st.fill, bgAll)` for strokes;
+                                         `ratio(sh.fill, PAPER)` for fills
+  burial under an opaque layer           `opaqueIdx` consulted for strokes;
+                                         ignored for fills
+
+Strokes were added to this file second, after a documented blind spot was found to BE the
+defect. So the stroke path got the careful treatment and the fill path kept the assumptions
+it was written with. **A file's newest code can be its most correct code, and the danger is
+then the old code that looks settled.**
+
+### RESULT
+
+```
+control  20/20 findings, identical breakdown, middle's person glyph present
+subject  1 finding  {occluded: 1}  -- cliff only, the documented expected one
+         2046 painted labels across 118 scene-views
+```
+
+87 -> 1, and the one remaining is deliberate.
+
+**Uncovered.** `cliff` stays as expected output rather than being waived, because waiving it
+means extending the control-chrome exclusion to `occluded`, which would also hide any real
+occlusion inside any control. And the general lesson is unpaid: the 8x crop that settled this
+took forty seconds and would have killed four of the five wrong hypotheses immediately. The
+cheapest instrument was the last one reached, six times running.

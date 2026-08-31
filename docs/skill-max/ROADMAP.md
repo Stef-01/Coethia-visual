@@ -36,13 +36,13 @@ because the ledger then claims ground that was not taken.
 HEAD 407a292
 syntax   OK - 4 inline blocks, 393,310 chars, all parse
 audit    59 scenes, 12 findings {tiny-text: 12}, ZERO text-collisions
-legible  87 -> 2, and BOTH of the two that were called false positives were real.
-         placement was a page defect (badge height hardcoded behind a scaling
-         label) and is fixed; comments was a check defect (mark compared to PAPER
-         instead of the local composite) and that is fixed too, though it did not
-         clear the finding. Remaining 2: cliff (deterministic, expected -- the
-         slider thumb over the tick it reports, left as intended) and comments
-         (open, four wrong diagnoses, see ledger). 2046 labels / 118 scene-views
+legible  87 -> 1, and the one left is deliberate: cliff's slider thumb over the
+         tick it reports. Both findings previously called false positives were
+         REAL -- placement a page defect (badge height hardcoded behind a scaling
+         label), comments TWO check defects (a mark compared to PAPER instead of
+         the local composite, and buried marks not tested against opaqueIdx).
+         Control holds at 20/20 with every true positive intact.
+         2046 painted labels / 118 scene-views
 boxes    CLEAN - no identically sized box is carrying an idea
 motion   CLEAN - every scene reaches the same settled state under reduced motion,
          0 page errors in both no-preference and reduce

@@ -467,7 +467,23 @@ const PROBE = function () {
          a render that was, correctly, showing nothing.
          Same shape as the ink-box/line-box split: a lesson learned once and applied
          to one of the two places it belongs. */
-      if (!haloCovers && !sameCtl
+      /* AND IT HAS TO BE ON SCREEN. `opaqueIdx` is the topmost fully-opaque layer
+         under this label, and the comment where it is computed says "compositing
+         handles buried FILLS on its own" -- which is true of building `bgAll`, where an
+         opaque layer's alpha does zero whatever is beneath it, and false HERE, because
+         this loop walks `unders` directly and never consults it. A mark painted below
+         that layer is not debris in the word; it is not on screen.
+         `comments` is the case, and it took five wrong answers to reach: the two
+         circles overlapping that label sit at paint indices 1621 and 1622, and the
+         sheet that covers the whole label is idx 1626. Cropped at 8x, the line
+         "nt along with it" is perfectly clean -- because both marks are behind the
+         sheet. Every hypothesis before this one was about the mark (too small, off to
+         one side, centre outside the band, invisible against the sheet, or the ink box
+         overhanging the glyphs -- that last one measured at -0.0px, so the box ends
+         exactly at the final glyph). The mark was never the problem. Paint order was.
+         Second instance of one asymmetry, now named: opaqueIdx and the local-composite
+         contrast test were both written for strokes and both skipped for fills. */
+      if (!haloCovers && !sameCtl && sh.idx > opaqueIdx
           && shArea < tArea * 0.30 && ovCore >= 5
           && sh.r.width >= 2 && sh.r.height >= 2
           && sh.cover >= 0.25
