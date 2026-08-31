@@ -1607,3 +1607,80 @@ entirely on their gaps. So the ten are **undetermined, not failing** -- and wide
 blindly risks making adjacent hit areas overlap, which is a worse defect than a small
 target and is exactly the trade `cliff` already punished. The count went down; the
 remainder is not closed, and the check saying so is it being honest.
+
+## SC 2.5.8 to zero, and four wrong fixes for one stale input
+
+13 -> 10 -> 1 -> **0**. Every focusable object across 59 scenes clears 24x24 CSS px at
+both widths. The fix is four lines; getting to it took four wrong attempts, and each one
+addressed a real cause that was not sufficient.
+
+| # | fix | why it failed |
+|---|---|---|
+| 1 | solve in `padHit` at draw time | the stage scale changes afterwards |
+| 2 | re-solve in `applyTypeScale` | gated on `TK !== prevTK`, so skipped for most scenes |
+| 3 | pass the target frame, as `computeTK` does | right frame, but the default fallback still read the live viewBox |
+| 4 | `ResizeObserver` on the svg | **watched the wrong object** -- `svgW 339 x svgH 467` never changes |
+
+Only instrumenting `sizeHit` to log its own inputs produced the answer:
+
+```
+frameArg  null
+vbNow     "77.12 -290.43 845.86 1165.06"   <- interpolated, mid-camera
+settled   "18 -192 963 1327"                <- 1.139x wider
+sc        0.4008  where the answer is 0.3519
+```
+
+The scene change TRANSITIONS the viewBox over `CAMERA` ms, so the live attribute during
+that window belongs to no scene. `sizeAllHits` now resolves the scene's target frame
+itself, so no caller can solve against an interpolation. The `ResizeObserver` was removed
+rather than left as harmless: an element resize observer cannot observe an attribute
+change, and its comment asserted a mechanism that does not exist.
+
+### The last one was a second mechanism for a job that already had one
+
+`arithmetic` held at 23x23 after the other twelve cleared. It is the slider thumb, and
+earlier in this same pass I gave it a hand-rolled transparent circle:
+
+```js
+thumb.insert('circle', ':first-child')
+  .attr('r', Math.max(14, 12 / (renderScale() || 1)))
+```
+
+`renderScale()` sampled once at draw time -- the exact staleness `padHit` was being fixed
+for -- and, not being a `rect[data-hit]`, invisible to `sizeAllHits`, so it could never be
+re-solved. It sat at 23 while the seven lens cells beside it went to 24. Now routed
+through `padHit`.
+
+**Third instance today of a rule fixed on one path and left on its sibling**, after
+`legible.js`'s two (contrast-vs-composite and `opaqueIdx`, both correct for strokes and
+wrong for fills). The generalisation is not "be more careful": it is that a second
+implementation of one job is where the fix fails to arrive, and the tell is a hand-rolled
+version of something the file already has a helper for.
+
+### Two false rationales written and reverted, in one sitting
+
+`need = 24.5 / sc`, with a comment explaining a rounding loss that measurement disproved.
+And the `ResizeObserver`, with a comment explaining a resize that never happens. Both were
+reverted. **A change whose comment asserts a disproved mechanism is worse than no change**,
+because the next reader inherits the fiction instead of the question -- and this file's
+comments are load-bearing, which is exactly why a wrong one is expensive.
+
+### GATE
+
+```
+a11y      CLEAN. No SC 2.5.8 findings at all -- the whole block is absent because the
+          count is zero. Reflow at 320px: 0px horizontal overflow. Tree named and roled.
+audit     59 scenes, 12 findings, all tiny-text, ZERO text-collisions, per-scene counts
+          byte-identical to the pre-change run
+interact  12/12, 0 console errors
+```
+
+`interact` mattered more than usual: `padHit` now inserts materially larger transparent
+rects at mobile, and a hit area that swallowed a neighbouring control would break
+interaction while every geometric check stayed green.
+
+**Uncovered.** The count is zero; conformance is still not asserted. 2.5.8's spacing
+exception remains unimplemented, so `a11y.js` can say a target is under 24x24 and cannot
+say whether it fails. Widening the lens toggles to 24 sidesteps that question rather than
+answering it, and if a future control legitimately needs to be smaller, the check will
+report it as a finding with no way to clear it honestly.
