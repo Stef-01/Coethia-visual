@@ -1684,3 +1684,135 @@ exception remains unimplemented, so `a11y.js` can say a target is under 24x24 an
 say whether it fails. Widening the lens toggles to 24 sidesteps that question rather than
 answering it, and if a future control legitimately needs to be smaller, the check will
 report it as a finding with no way to clear it honestly.
+
+---
+
+# RUN 2 — composition and taste, on a green suite
+
+## Stage −1 — preflight
+
+```
+stef-skill-max fleet: 54/54 required skills present
+optional absent: dataviz (documented fallback)
+repo dep absent: avoid-overlap (stage 5, out of scope this run)
+```
+
+No stage degraded by a missing specialist. Owner scoped the run to stages **2, 3, 4, 12, 13**; the
+nine already-passed stages are recorded with their metric rather than re-performed. **Stage 9 is
+dropped permanently** — standing rule 7 forbids a build step and the piece must open from `file://`,
+so GSAP cannot be adopted; stages 8 and 10 apply as principles only.
+
+## Phase A — and three corrections before a single number could be trusted
+
+The owner was offered a choice built on an inherited claim, and the claim was wrong.
+
+**1. I offered a fix for a defect that does not exist.** "`fit()` forces stage aspect 1.054" came from
+`ROADMAP.md`, not from reading `measure.js`. `fitBox` expands the short side to match the stage and its
+own comment says *"margins, not letterbox"*. Fitting content of one aspect into a viewport of another
+necessarily leaves margin; the alternatives are distorting and cropping. `12-qa.md` had already
+concluded exactly this — *"So this is a composition decision, not a fitter defect"* — and had already
+named the two honest answers. The option I put in front of the owner was not one of them.
+
+**2. Two hand-rolled probes, both returning impossible numbers.** First: mean emptiness **−69.5%**,
+i.e. content larger than its frame in all 59 scenes. Cause — scenes here are hidden by `opacity` on
+their GROUP, and `getComputedStyle` on a child does not inherit that, so every hidden scene counted.
+Second, after walking the opacity chain: still **14 scenes with negative emptiness**, because the probe
+measured all descendants where `measure.js` filters top-level scene groups and excludes the provenance
+stamp.
+
+**3. The repo had already written down the rule I was breaking.** `12-qa.md`'s method note:
+
+> The first coverage measurement reported 80% mean and **145% for three scenes** — impossible... The
+> fix was to copy `measure.js`'s `MEASURE` **verbatim. Reuse the instrument; do not re-derive it.**
+> This was the fifth time in this pass that a finding turned out to be my own measurement.
+
+I read past that note and then made its exact mistake twice. **The failure was not the probe. It was
+not searching the repo before measuring.** An impossible number is the instrument confessing, and both
+probes confessed immediately; what cost the time was writing the second one instead of reading the doc.
+
+### The measurement that held
+
+`MEASURE` copied verbatim, with a coverage-over-100% assertion the earlier attempts would have failed:
+
+```
+59 scenes | sanity check passes (0 scenes over 100%)
+stage aspect 1.054 | mean coverage 71.9%
+content aspect: min 0.56 (cliff) | median 1.49 | max 2.58 (tiers)
+46 of 59 wider than the stage, 13 taller
+```
+
+**71.9% is not comparable to `12-qa.md`'s 59%** — this omits `PAD`, that included it. No improvement is
+claimed. Different measurement, not a better number.
+
+Coverage reduces exactly to `min(c,A)/max(c,A)`, so the optimal stage aspect is computable rather than
+a matter of taste: **1.520, giving 79.9%.** Rejected, and rejected with the numbers rather than on
+instinct — it buys 7.9 mean points by making 20 scenes worse: `laws` 90→62, `notone` 81→56, `k280`
+78→54, `loop`/`coethia`/`stations`/`close` 73→51, `cliff` 53→37. The losers are phone and console
+facsimiles, tall because a phone is tall. **A mean that improves while its worst cases collapse is the
+wrong objective.** The owner chose per-scene recomposition instead.
+
+## Stage 2 — Aesthetic direction
+
+**Deliverable:** `docs/skill-max/02-direction.md`, 269 lines. Direction carried by `impeccable`;
+`ui-ux-pro-max`, `design-system` and `high-end-visual-design` held as reference only, per `stages.md`'s
+requirement that exactly one skill carry the direction.
+
+**Gate: PASSED, and asserted rather than assumed.** `git diff --quiet HEAD --
+faster-than-the-rumour.html` returns clean — the artifact is byte-identical, so contrast ratios and the
+tiny-text count cannot have moved. `package.json` untouched (`npm install --no-save`). `syntax.js` OK.
+
+### The finding: the palette doc is not the authority it looks like
+
+| | count |
+|---|---|
+| hexes declared in `docs/coethia-brand-palette.md` | 37 |
+| distinct hexes in the code | **120** |
+| declared but unused | 16 |
+| used but **undeclared** | **99** (501 occurrences) |
+| undeclared and used **exactly once** | **52** |
+
+All 16 declared-but-unused values are the **espresso-era dark edition** — the doc still documents a
+theme the piece no longer has.
+
+Three specifics worth more than the totals:
+
+- **`#8A8474` is used 92 times and is in no document.** It is `DIM`, the structural line weight inside
+  every illustration. The most load-bearing colour in the piece is undocumented.
+- **`#B8492E` appears 12× as a raw literal** while `ALARM` exists as a named constant; `#3A5D74` 26×
+  and `#DCD5C6` 16× likewise. **Token bypass** — which is also why freezing `ALARM` is the cheaper
+  call: a one-hex palette change is not a one-hex edit.
+- **`#2E6B2B`, 41 uses, undeclared and unnamed.** A green with no role in any document.
+
+**52 values used exactly once is the real finding.** That is not a palette, it is ad-hoc picking, and
+it is the argument for forbidding new colours before Stage 3 starts adding geometry.
+
+### And a 360-line surface no instrument has ever measured
+
+All eight verification scripts measure `#viz`. The page-chrome CSS — masthead, `.kicker`, `h1`,
+`.deck`, `.step p`, `.btn`, `.methods`, `.outro`, `.cta`, and 60 lines of `@media print` — is measured
+by none of them. `a11y.js` covers reflow and the tree, not the chrome's contrast or typography.
+
+Found only because `impeccable`'s detector was pointed at the file. It returned three findings and
+**all three are false positives**, each verified individually:
+
+- `low-contrast :hover 1.5:1, #000000 on #212e36` — composes a `@media print` `color:#000` with a
+  screen `.btn:hover{background:var(--ink)}`. On screen the colour is `#FFFFFF` (≈13:1); in print the
+  background is `none`. The combination cannot occur.
+- `all-caps-body on 57 chars` — `.kicker`, 13px mono at `.12em`. The detector's own description
+  permits uppercase for short labels.
+- `tight-leading 1.16x` — `.deck` at `clamp(20px,2.4vw,30px)`, display type. Real body is `.step p`
+  at **1.76** and `body` at **1.85**.
+
+The detector had to be un-degraded first: it ran with `htmlparser2`, `css-select`, `css-tree` and
+`domutils` absent, printed `[]`, and **said so** — *"findings are an undercount, not a clean bill of
+health."* Installed into the skill's own `node_modules`, since Node resolves from the script's
+directory rather than `cwd`. `[]` became three real evaluations. **An empty result from a degraded
+instrument is not a pass, and this one was honest enough to announce it** — which is more than the
+blank-page `legible.js` run managed earlier in this project.
+
+**Uncovered.** The 52 single-use hexes were counted as a class, not traced to a scene each. `#2E6B2B`
+(41 uses) and `#E74D4E` (18 uses) have no role assigned in the direction because I could not determine
+one without reading every call site — they are real tokens with no name. Per-scene typographic
+conformance is Stage 12's, not asserted here. The three sibling explainers share this design system and
+have never been measured by any instrument in this repo. The 60-line print stylesheet has never been
+rendered.

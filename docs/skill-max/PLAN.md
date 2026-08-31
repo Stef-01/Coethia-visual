@@ -178,3 +178,151 @@ because moving one would mean it changed the artifact. Dependency graph verified
 timings match their composition by arithmetic (frames ÷ fps = duration). **Renders deterministic:**
 render twice, compare hashes — a render that differs run to run makes every claim about it
 unattributable, which is the fitter's failure in another medium.
+
+---
+
+# RUN 2 — 2026-08-31. Composition and taste, on a green suite.
+
+Prior runs closed stages 0, 1, 5, 6, 7, 8, 10, 11, 13. This run is scoped by the owner to
+**stages 2, 3, 4, 12, 13**; the nine already-passed stages are recorded with their current
+metric rather than re-performed. Stage 9 is dropped permanently: standing rule 7 forbids a
+build step and the piece must open from `file://`, so GSAP cannot be adopted, and stages 8
+and 10 therefore apply as principles only.
+
+## Stage −1 — preflight
+
+```
+stef-skill-max fleet: 54/54 required skills present
+optional absent: dataviz (fallback: frontend-design + visual-storytelling-design)
+repo dep absent: avoid-overlap (stage 5 — out of scope this run)
+```
+
+No stage is degraded by a missing specialist.
+
+## House rules carried in verbatim — these outrank every stage
+
+From `CLAUDE.md` and `ROADMAP.md`:
+
+1. Exclusive ownership: check `git log -1` and `git status` before touching the repo.
+2. Never two Playwright runs at once.
+3. `SETTLE` stays at 4500 in `audit.js` and `measure.js`.
+4. Gate every step; any regression on a hard count reverts the stage.
+5. No rounded rectangle as the primary carrier of an idea. One shared light design system.
+   Real cited figures except the recreated Ads console, which says so. The accessible
+   surface is not negotiable.
+6. Append to `LEDGER.md` after every stage, including the *Uncovered* field.
+7. **Remotion never enters the explainer's dependency graph.** No build step; `file://`.
+
+## Owner decisions taken at the end of Phase A
+
+| decision | answer |
+|---|---|
+| Palette / type tokens | **FIXED.** Stage 2 writes direction only, no token edits. `ALARM #B8492E` stays at 4.23:1 deuteranopia, recorded as an accepted exception. Type scale not reopened, so the 12 mobile tiny-text findings stay documented, not fixed. |
+| Frame emptiness | **Recompose the wide scenes.** Stage aspect and `fitBox` untouched. |
+| Depth | Stages 2, 3, 4, 12, 13. |
+
+### The emptiness measurement, corrected twice before it was trusted
+
+`12-qa.md` recorded 41% mean emptiness and I initially described the cause as a `fit()`
+defect. **It is not.** `fitBox` expands the short side to match the stage aspect and its own
+comment says *"margins, not letterbox"* — fitting content of one aspect into a viewport of
+another necessarily leaves margin. `12-qa.md` already said so, and already named the two
+honest answers. I offered the owner a fix for a defect that does not exist.
+
+Two hand-rolled probes were then written to re-derive the number and both returned
+**impossible results** — mean emptiness of −69.5%, then 14 scenes with negative emptiness.
+`12-qa.md`'s own method note prescribes the remedy and I had read past it:
+
+> The fix was to copy `measure.js`'s `MEASURE` **verbatim. Reuse the instrument; do not
+> re-derive it.** This was the fifth time in this pass that a finding turned out to be my
+> own measurement.
+
+Third measurement, with `MEASURE` copied verbatim and a coverage-over-100% assertion that
+the earlier attempts would have failed:
+
+```
+59 scenes, sanity check passes (0 scenes over 100% coverage)
+stage aspect 1.054 | mean coverage 71.9% | content aspect: min 0.56, median 1.49, max 2.58
+```
+
+**71.9% is NOT comparable to 12-qa.md's 59%** — this omits `PAD` and that included it. No
+improvement is claimed; it is a different measurement.
+
+Coverage reduces exactly to `min(c,A)/max(c,A)`, so the optimal stage aspect is computable:
+**1.520, giving 79.9% mean.** Rejected, with numbers: it buys 7.9 mean points by making 20
+scenes worse — `laws` 90%→62%, `notone` 81%→56%, `k280` 78%→54%, `loop` 73%→51%,
+`cliff` 53%→37%. The losers are phone and console facsimiles that are tall because a phone
+is tall. A mean that improves while its worst cases collapse is the wrong objective.
+
+## Stage 2 — Aesthetic direction
+
+**Skill:** `impeccable` carries the direction. `ui-ux-pro-max`, `design-system` and
+`high-end-visual-design` are reference only, per `stages.md`: exactly one skill carries the
+direction or the stage reproduces the fleet thrash the pipeline exists to prevent.
+
+**Scope.** One written direction for the whole artifact. **Decisions, not edits — and this
+run, not even token edits.** Reconcile with `docs/coethia-brand-palette.md` and flag every
+place the code and the doc already disagree.
+
+**Not in scope.** Any change to a colour, a type size, `TK`, `MIN_LABEL_PX`, `BASE_LABEL`
+or `CON_TK`. Any per-scene work.
+
+**Deliverable.** `docs/skill-max/02-direction.md` — direction, token table with real
+values, explicit forbidden list, and the code-vs-doc disagreements.
+
+**Gate.** No file other than the deliverable changes. Contrast ratios and tiny-text count
+therefore cannot move; assert that rather than assume it.
+
+## Stage 3 — Per-scene composition
+
+**Skill:** `canvas-design`.
+
+**Queue — measured, content aspect ≥ 1.80 against a 1.054 stage:**
+
+| scene | aspect | content | coverage |
+|---|---|---|---|
+| `tiers` | 2.58 | 850×329 | 41% |
+| `measure` | 2.49 | 786×316 | 42% |
+| `sequelae` | 2.22 | 753×340 | 48% |
+| `weeks` | 2.15 | 863×402 | 49% |
+| `room` | 2.12 | 780×368 | 50% |
+| `gate` | 1.97 | 818×415 | 53% |
+| `translate` | 1.96 | 840×428 | 54% |
+
+Mean coverage in the queue: **48%**, against 71.9% for the piece.
+
+**`room` is EXEMPT, on a standing prior decision.** The ledger's Stage 14 entry argues it
+directly: the scene is built from "What Was in the Room After She Left It", the page uses the
+empty room to explain that the virus persists in a room "a case walked through ninety minutes
+ago", and *"the emptiness is not a frame around the subject, it is the subject."* Filling that
+frame would contradict the scene's argument. Six scenes to work.
+
+**Not in scope.** The stage aspect. `fitBox`. Any scene outside the queue. Any colour.
+
+**Deliverable.** `docs/skill-max/03-composition.md` — per scene: fault, fix, coordinates.
+
+**Gate.** frame-overflow 0→0; text-collision 0→0; `legible.js` 1→1; `interact.js` 12/12;
+`a11y.js` CLEAN with SC 2.5.8 at zero. Re-shoot both widths and attribute every diff to a
+listed fix.
+
+## Stage 4 — Drawn things instead of boxes
+
+**Skill:** `algorithmic-art`. Input is stage 3's weak-scene queue, not a fresh survey.
+`boxes.js` currently reports CLEAN, so this stage starts from "no box is carrying an idea"
+and only acts on what stage 3 hands it.
+
+**Gate.** Determinism — two consecutive suite runs produce identical geometry. Node count
+per scene within budget. No new console errors.
+
+## Stage 12 — Adversarial taste QA
+
+**Skills:** `design-review`, `audit-ai-design-slop`, `frontend-design-review`.
+
+Fresh screenshots at both widths via `audit.js --shots`. Output is a **ranked queue, not a
+set of edits**. The 28.1% emptiness question goes to this stage as a subject: does it read
+as a fault to a reviewer who has not been told about it?
+
+## Stage 13 — Close-out
+
+Full suite, then `RESULT.md`: before/after table, what each stage bought, what was
+deliberately not done, and the honest verdict including anything that got worse.
