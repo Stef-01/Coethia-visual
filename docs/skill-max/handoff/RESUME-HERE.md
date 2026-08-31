@@ -16,15 +16,46 @@ node measure.js --verify --strict    # slowest by far; run it last
 `syntax.js` is new this session and exists because a syntax error in this file is invisible to every
 check that does not execute it. See LEDGER "the check passed a blank page".
 
-## Why the session stopped
+## Why the session stopped — and this was diagnosed WRONG twice
 
-**Process table exhaustion, self-inflicted.** Dozens of background Bash tasks and Monitor loops were
-launched over a long session and then killed; the kills left **2048 zombie processes**, which is the
-per-user cap. Chromium could no longer start, then the shell could no longer fork at all — `echo`
-failed. Nothing was corrupted; the machine simply had no PIDs left.
+The symptom is real and it recurred three times: Chromium cannot start, then the shell cannot fork at
+all, and `echo` fails. What was written here before was that it was **self-inflicted** — dozens of
+background Bash tasks and Monitor loops launched and killed, leaving 2048 zombies. That was wrong, and
+it is worth correcting rather than quietly overwriting, because the wrong cause implies the wrong
+remedy and "use fewer background tasks" was never going to fix this.
 
-**Avoid the same trap.** One long-running foreground gate beats twenty background watchers. If a
-monitor is needed, use one, and let it exit on its own rather than killing it.
+Measured, finally:
+
+```
+$ ps -u $(id -u) | wc -l                      # 2673
+$ grep -c "^Z" ps.txt                         # 2062 zombies
+$ awk '/^Z/{c[$2]++} END{for(p in c) print c[p], p}' ps.txt
+  1810 2087    /Applications/Pioneer/FwUpdateManager/.../FwUpdateManagerd
+   252 2074    /Applications/Pioneer/DDJ-FLX10/.../DDJ-FLX10 AutoLauncherd
+```
+
+**Both parents have been up 41 days.** Two Pioneer DJ-controller daemons fork a child — a device poll
+or a firmware check — and never `wait()` on it. A zombie holds its PID slot until its parent reaps it,
+so over 41 days these two have taken 2062 slots out of the table and never given one back.
+
+So the table was already ~2062 short before this project launched a single process. Chromium wants
+dozens of PIDs per instance and `audit.js` runs it across 59 scenes at two widths, which is what pushed
+it over — but the headroom had been eaten by something with nothing to do with this repo. That also
+explains the part that never fitted the old story: it "recovered when orphaned tasks were reaped", i.e.
+reclaiming my own **live** processes helped, while the zombie count never moved.
+
+**The remedy** is to reap them, which only their parent can do — so kill the parent and `launchd`
+adopts and reaps the orphans:
+
+```bash
+kill 2087 2074      # PIDs change; re-derive them with the awk line above
+```
+
+Both are launch agents and macOS restarts them; a fresh instance starts with zero zombies. Nothing is
+lost. It will come back, because the leak is in those daemons and not in anything fixable from here —
+so expect to do this again, and check the zombie count FIRST next time rather than assuming the cause.
+
+Being careful with background tasks is still right, and it is no longer the explanation.
 
 ## State of the artifact
 
@@ -125,7 +156,16 @@ than settled by whichever setting quiets the checks.
 - `ALARM` `#B8492E` is 4.23:1 under deuteranopia against a 4.5 target; `#AE4429` clears it. A one-hex
   change that shifts the palette's temperature — owner's call.
 - ~41% mean frame emptiness on desktop: `fit()` forces stage aspect 1.054 on wide-short compositions.
-- `visual-motion-pass` branch: one unmerged commit from 2026-08-11, conflicts on two files.
+- `visual-motion-pass`: **merged**, per-hunk rather than wholesale — see
+  `docs/skill-max/handoff/merge-visual-motion-pass.py` for which side won each of the nine hunks and
+  why. Landed: the masthead rebrand across all four pages, `overscroll-behavior-x`, and the personas
+  blank-opening fix. Not landed: the branch's case-study restructure, because main had already fixed
+  two of its three complaints by measuring rather than by the branch's guessed constant.
+- **Still open from that branch, and it is a measurement not an opinion:** the branch's note that
+  `case`'s 940×700 frame letterboxes ~130px top and bottom, because a 940×700 viewBox in a pane taller
+  than it is wide is width-bound. `measure.js` is the instrument for that, and it has not been pointed
+  at the belief piece's case frames. If it confirms the letterboxing, the fix is a taller frame AND the
+  layout to fill it — they are one decision, which is why half of it was not landed.
 - Step 4 new scenes: blocked on editorial direction.
 - The six mobile `tiny-text` audit findings: the documented `CON_TK` exemption. Reverting it cost 11
   collisions when measured, and that is recorded.

@@ -34,7 +34,7 @@ window.d3 || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
+html{overscroll-behavior-x:none;scroll-behavior:smooth}
 body{
   margin:0; background:var(--bg); color:var(--ink-body);
   font-family:var(--sans); font-weight:300; font-size:17px; line-height:1.85;
@@ -316,7 +316,7 @@ h1{
 <div class="grain" aria-hidden="true"></div>
 
 <header class="masthead">
-  <a class="wordmark" href="index.html" aria-label="The Reachable — home">
+  <a class="wordmark" href="index.html" aria-label="The Belief Layer — home">
     <svg width="30" height="30" viewBox="-50 -50 100 100" aria-hidden="true">
       <circle cx="-16" cy="-12" r="15" fill="#C3DCEB"/>
       <circle cx="18" cy="-18" r="11" fill="#FFD733"/>
@@ -324,7 +324,7 @@ h1{
       <circle cx="-10" cy="24" r="10" fill="#E74D4E"/>
       <circle cx="4" cy="-2" r="7" fill="#7FCCC8"/>
     </svg>
-    <span>The Reachable</span>
+    <span>The Belief Layer</span>
   </a>
   <nav class="mastnav" aria-label="Explainers">
     <a href="political-health-personas.html"><span class="aro l">&lsaquo;</span> <span class="nl">The Personas</span></a>

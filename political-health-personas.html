@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>How Does Politics Shape American Health? — The Reachable</title>
+<title>How Does Politics Shape American Health? — The Belief Layer</title>
 <meta name="description" content="Party affiliation predicts American health behavior but never explains it. Five political health personas — segmented by belief and barrier, not ballot — show who can be reached and how.">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F8F6F1">
@@ -34,7 +34,14 @@ window.d3 || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
+html{
+  scroll-behavior:smooth;
+  /* A page with no horizontal scroll of its own hands a sideways trackpad
+     flick straight to the browser, which reads it as back/forward — so a
+     reader who flicks diagonally at the end of the piece gets thrown into
+     the other explainer without touching a link. Refuse the gesture. */
+  overscroll-behavior-x:none;
+}
 body{
   margin:0; background:var(--bg); color:var(--ink-body);
   font-family:var(--sans); font-weight:300; font-size:17px; line-height:1.85;
@@ -318,7 +325,9 @@ h1{
   display:inline-block;width:10px;height:10px;border-radius:50%;
   background:var(--c);margin-right:9px;vertical-align:baseline;
 }
-.tablescroll{overflow-x:auto}
+/* and once the table itself is scrolled to its end, do not chain the
+   leftover sideways momentum up to the document either */
+.tablescroll{overflow-x:auto;overscroll-behavior-x:contain}
 .tablescroll:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
 .datatable .scrollhint{display:none}
 @media (max-width:700px){
@@ -437,7 +446,7 @@ h1{
 <div class="grain" aria-hidden="true"></div>
 
 <header class="masthead">
-  <a class="wordmark" href="index.html" aria-label="The Reachable — home">
+  <a class="wordmark" href="index.html" aria-label="The Belief Layer — home">
     <svg width="30" height="30" viewBox="-50 -50 100 100" aria-hidden="true">
       <circle cx="-16" cy="-12" r="15" fill="#C3DCEB"/>
       <circle cx="18" cy="-18" r="11" fill="#FFD733"/>
@@ -445,7 +454,7 @@ h1{
       <circle cx="-10" cy="24" r="10" fill="#E74D4E"/>
       <circle cx="4" cy="-2" r="7" fill="#7FCCC8"/>
     </svg>
-    <span>The Reachable</span>
+    <span>The Belief Layer</span>
   </a>
   <nav class="mastnav" aria-label="Explainers">
     <a href="index.html"><span class="aro l">&lsaquo;</span> <span class="nl">Home</span></a>
@@ -1674,7 +1683,7 @@ const outLabel = gOut.append('text').attr('x',areaX(3)).attr('text-anchor','midd
 
 const stageFig = gStage.selectAll('g.fig').data(OPENERS).join('g')
   .attr('class','fig').attr('opacity',0)
-  .attr('transform',(o,i)=>`translate(${i===0?A_SOLO_X:B_X},${FIG_Y}) scale(${FIG_SCALE})`);
+  .attr('transform',(o,i)=>`translate(${i===0?A_X:B_X},${FIG_Y}) scale(${FIG_SCALE})`);
 stageFig.each(function(o){ drawArt(d3.select(this), o.art, 1); });
 
 const stageChip = gStage.selectAll('g.partychip').data(OPENERS).join('g')
@@ -1761,8 +1770,8 @@ function stageLayout(twoUp, converged, dur){
     .attr('x', c => noteX(c.fi, twoUp));
 }
 
-// set the un-transitioned starting state
-stageLayout(false, false, 0);
+// set the un-transitioned starting state — paired, matching the segue
+stageLayout(true, false, 0);
 
 /* =====================================================================
    11. BARS
@@ -2278,14 +2287,23 @@ let treesDrawn = false;
    what the later beats added rather than rebuilding the stage. */
 function renderStage(key, prev){
   const step = STAGE_KEYS.indexOf(key);
-  const twoUp     = step >= 2;
+  /* The pair holds its position for the whole segue. It used to open on an
+     empty stage and slide him from centre to left when she arrived, which cost
+     two things: the reader's very first scroll into the piece met a blank
+     850x900 pane under the words "Before Any of the Data, Two People" — it read
+     as a graphic that had failed to load — and he then travelled right, then
+     left, for no reason the copy asks for. Both people are on stage from the
+     first beat; what moves is the light, not the furniture. */
+  const twoUp     = true;
   const converged = step >= 3;
   const fresh     = !STAGE_KEYS.includes(prev);   // arriving from outside
 
   show(gStage, 1);
 
+  // before a person is introduced they are present but unlit — the scene is
+  // "two people" from the first frame, and each beat brings one of them forward
   stageFig.transition('vis').duration(FADE)
-    .attr('opacity', (o,i) => step >= 1 + i ? 1 : 0);
+    .attr('opacity', (o,i) => step >= 1 + i ? 1 : .32);
   stageChip.transition('vis').duration(FADE)
     .attr('opacity', (o,i) => step >= 1 + i ? 1 : 0);
   // party colour drains away at the convergence — the reader watches party

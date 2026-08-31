@@ -173,20 +173,29 @@ def main():
         return 1
 
     # overscroll-behavior-x, inserted rather than substituted, so it is handled
-    # separately and idempotently.
+    # separately and idempotently. Two placements, because the two pages differ:
+    # belief already has an `html{` rule to extend; index has none, so the rule is
+    # created ahead of `*{box-sizing:border-box}`, which is where its reset starts.
     for name in ('index.html', 'belief-based-communication.html'):
         if 'overscroll-behavior-x' in src[name]:
             print(f'  overscroll already present in {name}, leaving it')
             continue
-        needle = 'html{'
-        i = src[name].find(needle)
-        if i < 0:
-            problems.append(f'  {name}: no `html{{` rule to add overscroll-behavior-x to')
+        i = src[name].find('html{')
+        if i >= 0:
+            src[name] = (src[name][:i + 5]
+                         + 'overscroll-behavior-x:none;'
+                         + src[name][i + 5:])
+            print(f'  applied: {name} overscroll-behavior-x:none (extended html{{)')
             continue
-        src[name] = (src[name][:i + len(needle)]
-                     + 'overscroll-behavior-x:none;'
-                     + src[name][i + len(needle):])
-        print(f'  applied: {name} overscroll-behavior-x:none')
+        reset = '*{box-sizing:border-box}'
+        j = src[name].find(reset)
+        if j < 0:
+            problems.append(f'  {name}: no `html{{` rule and no `{reset}` to sit before')
+            continue
+        src[name] = (src[name][:j]
+                     + 'html{overscroll-behavior-x:none}\n'
+                     + src[name][j:])
+        print(f'  applied: {name} overscroll-behavior-x:none (new html{{ rule)')
 
     if problems:
         print('REFUSING TO PATCH:')
