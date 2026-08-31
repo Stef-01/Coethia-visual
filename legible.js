@@ -453,11 +453,25 @@ const PROBE = function () {
          inside the control's group, so `contains` does not relate them; a shared
          interactive ancestor does. */
       const sameCtl = tCtl && ctlOf(sh.node) === tCtl;
+      /* AGAINST THE LOCAL COMPOSITE, NOT AGAINST THE PAPER -- and the argument for
+         this is already written twenty lines up, in the stroke collector, where it
+         says: "Whether a stroke is visible depends on what it is drawn ON, and the
+         paper is only that for the scenes with nothing behind them... measuring
+         against a global constant instead of the local composite." The stroke test
+         then does the right thing (`ratio(st.fill, bgAll) < 1.6 -> continue`) and
+         this one, four lines away, kept comparing to PAPER.
+         `comments` is what it cost: a 21x21 circle filled #241c18 inside a comment
+         line, on a sheet that is itself #241c18. Against paper that is a huge ratio
+         and it reported as debris in the word; against the sheet it is about 1.0 and
+         cannot be seen at all. Dismissed as a false positive twice on the strength of
+         a render that was, correctly, showing nothing.
+         Same shape as the ink-box/line-box split: a lesson learned once and applied
+         to one of the two places it belongs. */
       if (!haloCovers && !sameCtl
           && shArea < tArea * 0.30 && ovCore >= 5
           && sh.r.width >= 2 && sh.r.height >= 2
           && sh.cover >= 0.25
-          && ratio(sh.fill, PAPER) > 1.6) {
+          && ratio(sh.fill, bgAll) > 1.6) {
         hits.push({
           kind: 'speckled', text: t.s, tag: sh.tag, el: sh.idx,
           detail: Math.round(ovCore) + 'sq px inside the word ' + bx(sh.r),

@@ -2799,10 +2799,29 @@ placement: { crumb:'Placements \u00b7 YouTube', step:'STATION 4', head:'Buying t
        was the player's own dark body, so dark-on-white became dark-on-dark.
        A fixed badge behind a scaling label is the same assumed-width mistake as the
        rest of them. Measured, so the pairing cannot come apart. */
+    /* THIRD ROUND, and the first two are why this is measured on BOTH axes.
+       Round two measured the WIDTH and left the height at a hardcoded 22 units, which
+       held at desktop and failed at mobile: the label paints at 8.6 * TK * CON_TK and
+       its cap height reaches ~22 units there, so the glyph tops landed 1.7px above the
+       badge's top edge and sat on the player's dark #202124. legible.js was right and
+       was dismissed twice as a false positive, because at 3x the strip is thin enough
+       to miss by eye while being plainly wrong to arithmetic: the badge covered 0.862
+       of the label's ink box against a 0.9 bar, so the resolved background was the
+       player body and dark-on-dark reported 1.00:1.
+       A measured width beside an assumed height is still an assumed box. getBBox()
+       returns the label's own user-space extent, so pad that on all four sides and the
+       badge cannot come apart from its label at any type scale. */
     const adLbl = label(player, px+20, py+25, 'Ad \u00b7 0:15', 8.6, 600, '#202124');
-    let adW = 96;
-    try { adW = Math.max(60, adLbl.node().getComputedTextLength() + 18); } catch (e) { adW = 96; }
-    const adBadge = roundRect(player, px+12, py+10, adW, 22, 4, '#FFFFFF');
+    let aX = px+12, aY = py+10, aW = 96, aH = 22;
+    try {
+      const bb = adLbl.node().getBBox();
+      if (bb && bb.width) {
+        const padX = 9, padY = 5;
+        aX = bb.x - padX; aY = bb.y - padY;
+        aW = bb.width + padX*2; aH = bb.height + padY*2;
+      }
+    } catch (e) { /* keep the authored box */ }
+    const adBadge = roundRect(player, aX, aY, aW, aH, 4, '#FFFFFF');
     player.node().insertBefore(adBadge.node(), adLbl.node());
     label(player, px+pw/2, py+70, 'CLINICIAN, ON CAMERA', 10, 700, '#FFFFFF', 'middle');
     label(player, px+pw/2, py+88, 'built for this barrier, not generic', 8.3, 400, '#bdc1c6', 'middle');

@@ -1366,3 +1366,104 @@ with margin on every side, so `inter(core, badge)/coreArea` is 1.0 and the reaso
 `covering` is not coverage at all. Candidates left are collection-time — the badge never entering
 `shapes`, or entering with an `idx` that puts it in `overs` — and both are one `page.evaluate` away.
 Do that instead of reading the file a fourth time.
+
+## Probing the instrument instead of reading it: one real page defect, one real check defect
+
+Written after `probe-bg.js`, which prints the numbers `legible.js` is actually working from
+for one label. It settled in one run what three readings of the source got wrong, two of
+which became edits a positive control rejected. **Both surviving findings were real. The
+"verified false positive" label, which sat in a commit message and in RESUME-HERE.md
+telling the next session not to look, was wrong on both.**
+
+### `placement` — a defect in the PAGE, and the same defect class as the other ten
+
+```
+idx   tag   fill      cover  box(l,t,w,h)     inkFrac  side   in?
+116   rect  #ffffff   1      51,195 39x10     0.862    under  -
+117   <- the label, ink y 193.28..203.28
+```
+
+The badge IS collected, opaque, in `unders`, and covers 0.862 of the ink box against a 0.9
+bar. The entire shortfall is a 1.72px strip at the TOP: badge y 195..205, ink from 193.28.
+So the tops of the capitals hang above the white badge onto the player's dark #202124,
+`covering` resolves to #202124, and dark-on-dark reports 1.00:1.
+
+Round two of this fix measured the badge's WIDTH and left its height at a hardcoded 22.
+**A measured width beside an assumed height is still an assumed box.** Both axes now come
+from `getBBox()` with padding, so the badge cannot come apart from its label at any type
+scale. Verified by re-probe: box `51,195 39x10` -> `50,191 39x14`, inkFrac 0.862 -> 1.0,
+`in=Y`, and the finding is gone from the sweep.
+
+### `comments` — a defect in the CHECK, which the file already argues against
+
+`speckled` compared a mark's fill to `PAPER`, a global constant. Twenty lines above, the
+stroke collector says why that is wrong -- *"whether a stroke is visible depends on what it
+is drawn ON, and the paper is only that for the scenes with nothing behind them... measuring
+against a global constant instead of the local composite"* -- and the stroke test then does
+it correctly. The fill test, four lines away, did not. Same shape as the ink-box/line-box
+split: a lesson learned once and applied to one of the two places it belongs.
+
+Measured for that label: `covering` composites to **#1b1512**, and the 21x21 mark is
+**#241c18** -- a ratio of about 1.08, invisible. Now correctly skipped.
+
+**It did not clear the finding, and that is the fourth wrong diagnosis of `comments`.** The
+reported mark is not the dark circle; on the probe's numbers the best match is idx 1622, a
+7x7 `#6e5343` avatar glyph at about **2.56:1** against the sheet -- genuinely visible, so it
+passes the colour gate on merit. It sits at x 254..261 while the label's ink box runs to
+270.9, i.e. inside the ink box near its right end, and the render shows the visible glyphs
+stopping around x 252. So the open question is why the ink box is ~19px wider than the text
+that is drawn, and the fix is not another threshold.
+
+The `bgAll` change is kept anyway, on its own merits: it is what the file already argues
+for, and the control confirms it costs nothing (20/20, identical breakdown).
+
+### `cliff` — deterministic, expected, and the consequence of a deliberate revert
+
+Ran `--only=cliff --all-views` twice: byte-identical, same 19 sq px, same box. Not flaky.
+
+It is the slider thumb over the "95" tick at mobile, and it is there because earlier in this
+same pass the tick labels were moved to `y+38` to clear the thumb, that move caused two real
+text-collisions, and it was reverted to `y+26` as intended. The argument for leaving it
+stands -- a handle covering the tick it rests on is what every real slider does, because that
+tick IS the value it reports -- so the finding is expected output, not a regression.
+
+Deliberately NOT fixed by editing the instrument. Extending the control-chrome exclusion
+from `speckled` to `occluded` would waive it, and would also waive any real occlusion
+inside any control, which is a worse trade than one documented expected finding. Three
+instrument edits this session have been wrong; the roadmap's rule is to stop and report.
+
+**Uncovered.** Why `comments`'s ink box exceeds its drawn text by ~19px. That is the live
+thread and it is a `getBBox`/`getExtentOfChar` question about the label, not a threshold
+question about the mark. And whether the probe's coordinates drift from `legible.js`'s --
+they disagree on the mark's size (21x21 vs a reported 10x10) and on the overlap (30 vs 53
+sq px), which means one of them is measuring a different scroll position and that has to be
+resolved before either number is trusted.
+
+### A transient console error, chased, and what it exposed
+
+`interact.js` reported `net::ERR_NAME_NOT_RESOLVED` where every previous run reported zero
+console errors. Chased rather than waved through, because "one new console error" and "one
+harmless console error" are not distinguishable without looking.
+
+It is transient DNS on the Google Fonts request. A network check on the same page
+immediately afterwards: **0 failed requests, 4 responses at 200** -- the `css2` stylesheet
+plus three `woff2` faces -- with Libre Franklin loaded. Corroborated by the audit's
+per-scene tiny-text counts being byte-identical across the two runs; had the type fallen
+back to Helvetica the metrics would have shifted and those counts with them.
+
+**What it exposed, which is not transient.** The artifact makes four network requests on
+load, for type. d3 is local, with a CDN fallback that only fires if the local copy fails,
+so the library is self-contained. The fonts are not.
+
+This does not violate standing rule 7, which is about there being no build step, and there
+is none. But it means: every measured fit in this piece is computed against whatever font
+actually loaded, and every number in this ledger -- tiny-text counts, legible findings --
+is only comparable across runs if font loading was consistent between them. Measuring
+rather than assuming is what makes the LAYOUT self-correcting; it does not make the
+METRICS run-to-run stable, and I had been treating cross-run deltas as if it did.
+
+**Uncovered.** Whether blocking `fonts.googleapis.com` changes the audit's tiny-text count.
+One run with request interception settles it. If it does, every cross-run comparison here
+carries a caveat and the fix is to vendor the two faces next to `d3.v7.min.js` -- which is
+also the only way this piece renders identically offline, and there is a font-licensing
+question attached to redistributing them that is the owner's to answer, not mine.
