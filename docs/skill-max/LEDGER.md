@@ -1160,3 +1160,209 @@ Two things generalise beyond this file:
 - **A syntax error in a bundled artifact is silent to anything that does not execute it.** `node --check`
   on the extracted inline script would have caught this in under a second, and nothing in the suite did
   that. It is now the first thing to run after any edit to the page, before any browser starts.
+
+---
+
+## Step 14 — Merging `visual-motion-pass`, and a merge that would have been a revert
+
+One commit from 2026-08-11. Nine conflict hunks. Main 66 commits ahead of the merge base. The obvious
+reading is "old branch, new main, take main" and the second-most obvious is "the user wrote it, take
+theirs". Both are wrong, and which hunk proves it is the interesting part.
+
+Both sides independently fixed the same defect — the "the belief map" chip overlapping a creator card:
+
+```js
+// branch, 2026-08-11
+const bx = CLX + 100;
+
+// main, since
+sf._w14 = starRow.select('.rowlabel').node().getComputedTextLength() / (14 * TK) * 14;
+const sz  = (st.active.includes(sf.id) && key!=='caseSum' ? 15.5 : 14) * TK;
+const bx  = (CLX - 42) + sf._w14 * (sz / 14) + 12;
+```
+
+Main measures the label, caches the measurement at a reference size, and rescales it when the
+active-row bump changes the type size — then transitions the pill and its text to the new x. The
+branch moves it by a guessed constant.
+
+**The commit immediately before this one was ten instances of that exact mistake.** Positioning
+something from an assumed text width, found in ten separate places, with the conclusion written down
+that *the remedy is never a better constant*. Merging this branch wholesale would have reinstated the
+defect class on the same day it was removed, in a file the commit never mentions, and every gate would
+have passed — `audit.js` does not look at that page.
+
+So: resolved per hunk, and the resolution recorded next to the code rather than in a commit message
+nobody re-reads. Main won all seven belief hunks. The branch won the personas file whole, because main
+never touched it after the base and its fix is real: `stageFig` opacity was `step >= 1 + i`, so under
+the words "Before Any of the Data, Two People" the reader's first scroll met a blank 850×900 pane.
+
+### The half that was deliberately not landed
+
+The branch's case-study restructure — a 940×860 `caseF` frame, a flank band, ledger rows held at .1
+instead of hidden. Its observation is specific and probably still true: a 940×700 viewBox in a pane
+taller than it is wide is width-bound, so it letterboxes ~130px top and bottom.
+
+It did not land because **frame and layout are one decision.** Taking `caseF`'s extra 160 units without
+the layout composed to fill them produces a worse frame than either side alone — a taller pane with the
+same content and more emptiness. And the letterboxing is a *measurement*: `measure.js` is the instrument
+for it and has never been pointed at that page. Landing a three-week-old note as a fact, into a layout
+that has since been rebuilt, is the shape of the regression this whole session was about.
+
+**Uncovered.** Whether the letterboxing claim is still true. `measure.js` has not been run against
+`belief-based-communication.html` at all — every frame-fit number in this ledger is about
+`faster-than-the-rumour.html`. The other three pages in this repo have never been measured by any
+instrument here.
+
+## The diagnosis that was wrong for two sessions
+
+Recorded because the wrong cause was written down twice, acted on twice, and implied a remedy that
+could never have worked.
+
+**Symptom.** Chromium cannot start; then the shell cannot fork; then `echo` fails. Three sessions.
+
+**What was written here before:** self-inflicted — dozens of background Bash tasks and Monitor loops
+launched and killed, leaving ~2048 zombies. Remedy: use fewer background tasks.
+
+**What it actually was:**
+
+```
+$ ps -u $(id -u) | wc -l                                        # 2673
+$ grep -c "^Z" ps.txt                                           # 2062 zombies
+$ awk '/^Z/{c[$2]++} END{for(p in c) print c[p], p}' ps.txt
+  1810 2087   .../Pioneer/FwUpdateManager/.../FwUpdateManagerd
+   252 2074   .../Pioneer/DDJ-FLX10/.../DDJ-FLX10 AutoLauncherd
+```
+
+Two Pioneer DJ-controller daemons, **up 41 days**, forking a device poll and never `wait()`ing on it.
+A zombie holds its PID slot until its parent reaps it, so those two had taken 2062 slots out of the
+table before this project started a single process. `kill 2087 2074` → `launchd` adopts and reaps the
+orphans → 2673 processes became 613 and the blocked `git push` went through on the next attempt.
+
+Two things this got wrong that are worth naming:
+
+- **The evidence for "self-inflicted" was that it happened while I was running background tasks.** That
+  is co-occurrence. The zombie count was never checked, and it was one `grep -c "^Z"` away — the same
+  shape as trusting `audit.js`'s zero text-collisions because it was the check that was running.
+- **The remedy followed from the cause, so a wrong cause produced a remedy that felt responsible and
+  did nothing.** Two sessions of being careful with background tasks, and the table stayed 2062 short.
+  It recurred each time, and each recurrence was read as confirmation rather than as refutation.
+
+Expect it again: the leak is in those daemons, not in anything fixable from this repo. **Check the
+zombie count first.**
+
+## The two checks that had never been run against this page
+
+`boxes.js` — CLEAN. 59 scenes, 4 exempt as recreated interfaces, and `middle 3` / `tiers 3` correctly
+classified as data marks whose dimensions encode a quantity. Its last result before this was not a
+failure but *nothing*: it died mid-run on a Playwright connection error, and a crash had been sitting
+in the record where a verdict looked like it should be.
+
+`motion.js` — CLEAN. 59 scenes walked under both `no-preference` and `reduce`, 0 page errors in each,
+every scene reaching the same settled state. Two intended reductions are reported as such rather than
+silently exempted: `air` draws 26 aerosol particles instead of 64, and `twoclocks` does not auto-play
+because auto-playing it would be the defect.
+
+**Uncovered.** `a11y.js` and `measure.js --verify --strict` at time of writing. Nothing in this entry
+is a claim about the screen-reader tree, zoom, contrast under colour-vision simulation, or frame fit.
+
+## Two confident diagnoses of the same instrument, both wrong, both caught by the control
+
+The two surviving `legible.js` findings had been recorded as "verified false positives, diagnose the
+instrument, do not bend the scene" — through two sessions and one commit. So: diagnose them. Both
+diagnoses were specific, both were argued from the code, and both were wrong. The interesting part is
+that they were wrong in the direction that would have felt like progress.
+
+### `placement` — "the background filter uses the line box"
+
+The argument, and it was a good one. `legible.js` carries a long comment establishing that a line box
+carries leading the glyphs do not use, that no fraction of it locates type at both 6.4px and 13px, and
+that `getBBox` should be asked instead. Three checks were built on the ink box. Then the filter that
+decides **what the background is** used the line box:
+
+```js
+const covering = unders.filter(sh => inter(t.r, sh.r) / tArea >= 0.9)
+```
+
+And `placement`'s Ad badge is measured to its label and 22 units tall, shorter than the label's line
+box — so coverage lands near 0.7, under the 0.9 bar, the badge drops out of the background, and dark
+type on a white badge reports 1.00:1 against the player's dark body. The lesson had been applied to the
+tests that ask *where the ink is* and never to the one that asks *what is behind it*. Self-consistent,
+grounded in the file's own reasoning, and it names a real asymmetry.
+
+**It did not fix the finding.** Changed to `inter(core, sh.r) / coreArea` and `placement` still reports
+1.00:1. So the badge fails the coverage test for some other reason, and the line/ink asymmetry — which
+is real — is not what is producing this number.
+
+### `comments` — "5 sq px of overlap is not 'inside the word'"
+
+`speckled` claims a mark appears BETWEEN TWO LETTERS and tests `ovCore >= 5` — five square pixels, a
+2.2×2.2 patch, which a 9×9 avatar circle grazing the first glyph satisfies while sitting beside the
+text. So require the mark's CENTRE to be in the band, which is what the claim actually says.
+
+**It did not fix the finding either** — the circle reports 53 sq px inside a 10×10 bbox, so it is more
+than half inside the ink box and its centre is comfortably in the band. Which also means the earlier
+hand-waiver was reasoning from the wrong picture: the mark is geometrically inside the label's ink box.
+The likely truth is that an ink BBOX is one rectangle spanning a whole string, so a dot in the gap
+between two words is inside the box and touches no letter — and the honest test is per-glyph extents
+via `getExtentOfChar`, not a tighter threshold on the same rectangle.
+
+### What the control did, which is the whole point of having one
+
+| instrument | control (pre-fix page) | subject (current page) |
+|---|---|---|
+| committed | **20 findings** | 2 findings |
+| with both edits | **19 findings** | 3 findings |
+
+The lost one:
+
+```
+[desktop] middle speckled "You need to reach the other " path 86sq px inside the word [722,674 18x10]
+```
+
+A real defect — the person glyph printing through the last line of the argument, one of the ~50 this
+pass fixed. The glyph is 18×10, wide and flat, so it straddles the ink box's bottom edge and its centre
+falls outside: `centreInWord` deleted a true positive. And the `core`/`coreArea` change introduced a
+new `cliff` finding — the slider thumb over the tick it reports, which is the known non-defect reverted
+earlier in this same pass.
+
+So the two edits: cleared neither target, lost one true positive, added one false positive. **Reverted,
+per the roadmap's rule that a regression is not argued with.** Both findings stand exactly where they
+were, and the record now says the two published diagnoses are disproved rather than pending.
+
+**Uncovered.** What actually makes `placement`'s badge fail the coverage test. It is not the line/ink
+asymmetry. Next step is a probe that prints `inter(core, badge)/coreArea` for that one label rather
+than another argument from the source — three sessions of reading this code have now produced three
+wrong answers about it, which is itself the finding: **this file is at the point where reading it is a
+worse instrument than measuring it.**
+
+And: whether either is a defect in the PAGE at all is still open. The "verified false positive" label
+rests on renders whose viewport was not recorded, and both findings are `[mobile]`. `shot.js` exists
+for exactly this and takes about forty seconds.
+
+### And then both were rendered at the width the findings are actually reported at
+
+The waiver had been asserted twice on renders whose viewport was never written down, while both findings
+are `[mobile]`. So the label "verified false positive" was not established — it was a conclusion with
+its evidence missing, which is the same failure as an unmeasured constant. `shot.js`, `W=375`, 3×, forty
+seconds. Both images are kept at `docs/skill-max/evidence/` rather than described, because a described
+screenshot is a claim and a committed one is a check.
+
+  `placement`  "Ad · 0:15" is dark type on a WHITE badge with clear margin on all four sides — the
+               badge is visibly wider and taller than the words. Reported at 1.00:1 against the
+               player's dark body, which the render shows it is nowhere near. FALSE POSITIVE, confirmed
+               at the reported width.
+  `comments`   "before my 12 month. i just went along with it" is clean; no mark in any word. The
+               avatar circle is well LEFT of where the text starts, and the reported bbox
+               [253,385 10x10] maps to image x 759–789 / y 1155–1185, which is empty sheet past the end
+               of the line. FALSE POSITIVE, confirmed at the reported width.
+
+So the artifact is clean on both and the conclusion is unchanged. What changed is that it is now
+supported. Worth separating, because "I was right" and "I had shown it" were being reported as the same
+thing, and only one of them was true.
+
+**The instrument bug is therefore real and belongs to `legible.js`, not to either scene.** For
+`placement` the render also rules out the remaining geometric theories: the badge covers the ink box
+with margin on every side, so `inter(core, badge)/coreArea` is 1.0 and the reason it is missing from
+`covering` is not coverage at all. Candidates left are collection-time — the badge never entering
+`shapes`, or entering with an `idx` that puts it in `overs` — and both are one `page.evaluate` away.
+Do that instead of reading the file a fourth time.

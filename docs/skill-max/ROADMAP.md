@@ -33,15 +33,33 @@ because the ledger then claims ground that was not taken.
 ## Where it stands right now
 
 ```
-HEAD 96c8a50
-audit    59 scenes, 6 findings {tiny-text: 6}, zero collisions, 0 console errors
-interact 12/12 pass
-fitter   node measure.js --verify prints IDEMPOTENT
+HEAD 407a292
+syntax   OK - 4 inline blocks, 393,310 chars, all parse
+audit    59 scenes, 12 findings {tiny-text: 12}, ZERO text-collisions
+legible  87 -> 2, both verified false positives; 2046 painted labels / 118 scene-views
+boxes    CLEAN - no identically sized box is carrying an idea
+motion   CLEAN - every scene reaches the same settled state under reduced motion,
+         0 page errors in both no-preference and reduce
+interact 12/12 pass, 0 console errors
+fitter   node measure.js --verify --strict -> IDEMPOTENT, exit 0.
+         59/59 desktop (aspect 1.054), 59/59 mobile (0.726), fitted twice,
+         identical frames both passes. No REFUSED scene. Worst resid 2.9.
+         The four historically non-converging scenes (subsidy, map, quadrants,
+         lenses) are clear -- measured, not inherited
 fleet    35/35 required skills present
 ```
 
+The tiny-text 6 -> 12 is a deliberate, measured trade and not a regression: the six console scenes are
+at their exact prior baseline (listen 2, grants 1, segments 3, subsidy 6, placement 2, privacy 4) and
+the six added are recreated-phone chrome under `clampPhoneText`. Three floors were tried and each was
+measured; none makes phone text both legible and contained at 375px, because those devices are too
+small in stage units for the copy they carry. That is a composition decision and it is open.
+
 Done: the suite restored and made honest; a convergent fitter; two frames off the type-scale ceiling;
-settle past the slowest entrance; four named easing curves; one duration scale and three staggers.
+settle past the slowest entrance; four named easing curves; one duration scale and three staggers; a
+second instrument (`legible.js`) for the failure mode `audit.js` structurally cannot see, and a first
+gate (`syntax.js`) because the worst thing that happened was a check passing a page that had stopped
+parsing.
 
 ---
 
@@ -65,7 +83,8 @@ is a real outcome and must not be relabelled; `BLOCKED` when it cannot proceed a
 | 10 | Stages 1–4, only if 9 justifies them | DONE — for the two findings `boxes.js` justified (`measure`, `translate`); `boxes.js` now reports CLEAN; see ledger |
 | 11 | Close out | DONE — see RESULT.md |
 | 12 | Remotion accessory video | DONE — `ColdOpen`, 750 frames, 1920x1080 h264, 25.045s; verified by decoding frames back out of the mp4 |
-| 13 | `legible.js` — text against graphics, and the 55 screenshots Step 9 left | DONE for desktop; **PARTIAL for mobile.** All 59 examined by eye at desktop; 12 defects fixed across 11 scenes. Desktop legible.js down to 1 finding, mobile still has ~27 — see ledger |
+| 13 | `legible.js` — text against graphics, and the 55 screenshots Step 9 left | DONE, desktop and mobile. 87 findings → 2, both rendered at 3× and shown to be instrument bugs (`comments`, `placement`); ~50 real defects fixed across ~35 scenes; audit text-collisions back to 0 after my own wraps introduced 4 |
+| 14 | Merge `visual-motion-pass` | DONE — per-hunk, not wholesale. Main won all 7 belief hunks on merit (it measures where the branch guessed a constant); the rebrand, `overscroll-behavior-x` and the personas blank-opening fix landed. See `handoff/merge-visual-motion-pass.py` |
 
 ---
 

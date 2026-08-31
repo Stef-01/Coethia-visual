@@ -227,18 +227,29 @@ findings that were each rendered at the reported position and cropped, and neith
 page. **Diagnose the instrument; do not bend the scene to satisfy it.** A check that is wrong twice and
 gets "fixed" by moving the artwork has taught the artwork to lie.
 
-- **`comments`** — "before my 12 month…" reports `speckled` against a 9×9 avatar circle in its
-  x-height band. Cropped twice at 3× (`K=comments W=375 node shot.js`): there is no mark inside any
-  word. The circle is in the band and beside the text, which is what `speckled` is meant to catch and
-  the reason it has a size threshold at all — the threshold is passing something it should not.
-- **`placement`** — "Ad · 0:15" reports `low-contrast 1.00:1`. Rendered: dark type on a white badge,
-  plainly legible. The badge is measured to its label and `insertBefore`'d, so it is both wide enough
-  and behind it, and the check still resolves the background to the player's dark body. Something in
-  the background compositing is not seeing that badge — most likely because it is inserted rather than
-  appended, so its document order and its paint order disagree with the assumption in `bgAt`.
+Both are now confirmed at **375px**, which is the width the findings are reported at and not the width
+the earlier waivers were checked at. Images committed at `docs/skill-max/evidence/`:
 
-Both are the same shape of bug as the nine listed in the ledger: the check asking a slightly different
-question from the one it reports. Start with `bgAt` and the `speckled` size threshold.
+- **`placement`** — `low-contrast 1.00:1`. The render shows dark type on a WHITE badge, visibly wider
+  and taller than the words, clear margin on all four sides.
+- **`comments`** — `speckled`, 53 sq px "inside the word". The line is clean; the avatar circle is well
+  left of where the text starts, and the reported bbox maps to empty sheet past the end of the line.
+
+**Do not attempt either of the two obvious fixes. Both were tried, measured, and reverted:**
+
+| tried | why it looked right | what the control said |
+|---|---|---|
+| `covering` filtered on the ink box instead of the line box | the file argues at length that a line box carries leading the glyphs do not use, then uses `t.r` in the one filter that decides what the background IS | did not clear `placement`; ADDED a false `cliff` finding |
+| `speckled` requires the mark's centre in the band | the mode claims a dot appears BETWEEN TWO LETTERS, and `ovCore >= 5` is a 2.2×2.2 patch | did not clear `comments`; DELETED a true positive — `middle`'s person glyph, 18×10, straddles the ink box's bottom edge so its centre is outside. Control 20 → 19 |
+
+The `placement` render also rules out coverage as the cause: the badge covers the ink box with margin on
+every side, so `inter(core, badge)/coreArea` is 1.0 and the badge is missing from `covering` for a
+reason that is not geometric. What is left is collection-time — the badge never entering `shapes`, or
+entering with an `idx` that puts it in `overs`.
+
+**Measure it; do not read it.** Three sessions of reading this file have produced three wrong answers
+about this one label. One `page.evaluate` that prints the badge's `idx`, `cover` and
+`inter(core, sh.r)/coreArea` settles it.
 
 ## The unparsed edit — resolved
 
