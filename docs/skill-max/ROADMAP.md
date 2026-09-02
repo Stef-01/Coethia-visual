@@ -91,6 +91,8 @@ is a real outcome and must not be relabelled; `BLOCKED` when it cannot proceed a
 | 12 | Remotion accessory video | DONE — `ColdOpen`, 750 frames, 1920x1080 h264, 25.045s; verified by decoding frames back out of the mp4 |
 | 13 | `legible.js` — text against graphics, and the 55 screenshots Step 9 left | DONE, desktop and mobile. 87 findings → 2, both rendered at 3× and shown to be instrument bugs (`comments`, `placement`); ~50 real defects fixed across ~35 scenes; audit text-collisions back to 0 after my own wraps introduced 4 |
 | 14 | Merge `visual-motion-pass` | DONE — per-hunk, not wholesale. Main won all 7 belief hunks on merit (it measures where the branch guessed a constant); the rebrand, `overscroll-behavior-x` and the personas blank-opening fix landed. See `handoff/merge-visual-motion-pass.py` |
+| 15 | Run 2 stage 2 — aesthetic direction | DONE — `02-direction.md`; palette doc governs 21 of 120 colours in use, 52 used exactly once |
+| 16 | Run 2 stage 3 — per-scene composition | DONE — 6 queued, 3 fixed (`tiers` banned pattern, `measure` 3x2→2x3, `translate` four drawn route glyphs), 2 declined as semantically horizontal, 1 clean. Fitter confirms `tiers` 850→543, `measure` 786→586 |
 
 ---
 

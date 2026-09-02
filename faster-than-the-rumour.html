@@ -2298,6 +2298,52 @@ bindTipQ = null;
    8. ONE EVIDENCE BASE, FOUR ROUTES
    ===================================================================== */
 
+/* One drawn object per belief route, because the route is a mechanism and a mechanism
+   can be drawn. Every stroke is INK or MUTE at 1.1-1.5 units -- no new colour, and thin
+   enough to sit inside a tinted card without competing with the type beside it.
+   Coordinates are local to the glyph's own translate, so a card moving does not move
+   the drawing relative to its label. */
+function routeGlyph(sel, t, x, y, k){
+  const G = sel.append('g').attr('transform','translate('+x+','+y+') scale('+k+')');
+  if (t === 'Autonomy-oriented'){
+    /* A fork with BOTH branches drawn and neither marked. "Choice kept" is the claim,
+       so a single arrow choosing one branch would contradict the label. */
+    pth(G, 'M 0 14 L 0 2', INK, 1.5);
+    pth(G, 'M 0 2 Q 0 -6 -13 -12', INK, 1.4);
+    pth(G, 'M 0 2 Q 0 -6 13 -12', INK, 1.4);
+    G.append('circle').attr('cx',-13).attr('cy',-12).attr('r',3).attr('fill','none')
+      .attr('stroke',INK).attr('stroke-width',1.3);
+    G.append('circle').attr('cx',13).attr('cy',-12).attr('r',3).attr('fill','none')
+      .attr('stroke',INK).attr('stroke-width',1.3);
+  }
+  if (t === 'Clinician-trusting'){
+    /* A stethoscope: the messenger IS the variable this route changes. */
+    pth(G, 'M -9 -14 L -9 -4 Q -9 8 0 8 Q 9 8 9 0', INK, 1.4);
+    G.append('circle').attr('cx',9).attr('cy',-3).attr('r',4.2).attr('fill','none')
+      .attr('stroke',INK).attr('stroke-width',1.4);
+    ln(G, -12, -15, -6, -15, INK, 1.4);
+  }
+  if (t === 'Overwhelmed'){
+    /* Four contradictory claims crossing, and one adjudicating line drawn through them
+       -- the label says this audience needs adjudication, not another claim. The tangle
+       is MUTE and the resolving line is INK, so the hierarchy states which is which. */
+    pth(G, 'M -14 -10 L 10 -2', MUTE, 1.1);
+    pth(G, 'M -12 0 L 12 -12', MUTE, 1.1);
+    pth(G, 'M -13 8 L 11 -6', MUTE, 1.1);
+    pth(G, 'M -10 -14 L 8 6', MUTE, 1.1);
+    pth(G, 'M -15 14 L 15 14', INK, 1.8);
+  }
+  if (t === 'Low-access'){
+    /* A route with stops ending at a clinic cross: the barrier is logistics, so the
+       drawing is the journey, not the belief. */
+    pth(G, 'M -15 10 Q -4 10 0 2 Q 4 -6 14 -6', MUTE, 1.3);
+    G.append('circle').attr('cx',-15).attr('cy',10).attr('r',2.4).attr('fill',MUTE);
+    G.append('circle').attr('cx',0).attr('cy',2).attr('r',2.4).attr('fill',MUTE);
+    ln(G, 14, -12, 14, -1, INK, 1.6);
+    ln(G, 9, -7, 19, -7, INK, 1.6);
+  }
+  return G;
+}
 const ROUTES = [
   { x:250, y:330, t:'Autonomy-oriented', tint:'#DCEBF5',
     l1:'Absolute benefits and harms.', l2:'Uncertainty stated. Choice kept.',
@@ -2338,13 +2384,28 @@ const ROUTES = [
       .attr('transform','translate('+c.x+','+c.y+')')
       .attr('tabindex',-1).attr('role','button').attr('aria-label', c.t + '. ' + c.w)
       .style('cursor','pointer');
+    /* EACH ROUTE GETS THE THING IT IS. These four cards were rounded rects (rx=14)
+       containing four centred labels and nothing else -- the repo's banned pattern, and
+       the same one `tiers` had. Step 10 fixed the HUB (a text-only pill became a drawn
+       book) and left the four cards, so the fix arrived on one path and not its sibling
+       -- the third instance of that shape in this pass.
+       boxes.js did not catch them: `padHit` inserts a transparent <rect> into every
+       control, and boxes.js exempts a rounded rect "accompanied by a path, circle,
+       polygon, image or line" -- a rect is not on that list, so that is not the reason.
+       They are identically sized and text-only and should have been reported. Recorded
+       as an open instrument question rather than guessed at.
+       The text also moves off centre onto a left axis: four centred blocks give ragged
+       left AND right, and an axis is a decision where centring is the absence of one. */
     const ct = nar0 ? -80 : -56, chh = nar0 ? 182 : 112, cw2 = nar0 ? 400 : 340;
     padHit(g, -cw2/2, ct, cw2, chh, 4);
     roundRect(g, -cw2/2, ct, cw2, chh, 14, c.tint);
-    label(g, 0, nar0?-42:-26, c.t, 12.5, 700, INK, 'middle');
-    label(g, 0, nar0?4:-2, c.l1, 9.8, 400, '#3A4750', 'middle');
-    label(g, 0, nar0?44:16, c.l2, 9.8, 400, '#3A4750', 'middle');
-    label(g, 0, nar0?86:42, 'same evidence \u00b7 different route', 8, 600, MUTE, 'middle');
+    const gx = -cw2/2 + (nar0 ? 46 : 40);          // glyph column centre
+    const tx = -cw2/2 + (nar0 ? 92 : 78);          // type axis
+    routeGlyph(g, c.t, gx, ct + chh/2, nar0 ? 1.15 : 1);
+    label(g, tx, nar0?-42:-26, c.t, 12.5, 700, INK, 'start');
+    label(g, tx, nar0?4:-2, c.l1, 9.8, 400, '#3A4750', 'start');
+    label(g, tx, nar0?44:16, c.l2, 9.8, 400, '#3A4750', 'start');
+    label(g, tx, nar0?86:42, 'same evidence \u00b7 different route', 8, 600, MUTE, 'start');
   });
 })();
 function layoutRoutes(){
@@ -2429,14 +2490,30 @@ function measureGlyph(g, key, col){
 function layoutDash(){
   const nar = isNarrow();
   const w = nar ? 620 : 250, h = nar ? 132 : 84;
+  /* TWO COLUMNS AT DESKTOP, NOT THREE. The scene's composition was never the problem --
+     six instrument tiles, each with a drawn glyph, which is a legitimate use of a
+     rounded rect as chrome and which boxes.js correctly exempts. Its ASPECT was the
+     problem: 3x2 at 250 wide is 786 units across against 316 tall, an aspect of 2.49
+     into a 1.054 stage, so 58% of the frame was margin the composition never asked for.
+     2x3 is 518x296 and the content, head and foot together come to about 510x386 --
+     aspect 1.32, within 25% of the stage instead of 136% over it.
+     A scene at aspect 2.5 is a scene that should have been more rows. Reflowing costs
+     nothing here because the tiles are self-contained; no tile changed. */
+  const COLS = nar ? 1 : 2;
+  const gw = COLS*w + (COLS-1)*18;
+  const x0 = nar ? 190 : Math.round(500 - gw/2);
+  const rows = Math.ceil(6/COLS);
   gDash.selectAll('g.dcell').each(function(){
     const i = +this.getAttribute('data-i');
-    const x = nar ? 190 : 130 + (i%3)*(w+18);
-    const y = nar ? 210 + i*(h+18) : 210 + Math.floor(i/3)*(h+22);
+    const x = x0 + (i%COLS)*(w+18);
+    const y = nar ? 210 + i*(h+18) : 210 + Math.floor(i/COLS)*(h+22);
     d3.select(this).attr('transform','translate('+x+','+y+')');
   });
   gDash.select('text.dhead').attr('y', nar ? 120 : 170);
-  gDash.select('text.dfoot').attr('y', nar ? 210 + 6*(h+18) + 30 : 470);
+  /* Derived from the row count rather than the hardcoded 470, which was correct for two
+     rows and would have left the footer sitting inside the third. */
+  gDash.select('text.dfoot').attr('y', nar ? 210 + 6*(h+18) + 30
+                                           : 210 + rows*(h+22) + 30);
 }
 layoutDash();
 
@@ -2552,48 +2629,154 @@ drawGantt(); drawGanttPanel(); wireGantt();
    ===================================================================== */
 
 (function(){
+  /* STACKED REGISTER, replacing three rounded cards standing side by side.
+     WHAT WAS WRONG, and it was the clearest instance in the piece of the repo's own
+     banned pattern. Three rx=16 rects at x=200/500/800 with heights hardcoded
+     h:150/212/274, each containing ONLY text. The heights are an arithmetic sequence
+     (+62) chosen to look like a rise; they encode no quantity, there is no axis and no
+     source. "No rounded rectangle may be the primary carrier of an idea" -- this was
+     three of them carrying the whole scene.
+
+     boxes.js reported CLEAN on it, and that is worth recording: its rule requires the
+     boxes be IDENTICALLY SIZED, so it classified these as "data marks (dimensions
+     encode a quantity)" purely because they differ. Differing size is not evidence of
+     encoding. The instrument built to catch this pattern was defeated by the pattern
+     being drawn slightly better than the worst case.
+
+     WHAT IT IS NOW. Three registers stacked down a common left axis, separated by
+     rules rather than enclosed by borders -- a plate, not a dashboard. A rule
+     separates without enclosing, which is the whole distinction. Depth of engagement
+     is carried by a graduated strata gauge (1, 2, then 3 filled cells): a drawn
+     instrument whose filled count IS the quantity, where the card heights were a
+     quantity nobody had measured.
+
+     AND IT FIXES THE FRAME. Old content 850x329, aspect 2.58 against a 1.054 stage --
+     41% coverage, the worst in the piece, with ~24% of the frame empty above and ~48%
+     below. New desktop content is 600x552, aspect 1.087, which is within 3% of the
+     stage. Two registers beat one row: the vertical is half the available argument. */
+  /* SEPARATE COPY PER WIDTH, because a line is not a length. label() renders at
+     size*TK and TK reaches 3.00 at 375px, so a 39-character desktop line paints three
+     times wider on a phone. Authoring one set of strings for both widths made this
+     scene CLAMPED_HI at mobile -- the fitter asked for w* 1179 against a band ceiling
+     of 1178, clamped, and audit reported `frame-overflow R248`. The original code
+     carried `nar` variants and I dropped them in the rewrite.
+     Wrapping at draw time was the alternative and is worse here: a wrap changes the
+     line count, the line count sets the register height, and the height feeds the
+     extent the fitter is solving -- the same TK feedback loop that made this scene
+     unfittable in the first place. Authored line breaks are TK-invariant. */
   const T = [
-    { x:200, h:150, tint:'#EFEAE0', n:'Tier 1 \u00b7 Information',
-      s:['The listening intake and the','belief map, as intelligence.','No campaign attached.'] },
-    { x:500, h:212, tint:'#DCEBF5', n:'Tier 2 \u00b7 Training',
-      s:['Your team learns the console:','structure, compliant segments,','testing, privacy-safe measurement.'] },
-    { x:800, h:274, tint:'#E7F2F1', n:'Tier 3 \u00b7 Service',
-      s:['Campaign operations at','commercial tempo. Strategy','through execution.'] }
+    { tint:'#EFEAE0', n:'Tier 1 \u00b7 Information', dep:1,
+      s:['The listening intake and the belief map,','as intelligence. No campaign attached.'],
+      sn:['The listening intake','and the belief map, as','intelligence. No','campaign attached.'] },
+    { tint:'#DCEBF5', n:'Tier 2 \u00b7 Training', dep:2,
+      s:['Your team learns the console: structure,','compliant segments, testing,','privacy-safe measurement.'],
+      sn:['Your team learns the','console: structure,','compliant segments,','testing, privacy-safe','measurement.'] },
+    { tint:'#E7F2F1', n:'Tier 3 \u00b7 Service', dep:3,
+      s:['Campaign operations at commercial','tempo. Strategy through execution.'],
+      sn:['Campaign operations at','commercial tempo.','Strategy through','execution.'] }
   ];
-  const BASEY = 560;
   const nar = isNarrow();
-  T.forEach((t,i)=>{
-    const cx = nar ? 500 : t.x;
-    const cy = nar ? 108 + i*214 : BASEY - t.h;
-    const hw = nar ? 384 : 125;
-    const chh = nar ? 190 : t.h;
-    const lead = nar ? 40 : 17;
-    const g = gTier.append('g').attr('class','tier').attr('data-x',cx).attr('data-y',cy)
-      .attr('transform','translate('+cx+','+cy+')');
-    roundRect(g, -hw, 0, hw*2, chh, 16, t.tint);
-    label(g, 0, nar ? 46 : 30, t.n, 13, 700, INK, 'middle');
-    t.s.forEach((ln,k)=> label(g, 0, (nar ? 88 : 52)+k*lead, ln, 10.5, 400, '#333', 'middle'));
+  /* Solved so the content's aspect approaches the stage's, per scene. Desktop stage is
+     1.054 and mobile 0.726, so mobile is NARROWER and TALLER on purpose -- a scaled-down
+     desktop layout would be the wrong aspect at both widths. */
+  const AX  = nar ? 180 : 250;               // the common left axis
+  const GAP = nar ? 30  : 20;                // rule to next register
+  const TOP = nar ? 100 : 120;
+  const GW  = nar ? 78  : 62;                // gauge column width
+  const TX  = AX + GW;                       // type axis, right of the gauge
+  const TY  = nar ? 52 : 34;                 // title baseline within a register
+  const BY  = nar ? 92 : 62;                 // first body baseline
+  const LEAD = nar ? 30 : 19;
+  /* NO FULL-WIDTH TINT BAND, and this is a measured retreat rather than a preference.
+     The band was sized from getComputedTextLength() so it would always fit its type --
+     correct in itself, and it made this scene UNFITTABLE at mobile. `measure.js`
+     reported `fitted 58/59` with `tiers` the miss, and the reason is structural:
+     label() renders at size*TK, while a <rect> in user units is NOT scaled by TK. So a
+     band measured from its text grows with TK, the content extent grows with it, the
+     frame grows, TK changes -- and the fitter's 1-D fixed point does not exist. At
+     desktop TK is clamped to 1.0 so it converged (FLAT); at mobile TK is free and it
+     diverged. That is the failure mode measure.js documents for `subsidy`, `map`,
+     `quadrants` and `lenses`: extent is not purely a function of TK because something
+     is sized from the frame.
+     Two ways out. Let the band track the text and accept a non-convergent fitter, or
+     stop enclosing the text. The philosophy already argued for the second -- "a rule
+     separates without enclosing, which is the entire distinction between a plate and a
+     dashboard" -- so the bands go and the rules stay. Everything below is now in
+     AUTHORED units and TK-invariant: y positions are authored (label() scales the glyph
+     size, not the baseline), the rule length is authored, and RH comes from the line
+     count. Text may render past the rule's end at TK 3; a rule is not a container, so
+     that is text next to a rule rather than text overflowing a box.
+     The tint survives where it can be TK-invariant: a fixed block behind the gauge,
+     which is drawn geometry rather than type. */
+  const RULEW = nar ? 640 : 470;
+  const GCW = nar ? 26 : 20, GCH = nar ? 18 : 14, GCGAP = 4;
+  const STACKH = 3*GCH + 2*GCGAP + (nar ? 20 : 16) + 6;
+
+  let y = TOP;
+  const rows = T.map((t)=>{
+    const lines = nar ? t.sn : t.s;
+    const typeH = BY + (lines.length-1)*LEAD + (nar ? 16 : 10) + (nar ? 30 : 24);
+    const rh = Math.max(STACKH + 34, typeH);
+    const g = gTier.append('g').attr('class','tier')
+      .attr('data-x',0).attr('data-y',y).attr('transform','translate(0,'+y+')');
+    /* the tint, as a fixed block behind the gauge column only */
+    g.append('rect').attr('x',AX).attr('y',0).attr('width',GW - 8).attr('height',rh)
+      .attr('fill',t.tint);
+    const cellsH = 3*GCH + 2*GCGAP;
+    const y0 = (rh - STACKH) / 2;
+    for (let k=0;k<3;k++){
+      g.append('rect').attr('x',AX+16).attr('y',y0 + (2-k)*(GCH+GCGAP))
+        .attr('width',GCW).attr('height',GCH)
+        /* TEAL_D and LINE, not GLASS and DIM: those are declared around line 3444 and
+           this scene builds in a load-time IIFE near 2555, so referencing them threw
+           "Cannot access 'GLASS' before initialization" -- `const` hoists into a
+           temporal dead zone but does not initialise. Found by shot.js printing its
+           page-error count even when that count is zero. */
+        .attr('fill', k < t.dep ? TEAL_D : 'none')
+        .attr('stroke', k < t.dep ? 'none' : LINE).attr('stroke-width',1.1);
+    }
+    mono(g, AX+16, y0 + cellsH + (nar ? 20 : 16), String(t.dep)+'/3',
+         nar ? 7.4 : 6.4, MUTE, 'start');
+    label(g, TX, TY, t.n, 13, 700, INK, 'start');
+    lines.forEach((sln,k)=> label(g, TX, BY+k*LEAD, sln, 10.5, 400, '#333', 'start'));
+    ln(gTier, AX, y + rh + GAP/2, AX + RULEW, y + rh + GAP/2, LINE, 1.2);
+    y += rh + GAP;
+    return { t, rh };
   });
-  /* The ascent line reads as a rise across a horizontal row; stacked, it does not.
+  const LASTRULE = y - GAP/2;
 
-     Both of its ends used to float. It ran from (98, BASEY-172) to (778,
-     BASEY-294), and the three card tops are at BASEY-150, BASEY-212 and
-     BASEY-274 -- so the line began 22 units above Tier 1's top edge and ended 20
-     above Tier 3's, hanging in the paper at both ends with nothing under it. A
-     line whose job is to trace a rise across three objects has to touch them, or
-     it is a line next to three objects.
+  /* The punchline sat 200 units below the cards in open paper -- a line of text with
+     nothing near it has been abandoned, not emphasised. It now sits under the last rule
+     on the type axis, so it reads as the column's conclusion rather than a caption
+     floating in the margin. Anchored to LASTRULE, which is derived from the registers'
+     own heights, so it cannot drift if a tier gains a line. */
+  /* ONE label() WITH A WRAP CAP, not three hand-placed lines. Everything this needed
+     already existed and I rebuilt it badly three times:
 
-     Now it starts on Tier 1's top-LEFT corner, passes over Tier 2's top edge, and
-     ends on Tier 3's top-RIGHT corner. Written in terms of T[i].h so it stays
-     attached if a card's height changes. */
-  const HW = 125;
-  if (!nar) gTier.append('path').attr('class','ascent')
-    .attr('d','M '+(T[0].x-HW)+' '+(BASEY-T[0].h)
-            +' Q 300 '+(BASEY-T[0].h-50)+' '+T[1].x+' '+(BASEY-T[1].h)
-            +' Q 700 '+(BASEY-T[1].h-48)+' '+(T[2].x+HW)+' '+(BASEY-T[2].h))
-    .attr('fill','none').attr('stroke',TEAL_D).attr('stroke-width',1.6)
-    .attr('stroke-dasharray','6 5').attr('opacity',.8);
-  label(gTier, 500, nar ? 760 : BASEY+52, 'It starts as a report. It ends as a flywheel your team owns.', 12.5, 700, INK, 'middle');
+       centred -> left-anchored   frame-overflow R248 (59 chars at size*TK 2.70 from
+                                  x=258 reaches ~1260 against a frame edge of 918)
+       3 labels spaced by 34      text-collision 2x -- 34 < the real leading of 44.6
+       3 labels spaced by PLEAD   text-collision 3x -- WORSE, because TK IS 1 AT DRAW
+                                  TIME. This scene is built in a load-time IIFE before
+                                  computeTK() has run, so size*TK*1.32 evaluated to 16.5.
+
+     label()'s own comment states the trap verbatim: "Scenes built inside a load-time
+     IIFE are drawn before computeTK() has ever run, so TK is still 1 and the leading
+     comes out a third of what it needs to be. Record the anchor and the unscaled
+     leading on each line so applyTypeScale() can re-lay them out against the real TK."
+     Passing a wrapCap does that -- wrapFor splits the copy, each line carries data-wl /
+     data-wg / data-wlead, and applyTypeScale re-stacks them at the true TK on every
+     scale change. Three attempts to hand-roll a mechanism the file already had. */
+  /* 26, not 44, at mobile. The wrapped punchline is three lines there and label()
+     records them for applyTypeScale() to re-stack at the real TK -- which happens AFTER
+     the fitter has measured, so the block settles lower than the frame it was fitted
+     to. audit reported `frame-overflow B7`: seven units past the bottom edge.
+     Pulled up 18 rather than the 7 the overflow measured, because shaving a defect to
+     exactly its reported size leaves nothing for the next re-fit to absorb, and this
+     scene has already traded frame-overflow against text-collision twice. */
+  label(gTier, TX, LASTRULE + (nar ? 26 : 30),
+        'It starts as a report. It ends as a flywheel your team owns.',
+        12.5, 700, INK, 'start', nar ? 22 : 0);
 })();
 
 (function(){
@@ -7008,11 +7191,10 @@ function render(key){
   show(gTier, key === 'tiers' ? 1 : 0);
   if (key === 'tiers' && prev !== 'tiers' && !REDUCE){
     gTier.selectAll('g.tier').attr('opacity',0)
-      .attr('transform',function(){ return 'translate('+this.getAttribute('data-x')+','+(+this.getAttribute('data-y')+26)+')'; })
+      .attr('transform',function(){ return 'translate(0,'+(+this.getAttribute('data-y')+26)+')'; })
       .transition('rise').duration(T_ENTER).delay((d,i)=>0+i*S_BEAT).ease(E_ENTER)
       .attr('opacity',1)
-      .attr('transform',function(){ return 'translate('+this.getAttribute('data-x')+','+this.getAttribute('data-y')+')'; });
-    gTier.selectAll('path.ascent').attr('opacity',0).transition('rise').duration(T_ENTER).ease(E_ENTER).delay(T_QUICK).attr('opacity',.8);
+      .attr('transform',function(){ return 'translate(0,'+this.getAttribute('data-y')+')'; });
   }
 
   show(gFit, key === 'fit' ? 1 : 0);

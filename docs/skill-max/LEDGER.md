@@ -1816,3 +1816,98 @@ one without reading every call site — they are real tokens with no name. Per-s
 conformance is Stage 12's, not asserted here. The three sibling explainers share this design system and
 have never been measured by any instrument in this repo. The 60-line print stylesheet has never been
 rendered.
+
+## Stage 3 — Per-scene composition. 6 queued, 3 fixed, 2 declined, 1 clean.
+
+Philosophy first (`03-philosophy.md`, **Stacked Register** — evidence accumulates upward in bands, not
+outward in containers). `canvas-design`'s discipline, not its output contract: that skill produces a
+standalone `.pdf`/`.png` art object and the thing needing composition was six scenes inside a 400KB
+explainer, so the philosophy pass was kept and the canvas was not. Recorded rather than quietly
+substituted.
+
+### `tiers` — the banned pattern in its purest form, and boxes.js excused it
+
+Three `rx=16` rects at `x=200/500/800`, heights hardcoded `h:150/212/274`, each holding only a title
+and three centred lines. *"No rounded rectangle may be the primary carrier of an idea"* — three of
+them carried the whole scene. **The heights are an arithmetic sequence (+62) with no quantity behind
+them, no axis and no source.**
+
+`boxes.js` reported CLEAN because its rule requires the boxes be *identically sized*, so it filed
+these under *"data marks (dimensions encode a quantity — the rule permits these)"* purely because they
+differ. **Differing size is not evidence of encoding.** The instrument written to catch this pattern
+was defeated by the pattern being drawn slightly better than its worst case. Confirmed by the gate:
+`data marks` went from `middle 3, tiers 3` to `middle 3` — the excuse disappeared with the rects.
+
+Now three registers down a common left axis, separated by `LINE` rules rather than enclosed, with a
+graduated strata gauge (`dep` of 3 cells, `TEAL_D` filled / `LINE` outlined, `n/3` mono readout). The
+filled count IS the quantity the heights pretended to be. Ascent path deleted, and its animation line
+with it rather than left selecting nothing.
+
+**Three of my own constants had to be measured out of it, each caught by the render and not the code:**
+
+| pass | constant | what it did |
+|---|---|---|
+| 1 | `GLASS`/`DIM` | `Cannot access 'GLASS' before initialization` — declared ~3444, scene builds in a load-time IIFE ~2555. `const` hoists into a temporal dead zone. Found because `shot.js` prints its page-error count even when zero. |
+| 2 | `BW = 600` | text stopped ~40% short of the band edge — **moved the emptiness from the frame INTO the object**, which Stage 2's own governing sentence forbids |
+| 3 | `RH = 155` | Tiers 1 and 3 have two body lines, Tier 2 three — two bands carried ~60 units of dead bottom |
+
+Sixteenth and seventeenth instances of the assumed-dimension bug in this file.
+
+### `measure` — the composition was never wrong, the aspect was
+
+Six instrument tiles each with a drawn glyph: legitimate chrome, correctly exempted by `boxes.js`.
+But 3 columns × 2 rows at 250 wide is `786×316` into a 1.054 stage — 58% of the frame was margin the
+composition never asked for. Reflowed to `COLS=2`, centred under the heading. **The fitter confirms
+it: `w* 786 → 586`.** No tile changed; self-contained tiles are what made the reflow free. The
+footer's hardcoded `y=470` was correct for two rows and inside the third once reflowed — now derived
+from the row count.
+
+### `translate` — the fix that arrived on one path and not its sibling
+
+Four route cards were `rx=14` rects holding four centred labels and nothing else. **Step 10 fixed the
+hub** (a text-only pill became a drawn book, fault F6) **and left the four cards.** Third instance in
+this pass of a rule fixed on one path and left on its sibling, after `legible.js`'s
+contrast-vs-composite and `opaqueIdx`.
+
+Each route now gets the mechanism it is: a fork with **both** branches drawn and neither marked (an
+arrow choosing one would contradict "choice kept"); a stethoscope (the messenger is the variable, not
+the message); four contradictory claims crossing in `MUTE` 1.1 with one adjudicating line through them
+in `INK` 1.8 (the label says this audience needs adjudication, not another claim); a route with stops
+ending at a clinic cross (the barrier is logistics, so the drawing is the journey). Card text moved off
+centre onto a left axis — four centred blocks give ragged left *and* right.
+
+### Declined, with the reason
+
+`weeks` (aspect 2.15) is a twelve-week Gantt and `sequelae` (2.22) is a time-to-death axis. **The
+horizontal is elapsed time.** Verticalising either to serve a coverage metric would break the thing
+the scene exists to show — the mandate's "may not weaken a metric to make the deliverable look better",
+pointed the other way. `gate` (1.97) assessed and left: its bar is already measured to its own banner
+and `data-pin`ned, and its width is the five lanes it crosses.
+
+### The correction this stage owes, and the regression that proved it
+
+**My option preview told the owner "No `measure.js` re-run needed." That was wrong.** `stages.md`:
+*"New geometry means stale camera frames and new collision risk. Stage 5 must re-fit."* The gate then
+produced exactly that: **`frame-overflow: 0 → 1`**, `tiers`' registers stacking past a frame fitted to
+the old 850×329 row. Predicted, measured, and the re-fit is the remedy rather than a revert.
+
+Everything else held across the change: `legible` 1 finding / 2047 painted labels, `a11y` CLEAN with
+SC 2.5.8 at zero, `interact` 12/12 with 0 console errors, `tiny-text` 12 with byte-identical per-scene
+counts.
+
+### A static sweep, because boxes.js's CLEAN is not evidence here
+
+`boxes.js` missed `tiers` (differing sizes read as quantitative encoding) and missed `translate` for a
+reason still unexplained — it is *not* `padHit`'s transparent rect, since `boxes.js` exempts on
+"path, circle, polygon, image or line" and a `rect` is not on that list. So the pattern was swept
+statically across all 59 scenes: 30 candidate sites, all legitimate on inspection — the recreated Ads
+console (`GBLUE`/`GBORD`/`GSURF`), data bars whose dimension encodes a quantity, facsimile chrome —
+except `translate`, already fixed.
+
+**Uncovered.** Why `boxes.js` passed `translate`. My static sweep's own limitation: it only sees
+drawing calls into the *same* target, so `fit` and `cases` came up as candidates because their glyphs
+are drawn into sub-groups — two false positives out of thirty, and the same class of bug as everything
+else this session. Mobile renders of the three changed scenes were gated but not inspected by eye. The
+53 scenes outside the aspect queue were not re-examined for composition; `translate` at 1.96 held the
+second-worst instance of the banned pattern, so **an aspect sweep is a good filter for the frame and a
+poor one for the pattern**, and only the aspect sweep was run.
